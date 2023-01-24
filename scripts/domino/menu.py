@@ -29,10 +29,10 @@ def install():
     menu.install_utils()
 
 
-cb_add_blended_jnt = """from domino_edition.api import lib
+cb_add_blended_jnt = """import domino_edition.api.lib
 domino_edition.api.lib.add_blended_jnt()"""
 
-cb_add_support_jnt = """from domino_edition.api import lib
+cb_add_support_jnt = """import domino_edition.api.lib
 domino_edition.api.lib.add_support_jnt()"""
 
 
