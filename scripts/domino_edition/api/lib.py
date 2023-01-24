@@ -328,6 +328,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
         for key, value in context.items():
             log.Logger.info(f"{key}: {value}")
         log.Logger.info("{:=^50}".format(""))
+        del context
 
 
 def add_blended_jnt():
