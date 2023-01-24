@@ -1554,6 +1554,8 @@ class Rig:
         pm.sets(controller_sets, edit=True, addElement=context["ctls"])
         s = [model_sets, geometry_sets, skeleton_sets, controller_sets]
         pm.sets(rig_sets, edit=True, addElement=s)
+        sets_attr = attribute.add(context["asset"][1], longName="sets", typ="message")
+        pm.connectAttr(rig_sets.attr("message"), sets_attr)
 
     @staticmethod
     def callback(context):
