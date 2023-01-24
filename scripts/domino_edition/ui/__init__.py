@@ -662,7 +662,7 @@ class CommonPieceSettings(DominoDialog):
     def resize_window(self):
         index = self.common_settings.toolBox.currentIndex()
         if index == 0:
-            size = QtCore.QSize(370, 590)
+            size = QtCore.QSize(370, 530)
         else:
             size = self.common_settings.toolBox.currentWidget().sizeHint()
         self.resize(size)

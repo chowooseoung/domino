@@ -73,5 +73,5 @@ class Settings(CommonPieceSettings):
         super(Settings, self).resize_window()
         index = self.common_settings.toolBox.currentIndex()
         if index == 1:
-            size = QtCore.QSize(370, 910)
+            size = QtCore.QSize(370, 755)
             self.resize(size)

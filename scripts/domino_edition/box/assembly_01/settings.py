@@ -9,6 +9,7 @@ from domino_edition.ui import (DominoDialog,
                                UiFunctionSet)
 from . import (settings_ui,
                character_set_settings_ui)
+from PySide2 import QtCore
 
 
 class Settings(DominoDialog, settings_ui.Ui_Dialog):
@@ -21,8 +22,8 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
         ui = self
 
         self.setObjectName("DominoAssemblySettings")
+        self.resize_window()
         self.visibilitySignal.connect(self.setup_window_title)
-        self.resize(360, 730)
         ui.toolBox.currentChanged.connect(self.resize_window)
 
         self.ui_funcs.install_name_lineEdit(
@@ -205,7 +206,16 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
             "jnt_name_ext")
 
     def resize_window(self):
-        return 0
+        index = self.toolBox.currentIndex()
+        if index == 0:
+            size = QtCore.QSize(370, 601)
+            self.resize(size)
+        elif index == 1:
+            size = QtCore.QSize(370, 510)
+            self.resize(size)
+        elif index == 2:
+            size = QtCore.QSize(370, 574)
+            self.resize(size)
 
 
 class CharacterSetSettings(DominoDialog, character_set_settings_ui.Ui_Dialog):
