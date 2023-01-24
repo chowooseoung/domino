@@ -398,7 +398,7 @@ def add_support_jnt():
                                source=False)
     if not plugs:
         return None
-    plug = [x for x in plugs if "blended_jnts" in x]
+    plug = [x for x in plugs if "blended_jnts" in x.attrName()]
     if not plug:
         return None
 
@@ -438,6 +438,7 @@ def add_support_jnt():
     selected_container = pm.container(query=True,
                                       findContainer=selected_root)
     pm.container(selected_container, edit=True, current=True)
+    piece.rig.root = selected_root
     jnt = piece.rig.create_support_jnt(name="",
                                        description=description,
                                        blended_index=index,
@@ -454,8 +455,8 @@ def add_support_jnt():
                           if x.type() == "objectSet"]
             sets.extend(child_sets)
             for s in sets:
-                if pm.sets(selected[0], isMember=s):
-                    pm.sets(jnt, addElement=s)
+                if pm.sets(s, isMember=selected[0]):
+                    pm.sets(s, addElement=jnt)
         ssc = selected[0].attr("segmentScaleCompensate").get()
         selected[0].attr("segmentScaleCompensate").set(ssc)
     else:
