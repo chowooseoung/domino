@@ -871,7 +871,6 @@ class Rig:
         context["jnts"] = []
         context["ctls"] = []
         context["refs"] = []
-        context["host"] = []
         context["callbacks"] = []
         model.attr("overrideEnabled").set(1)
         skeleton.attr("overrideEnabled").set(1)
