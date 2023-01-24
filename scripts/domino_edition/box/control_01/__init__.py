@@ -68,7 +68,7 @@ class Control01Data(piece.DData):
                                                   "zyx"],
                                      "value": "xyz"},
             "space_switch_array": {"typ": "string", "value": ""},
-            "ctl_size": {"typ": "long", "value": 1}
+            "ctl_size": {"typ": "float", "value": 1}
         })
         return preset
 
