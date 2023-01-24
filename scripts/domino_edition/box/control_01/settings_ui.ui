@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>328</width>
-    <height>521</height>
+    <height>502</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,7 +51,62 @@
         </property>
         <item>
          <property name="text">
+          <string>origin</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>host</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>arrow</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>arrow4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>square</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>wave</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>circle</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>circle3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>locator</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>cube</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>angle</string>
          </property>
         </item>
        </widget>
