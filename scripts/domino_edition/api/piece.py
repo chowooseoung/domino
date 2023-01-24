@@ -1555,22 +1555,6 @@ class Rig:
         pm.sets(controller_sets, edit=True, addElement=context["ctls"])
         s = [model_sets, geometry_sets, skeleton_sets, controller_sets]
         pm.sets(rig_sets, edit=True, addElement=s)
-        context["sets"] = rig_sets
-        sets_attr = attribute.add(context["asset"][1],
-                                  longName="sets",
-                                  typ="message")
-        pm.connectAttr(context['sets'].attr("message"), sets_attr)
-
-    @staticmethod
-    def create_pose(context):
-        pose_attr = attribute.add(context["asset"][1],
-                                  longName="pose",
-                                  typ="message",
-                                  multi=True)
-        default_pose = pm.dagPose(context["ctls"], name="defaultPose", save=True)
-
-        # default pose
-        pm.connectAttr(default_pose.attr("message"), pose_attr[0])
 
     @staticmethod
     def callback(context):

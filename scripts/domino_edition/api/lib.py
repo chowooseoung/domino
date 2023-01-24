@@ -297,7 +297,6 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
             Rig.setup_ctl(context)
             Rig.setup_jnt(context)
             Rig.create_sets(context)
-            Rig.create_pose(context)
             Rig.callback(context)
 
             assert assembly_data["end_point"] != "cleanup", AssertionError("End Point : cleanup")
