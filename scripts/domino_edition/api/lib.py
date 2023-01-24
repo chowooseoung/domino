@@ -314,21 +314,16 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
             log.Logger.info("Debug mode. all contents remove from asset")
             Rig.debug_mode(context)
         elif context["mode"] == "PUB":
-            log.Logger.info(
-                "Publish mode. all assets not publish attribute lock")
+            log.Logger.info("Publish mode. all assets not publish attribute lock")
             Rig.blackbox(context)
 
         # select
         if "sets" in context:
-            pm.select(context["sets"],
-                      noExpand=True,
-                      replace=True)
+            pm.select(context["sets"], noExpand=True, replace=True)
             if pm.objExists(context["asset"][0]):
                 pm.select(context["asset"][0], add=True)
             if pm.objExists(context["asset"][1]):
                 pm.select(context["asset"][1], add=True)
-        if context["character_set"]:
-            pm.select([context["character_set"]], add=True)
 
         log.Logger.info("{:+^50}".format("CONTEXT"))
         for key, value in context.items():

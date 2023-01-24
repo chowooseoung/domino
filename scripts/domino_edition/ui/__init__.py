@@ -628,10 +628,6 @@ class CommonPieceSettings(DominoDialog):
             ui.orientZ_spinBox,
             "offset_orient_z")
 
-        self.ui_funcs.install_lineEdit(
-            ui.character_set_lineEdit,
-            "character_set")
-
         ui.custom_jnt_name_pushButton.clicked.connect(
             partial(utils.show_dialog,
                     JntNameSetting,

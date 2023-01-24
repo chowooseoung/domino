@@ -99,13 +99,6 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
             "r_color_fk")
 
         self.ui_funcs.install_checkBox(
-            ui.use_character_set_checkBox,
-            "use_character_set")
-        self.ui_funcs.install_lineEdit(
-            ui.character_set_name_lineEdit,
-            "character_set")
-
-        self.ui_funcs.install_checkBox(
             ui.run_sub_pieces_checkBox,
             "run_sub_pieces")
 

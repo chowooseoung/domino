@@ -119,19 +119,6 @@ class Assembly01Data(piece.DData):
                           "value": ""},
             "sub_jnt_custom_name": {"typ": "bool",
                                     "value": False},
-            "use_character_set": {"typ": "bool",
-                                  "value": True},
-            "character_set": {"typ": "string",
-                              "value": "character"},
-            "sub_character_set": {"typ": "string",
-                                  "value": json.dumps({
-                                      "face": "",
-                                      "spine": {"neck": {"head": ""},
-                                                "l_arm": {"l_finger": ""},
-                                                "r_arm": {"r_finger": ""},
-                                                "l_leg": "",
-                                                "r_leg": ""},
-                                      "secondary": ""})},
             "l_color_fk": {"typ": "long",
                            "value": 6,
                            "minValue": 0,
@@ -360,29 +347,7 @@ class Assembly01Rig(piece.Rig):
         choice.attr("input")[0].set(1)
         choice.attr("input")[1].set(2)
         pm.connectAttr(ctl_mouseover_attr, choice.attr("selector"))
-        pm.connectAttr(choice.attr("output"),
-                       ctl_tag.attr("visibilityMode"))
-
-        context["character_set"] = None
-        if data["use_character_set"]:
-            pm.container(edit=True, current=False)
-            context["sub_character_set"] = []
-
-            def create_sub_character_set(parent, child):
-                if child:
-                    for key, value in child.items():
-                        _char = pm.character(name=key, empty=True)
-                        pm.character(_char, edit=True, addElement=parent)
-                        context["sub_character_set"].append(_char)
-                        create_sub_character_set(_char, value)
-
-            context["character_set"] = \
-                pm.character(name=f"{context['name']}_{naming.CHARACTER_SET_EXT}",
-                             empty=True)
-            sub_character_set = json.loads(data["sub_character_set"])
-
-            create_sub_character_set(context["character_set"],
-                                     sub_character_set)
+        pm.connectAttr(choice.attr("output"), ctl_tag.attr("visibilityMode"))
 
     def attributes(self, context):
         self.set_current_container()

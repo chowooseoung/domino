@@ -17,7 +17,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(412, 514)
+        Form.resize(412, 456)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -43,7 +43,7 @@ class Ui_Form(object):
 "}")
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 394, 470))
+        self.page.setGeometry(QRect(0, 0, 394, 412))
         sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
@@ -308,29 +308,6 @@ class Ui_Form(object):
 
         self.verticalLayout.addWidget(self.groupBox_3)
 
-        self.groupBox_5 = QGroupBox(self.page)
-        self.groupBox_5.setObjectName(u"groupBox_5")
-        sizePolicy.setHeightForWidth(self.groupBox_5.sizePolicy().hasHeightForWidth())
-        self.groupBox_5.setSizePolicy(sizePolicy)
-        self.horizontalLayout_4 = QHBoxLayout(self.groupBox_5)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.label_5 = QLabel(self.groupBox_5)
-        self.label_5.setObjectName(u"label_5")
-        sizePolicy5.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
-        self.label_5.setSizePolicy(sizePolicy5)
-
-        self.horizontalLayout_4.addWidget(self.label_5)
-
-        self.character_set_lineEdit = QLineEdit(self.groupBox_5)
-        self.character_set_lineEdit.setObjectName(u"character_set_lineEdit")
-        sizePolicy2.setHeightForWidth(self.character_set_lineEdit.sizePolicy().hasHeightForWidth())
-        self.character_set_lineEdit.setSizePolicy(sizePolicy2)
-
-        self.horizontalLayout_4.addWidget(self.character_set_lineEdit)
-
-
-        self.verticalLayout.addWidget(self.groupBox_5)
-
         self.groupBox_6 = QGroupBox(self.page)
         self.groupBox_6.setObjectName(u"groupBox_6")
         self.gridLayout_4 = QGridLayout(self.groupBox_6)
@@ -391,9 +368,6 @@ class Ui_Form(object):
         self.use_RGB_colors_checkBox.setText(QCoreApplication.translate("Form", u"Use RGB Colors", None))
         self.color_fk_pushButton.setText("")
         self.label_7.setText(QCoreApplication.translate("Form", u"Fk", None))
-        self.groupBox_5.setTitle(QCoreApplication.translate("Form", u"Character Set", None))
-        self.label_5.setText(QCoreApplication.translate("Form", u"Set Name", None))
-        self.character_set_lineEdit.setText(QCoreApplication.translate("Form", u"rig", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("Form", u"Host Settings", None))
         self.select_host_pushButton.setText(QCoreApplication.translate("Form", u"Select", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page), QCoreApplication.translate("Form", u"Common Settings", None))

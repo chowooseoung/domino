@@ -17,7 +17,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(390, 597)
+        Dialog.resize(390, 583)
         self.verticalLayout_3 = QVBoxLayout(Dialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.toolBox = QToolBox(Dialog)
@@ -38,7 +38,7 @@ class Ui_Dialog(object):
         self.toolBox.setFrameShadow(QFrame.Raised)
         self.rig_page = QWidget()
         self.rig_page.setObjectName(u"rig_page")
-        self.rig_page.setGeometry(QRect(0, 0, 355, 602))
+        self.rig_page.setGeometry(QRect(0, 0, 372, 493))
         self.verticalLayout = QVBoxLayout(self.rig_page)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(self.rig_page)
@@ -328,38 +328,6 @@ class Ui_Dialog(object):
 
 
         self.verticalLayout.addWidget(self.groupBox_3)
-
-        self.groupBox_2 = QGroupBox(self.rig_page)
-        self.groupBox_2.setObjectName(u"groupBox_2")
-        self.gridLayout = QGridLayout(self.groupBox_2)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.label_4 = QLabel(self.groupBox_2)
-        self.label_4.setObjectName(u"label_4")
-
-        self.gridLayout.addWidget(self.label_4, 1, 0, 1, 1)
-
-        self.label_3 = QLabel(self.groupBox_2)
-        self.label_3.setObjectName(u"label_3")
-
-        self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
-
-        self.character_set_hierarchy_pushButton = QPushButton(self.groupBox_2)
-        self.character_set_hierarchy_pushButton.setObjectName(u"character_set_hierarchy_pushButton")
-
-        self.gridLayout.addWidget(self.character_set_hierarchy_pushButton, 1, 1, 1, 1)
-
-        self.character_set_name_lineEdit = QLineEdit(self.groupBox_2)
-        self.character_set_name_lineEdit.setObjectName(u"character_set_name_lineEdit")
-
-        self.gridLayout.addWidget(self.character_set_name_lineEdit, 2, 1, 1, 1)
-
-        self.use_character_set_checkBox = QCheckBox(self.groupBox_2)
-        self.use_character_set_checkBox.setObjectName(u"use_character_set_checkBox")
-
-        self.gridLayout.addWidget(self.use_character_set_checkBox, 0, 0, 1, 1)
-
-
-        self.verticalLayout.addWidget(self.groupBox_2)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -735,12 +703,6 @@ class Ui_Dialog(object):
         self.right_color_fk_pushButton.setText("")
         self.label_6.setText(QCoreApplication.translate("Dialog", u"Center", None))
         self.use_RGB_colors_checkBox.setText(QCoreApplication.translate("Dialog", u"Use RGB Colors", None))
-        self.groupBox_2.setTitle(QCoreApplication.translate("Dialog", u"Character Set", None))
-        self.label_4.setText(QCoreApplication.translate("Dialog", u"Character Set Hierarchy", None))
-        self.label_3.setText(QCoreApplication.translate("Dialog", u"Set Name", None))
-        self.character_set_hierarchy_pushButton.setText(QCoreApplication.translate("Dialog", u"Edit", None))
-        self.character_set_name_lineEdit.setText(QCoreApplication.translate("Dialog", u"rig", None))
-        self.use_character_set_checkBox.setText(QCoreApplication.translate("Dialog", u"Use Character Set", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.rig_page), QCoreApplication.translate("Dialog", u"Rig Settings", None))
         self.sub_pieces_new_pushButton.setText(QCoreApplication.translate("Dialog", u"New", None))
 

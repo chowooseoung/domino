@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>412</width>
-    <height>514</height>
+    <height>456</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -52,7 +52,7 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget&gt;QWidget
         <x>0</x>
         <y>0</y>
         <width>394</width>
-        <height>470</height>
+        <height>412</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -543,47 +543,6 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget&gt;QWidget
             </property>
             <property name="text">
              <string>Fk</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_5">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Character Set</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Set Name</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="character_set_lineEdit">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>rig</string>
             </property>
            </widget>
           </item>

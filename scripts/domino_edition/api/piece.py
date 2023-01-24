@@ -226,8 +226,6 @@ class DData:
                              "maxValue": 31},
                 "jnt_names": {"typ": "string",
                               "value": ""},
-                "character_set": {"typ": "string",
-                                  "value": "character"},
                 "blended_jnt_names": {"typ": "string",
                                       "value": ""},
                 "blended_jnt_indices": {"typ": "string",
@@ -1168,9 +1166,6 @@ class Rig:
                 parent_ctl = cns_ctl
             controller.tag(ctl, parent_ctl)
 
-        character_set = f"{context['name']}_{naming.CHARACTER_SET_EXT}" \
-            if data["character_set"] == "character" \
-            else data["character_set"]
         if cns_ctl:
             context["ctls"].append(cns_ctl)
             attribute.add(cns_ctl,
@@ -1181,10 +1176,6 @@ class Rig:
                           longName="description",
                           typ="string",
                           value=f"{publish_name}_cns")
-            attribute.add(cns_ctl,
-                          longName="character_set_name",
-                          typ="string",
-                          value=character_set)
         context["ctls"].append(ctl)
         attribute.add(ctl,
                       longName="is_domino_ctl",
@@ -1195,11 +1186,6 @@ class Rig:
                       longName="description",
                       typ="string",
                       value=publish_name)
-        # this attribute be used find character set
-        attribute.add(ctl,
-                      longName="character_set_name",
-                      typ="string",
-                      value=character_set)
         return ctl, loc
 
     def create_ref(self, context, name, anchor, m):
@@ -1538,56 +1524,6 @@ class Rig:
         pm.connectAttr(context["asset"][1].attr("ctl_vis"),
                        context["roots"].attr("v"))
 
-        # controller add to character set
-        if context["character_set"]:
-            for r in [x[1] for x in context["containers"]]:
-                c = pm.container(query=True, findContainer=r)
-                character_set = r.attr("character_set").get()
-                if not character_set:
-                    continue
-                sub_character_set = [x for x in context["sub_character_set"] if x.exists()]
-                character_set_node = ["character"] + sub_character_set
-                no_match = True
-                for c_set in character_set_node:
-                    if c_set == character_set:
-                        if c_set == "character":
-                            c_set = context["character_set"]
-                        pm.character(c, edit=True, addElement=c_set)
-                        no_match = False
-                        break
-                if no_match:
-                    log.Logger.warning(("don't exists character set "
-                                        f": {character_set}, {c}"))
-        # remove empty character set
-        character_attr = attribute.add(context["asset"][1],
-                                       longName="character",
-                                       typ="message",
-                                       multi=True)
-        if context["character_set"]:
-            sub_char_sets = context["sub_character_set"].copy()
-            sub_char_sets.reverse()
-            delete_list = []
-            for index, sub_c in enumerate(sub_char_sets.copy()):
-                index = len(sub_char_sets) - index - 1
-                if pm.objExists(sub_c):
-                    members = pm.character(sub_c, query=True) or []
-                    if not [x for x in members if not pm.nodeType(x) == "character"]:
-                        delete_list.append(sub_c)
-                        context["sub_character_set"][index] = None
-                else:
-                    context["sub_character_set"][index] = None
-            if delete_list:
-                pm.delete(delete_list)
-            if pm.objExists(context["character_set"]):
-                if not pm.character(context["character_set"], query=True):
-                    pm.delete(context["character_set"])
-            pm.connectAttr(context['character_set'].attr("message"), character_attr[0])
-            count = 1
-            for c_set in context["sub_character_set"]:
-                if c_set is not None:
-                    pm.connectAttr(c_set.attr("message"), character_attr[count])
-                    count += 1
-
     @staticmethod
     def setup_jnt(context):
         for jnt in context["jnts"]:
@@ -1631,10 +1567,10 @@ class Rig:
                                   longName="pose",
                                   typ="message",
                                   multi=True)
-        # default_pose = pm.dagPose(context["ctls"], name="defaultPose", save=True)
+        default_pose = pm.dagPose(context["ctls"], name="defaultPose", save=True)
 
         # default pose
-        # pm.connectAttr(default_pose.attr("message"), pose_attr[0])
+        pm.connectAttr(default_pose.attr("message"), pose_attr[0])
 
     @staticmethod
     def callback(context):
