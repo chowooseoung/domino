@@ -1485,6 +1485,7 @@ class Rig:
             description = f"{description}_" if description else ""
             publish_attrs = pm.listAttr(host,
                                         keyable=True,
+                                        userDefined=True,
                                         shortNames=True) or []
             publish_attrs += pm.listAttr(host,
                                          channelBox=True,
