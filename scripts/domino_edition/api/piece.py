@@ -854,6 +854,7 @@ class Rig:
         asset_container_name = f"{assembly_data['name']}_{naming.ASSET_EXT}"
         asset_name = f"{assembly_data['name']}_rig"
         asset_container = pm.container(name=asset_container_name)
+        asset_container.attr("iconName").set(f"{assembly_data['icon_name']}.png")
         pm.container(asset_container, edit=True, current=True)
         asset = pm.createNode("transform", name=asset_name)
         model = pm.createNode("transform", name="model", parent=asset)

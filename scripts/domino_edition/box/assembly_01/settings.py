@@ -26,6 +26,10 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
         self.visibilitySignal.connect(self.setup_window_title)
         ui.toolBox.currentChanged.connect(self.resize_window)
 
+        self.ui_funcs.install_comboBox(
+            ui.icon_name_comboBox,
+            "icon_name")
+
         self.ui_funcs.install_name_lineEdit(
             ui.rig_name_lineEdit,
             "name")

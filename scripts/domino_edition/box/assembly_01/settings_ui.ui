@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>390</width>
-    <height>583</height>
+    <height>609</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
         <x>0</x>
         <y>0</y>
         <width>372</width>
-        <height>493</height>
+        <height>519</height>
        </rect>
       </property>
       <attribute name="label">
@@ -59,7 +59,14 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
           <string>Rig Identifier</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="2" column="1" colspan="2">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" colspan="2">
            <widget class="QComboBox" name="end_point_comboBox">
             <item>
              <property name="text">
@@ -94,13 +101,30 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>Mode</string>
+             <string>Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>End Point</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="3">
+           <widget class="QTextEdit" name="notes_textEdit">
+            <property name="placeholderText">
+             <string>Publish note</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1" colspan="2">
+           <widget class="QLineEdit" name="rig_name_lineEdit"/>
+          </item>
+          <item row="2" column="1" colspan="2">
            <widget class="QComboBox" name="mode_comboBox">
             <property name="currentIndex">
              <number>1</number>
@@ -122,28 +146,20 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
             </item>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_12">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>End Point</string>
+             <string>IconName</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1" colspan="2">
-           <widget class="QLineEdit" name="rig_name_lineEdit"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3">
-           <widget class="QTextEdit" name="notes_textEdit">
-            <property name="placeholderText">
-             <string>Publish note</string>
-            </property>
+           <widget class="QComboBox" name="icon_name_comboBox">
+            <item>
+             <property name="text">
+              <string>human</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

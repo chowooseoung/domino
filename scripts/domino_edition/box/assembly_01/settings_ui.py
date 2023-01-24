@@ -17,7 +17,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(390, 583)
+        Dialog.resize(390, 609)
         self.verticalLayout_3 = QVBoxLayout(Dialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.toolBox = QToolBox(Dialog)
@@ -38,13 +38,18 @@ class Ui_Dialog(object):
         self.toolBox.setFrameShadow(QFrame.Raised)
         self.rig_page = QWidget()
         self.rig_page.setObjectName(u"rig_page")
-        self.rig_page.setGeometry(QRect(0, 0, 372, 493))
+        self.rig_page.setGeometry(QRect(0, 0, 372, 519))
         self.verticalLayout = QVBoxLayout(self.rig_page)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(self.rig_page)
         self.groupBox.setObjectName(u"groupBox")
         self.gridLayout_3 = QGridLayout(self.groupBox)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.label_2 = QLabel(self.groupBox)
+        self.label_2.setObjectName(u"label_2")
+
+        self.gridLayout_3.addWidget(self.label_2, 2, 0, 1, 1)
+
         self.end_point_comboBox = QComboBox(self.groupBox)
         self.end_point_comboBox.addItem("")
         self.end_point_comboBox.addItem("")
@@ -54,12 +59,27 @@ class Ui_Dialog(object):
         self.end_point_comboBox.addItem("")
         self.end_point_comboBox.setObjectName(u"end_point_comboBox")
 
-        self.gridLayout_3.addWidget(self.end_point_comboBox, 2, 1, 1, 2)
+        self.gridLayout_3.addWidget(self.end_point_comboBox, 3, 1, 1, 2)
 
-        self.label_2 = QLabel(self.groupBox)
-        self.label_2.setObjectName(u"label_2")
+        self.label = QLabel(self.groupBox)
+        self.label.setObjectName(u"label")
 
-        self.gridLayout_3.addWidget(self.label_2, 1, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.label, 1, 0, 1, 1)
+
+        self.label_12 = QLabel(self.groupBox)
+        self.label_12.setObjectName(u"label_12")
+
+        self.gridLayout_3.addWidget(self.label_12, 3, 0, 1, 1)
+
+        self.notes_textEdit = QTextEdit(self.groupBox)
+        self.notes_textEdit.setObjectName(u"notes_textEdit")
+
+        self.gridLayout_3.addWidget(self.notes_textEdit, 4, 0, 1, 3)
+
+        self.rig_name_lineEdit = QLineEdit(self.groupBox)
+        self.rig_name_lineEdit.setObjectName(u"rig_name_lineEdit")
+
+        self.gridLayout_3.addWidget(self.rig_name_lineEdit, 1, 1, 1, 2)
 
         self.mode_comboBox = QComboBox(self.groupBox)
         self.mode_comboBox.addItem("")
@@ -67,27 +87,18 @@ class Ui_Dialog(object):
         self.mode_comboBox.addItem("")
         self.mode_comboBox.setObjectName(u"mode_comboBox")
 
-        self.gridLayout_3.addWidget(self.mode_comboBox, 1, 1, 1, 2)
+        self.gridLayout_3.addWidget(self.mode_comboBox, 2, 1, 1, 2)
 
-        self.label_12 = QLabel(self.groupBox)
-        self.label_12.setObjectName(u"label_12")
+        self.label_3 = QLabel(self.groupBox)
+        self.label_3.setObjectName(u"label_3")
 
-        self.gridLayout_3.addWidget(self.label_12, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.label_3, 0, 0, 1, 1)
 
-        self.rig_name_lineEdit = QLineEdit(self.groupBox)
-        self.rig_name_lineEdit.setObjectName(u"rig_name_lineEdit")
+        self.icon_name_comboBox = QComboBox(self.groupBox)
+        self.icon_name_comboBox.addItem("")
+        self.icon_name_comboBox.setObjectName(u"icon_name_comboBox")
 
-        self.gridLayout_3.addWidget(self.rig_name_lineEdit, 0, 1, 1, 2)
-
-        self.label = QLabel(self.groupBox)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout_3.addWidget(self.label, 0, 0, 1, 1)
-
-        self.notes_textEdit = QTextEdit(self.groupBox)
-        self.notes_textEdit.setObjectName(u"notes_textEdit")
-
-        self.gridLayout_3.addWidget(self.notes_textEdit, 3, 0, 1, 3)
+        self.gridLayout_3.addWidget(self.icon_name_comboBox, 0, 1, 1, 2)
 
 
         self.verticalLayout.addWidget(self.groupBox)
@@ -669,6 +680,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.groupBox.setTitle(QCoreApplication.translate("Dialog", u"Rig Identifier", None))
+        self.label_2.setText(QCoreApplication.translate("Dialog", u"Mode", None))
         self.end_point_comboBox.setItemText(0, QCoreApplication.translate("Dialog", u"all", None))
         self.end_point_comboBox.setItemText(1, QCoreApplication.translate("Dialog", u"objects", None))
         self.end_point_comboBox.setItemText(2, QCoreApplication.translate("Dialog", u"attributes", None))
@@ -676,14 +688,16 @@ class Ui_Dialog(object):
         self.end_point_comboBox.setItemText(4, QCoreApplication.translate("Dialog", u"connections", None))
         self.end_point_comboBox.setItemText(5, QCoreApplication.translate("Dialog", u"cleanup", None))
 
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"Mode", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"Name", None))
+        self.label_12.setText(QCoreApplication.translate("Dialog", u"End Point", None))
+        self.notes_textEdit.setPlaceholderText(QCoreApplication.translate("Dialog", u"Publish note", None))
         self.mode_comboBox.setItemText(0, QCoreApplication.translate("Dialog", u"DEBUG", None))
         self.mode_comboBox.setItemText(1, QCoreApplication.translate("Dialog", u"WIP", None))
         self.mode_comboBox.setItemText(2, QCoreApplication.translate("Dialog", u"PUB", None))
 
-        self.label_12.setText(QCoreApplication.translate("Dialog", u"End Point", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"Name", None))
-        self.notes_textEdit.setPlaceholderText(QCoreApplication.translate("Dialog", u"Publish note", None))
+        self.label_3.setText(QCoreApplication.translate("Dialog", u"IconName", None))
+        self.icon_name_comboBox.setItemText(0, QCoreApplication.translate("Dialog", u"human", None))
+
         self.groupBox_4.setTitle(QCoreApplication.translate("Dialog", u"Ctl Settings", None))
         self.label_11.setText(QCoreApplication.translate("Dialog", u"Origin Ctl Size", None))
         self.label_10.setText(QCoreApplication.translate("Dialog", u"Origin Sub Ctl Count", None))

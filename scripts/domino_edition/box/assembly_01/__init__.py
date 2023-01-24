@@ -168,6 +168,8 @@ class Assembly01Data(piece.DData):
             "ncurve_ctls_shapes": {"typ": "message",
                                    "multi": True,
                                    "value": {}},
+            "icon_name": {"typ": "string",
+                          "value": "human"},
             "publish_notes": {"typ": "string",
                               "value": ""}
         }
