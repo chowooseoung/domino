@@ -1009,7 +1009,7 @@ class Arm2jnt01Rig(piece.Rig):
             self.fk_ik_attr.set(0)
             name = self.naming("autoClavicle", "inp", _s="ctl")
             pm.select(self.auto_clavicle_aim_jnt)
-            interpolator = pm.PyNode(pm.poseInterpolator(name=name)[0])
+            interpolator = pm.PyNode(f"|{pm.poseInterpolator(name=name)[0]}")
             pm.parent(interpolator, self.root)
             interpolator = interpolator.getShape()
             interpolator.attr("regularization").set(100)
