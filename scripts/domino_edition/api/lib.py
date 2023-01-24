@@ -137,6 +137,14 @@ def mirror_guide(guide):
             i = en[0].split(":").index(mirror_side)
             container.attr("side").set(i)
             container.attr("d_id").set(str(uuid.uuid4()))
+            host = container.attr("host").get()
+            if host:
+                host_side = host.split("_")[-1][0]
+                if host_side != "C":
+                    mirror_host_side = "R" if host_side == "L" else "L"
+                    mirror_host = host.replace(f"_{host_side}", f"_{mirror_host_side}")
+                    container.attr("host").set(mirror_host)
+
             for i in pm.listAttr(container, userDefined=True):
                 if "space_switch_array" in i:
                     mirror_data = []

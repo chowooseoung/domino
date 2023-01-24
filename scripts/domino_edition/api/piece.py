@@ -719,7 +719,7 @@ class Rig:
         original_host = host_root.attr("host").inputs()
         if self.ddata.parent is not None:
             if data["host"]:
-                host_container, host_root = find_rig_from_id(self.root.getParent(generations=-1), data["host"])
+                host_container, host_root = find_rig_from_identifier(self.root.getParent(generations=-1), data["host"])
         host = host_root.attr("host").inputs()
         if original_host != host:
             pm.delete(original_host)

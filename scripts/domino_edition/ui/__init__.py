@@ -17,7 +17,7 @@ from pymel import core as pm
 from domino_edition.api import (utils,
                                 lib)
 from domino_edition.api.piece import (Identifier,
-                                      find_guide_from_id)
+                                      find_guide_from_identifier)
 from domino.api.color import MAYA_OVERRIDE_COLOR
 from domino.api import log
 
@@ -537,22 +537,26 @@ class UiFunctionSet:
     def add_host_lineEdit(self, line_edit, target_attr):
         selected = pm.ls(selection=True)
         if not selected:
+            self.set_attr_to_piece(target_attr, "")
+            line_edit.setText("")
             return 0
 
         if not selected[0].hasAttr("is_domino_guide"):
             return 0
         guide = selected[0]
 
-        d_id = guide.attr("d_id").get()
-        self.set_attr_to_piece(target_attr, d_id)
+        name = guide.attr("name").get()
+        side = guide.attr("side").get(asString=True)
+        index = guide.attr("index").get()
+        self.set_attr_to_piece(target_attr, Identifier.to_str(name, side, index))
         self.update_host_lineEdit(line_edit, target_attr, 0)
 
     def update_host_lineEdit(self, line_edit, target_attr, state):
         line_edit.setText("")
         top_node = self.root.getParent(generations=-1)
 
-        d_id = self.get_attr_from_piece(target_attr)
-        guide = find_guide_from_id(top_node, d_id)
+        identifier = self.get_attr_from_piece(target_attr)
+        guide = find_guide_from_identifier(top_node, identifier)
         if guide:
             line_edit.setText(guide.strip())
 
