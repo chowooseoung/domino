@@ -71,23 +71,21 @@ def sp_ikh(parent, name, chain, curve=None):
 
 
 def labeling(jnt, name, side, index, description):
-    pm.setAttr(jnt.attr("type"), 18)
-    if side is None and index is None:
-        side = "C"
-        label = name
-    else:
-        side = "C" if side in ["L", "R"] else side
-        label = f"{side}{index}_{name}"
-    if description:
-        label += f"_{description}"
-
-    pm.setAttr(jnt.attr("otherType"), label, type="string")
     if side == "C":
         pm.setAttr(jnt.attr("side"), 0)
     if side == "L":
         pm.setAttr(jnt.attr("side"), 1)
     if side == "R":
         pm.setAttr(jnt.attr("side"), 2)
+    pm.setAttr(jnt.attr("type"), 18)
+    if side is None and index is None:
+        label = name
+    else:
+        label = f"{'S' if side in ['L', 'R'] else side}{index}_{name}"
+    if description:
+        label += f"_{description}"
+
+    pm.setAttr(jnt.attr("otherType"), label, type="string")
 
 
 def pole_vec_position(parent, positions, multiple):
