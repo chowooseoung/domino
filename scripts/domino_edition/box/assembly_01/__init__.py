@@ -287,13 +287,13 @@ class Assembly01Rig(piece.Rig):
                                                 longName="model_dp_type",
                                                 typ="enum",
                                                 enumName=["normal", "template", "reference"],
-                                                defaultValue=1,
+                                                defaultValue=2,
                                                 channelBox=True)
         skeleton_display_type_attr = attribute.add(asset_root,
                                                    longName="skeleton_dp_type",
                                                    typ="enum",
                                                    enumName=["normal", "template", "reference"],
-                                                   defaultValue=1,
+                                                   defaultValue=2,
                                                    channelBox=True)
         pm.connectAttr(model_display_type_attr, context["model"].attr("overrideDisplayType"))
         pm.connectAttr(skeleton_display_type_attr, context["skeleton"].attr("overrideDisplayType"))
