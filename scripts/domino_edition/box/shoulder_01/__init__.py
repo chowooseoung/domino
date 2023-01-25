@@ -91,19 +91,11 @@ class Shoulder01Rig(piece.Rig):
         name = self.naming("", _s="ctl")
         distance = vector.get_distance(start_pos, dt.Matrix(data["anchors"][-1]).translate)
         offset = distance / -2 if self.ddata.negate else distance / 2
-        self.shoulder_ctl, self.shoulder_loc = self.create_ctl(context=context,
-                                                               parent=None,
-                                                               name=name,
-                                                               publish_name="shoulder",
-                                                               parent_ctl=None,
-                                                               color=fk_color,
-                                                               keyable_attrs=["tx", "ty", "tz",
-                                                                              "rx", "ry", "rz"],
-                                                               m=look_at_m,
-                                                               shape="cube",
-                                                               width=distance,
-                                                               height=distance / 3,
-                                                               depth=distance / 3,
+        self.shoulder_ctl, self.shoulder_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=None,
+                                                               color=fk_color, keyable_attrs=["tx", "ty", "tz",
+                                                                                              "rx", "ry", "rz"],
+                                                               m=look_at_m, shape="cube", width=distance,
+                                                               height=distance / 3, depth=distance / 3,
                                                                po=(offset, 0, 0))
         name = self.naming("", "ref", _s="ctl")
         self.shoulder_ref = self.create_ref(context=context, name=name, anchor=False, m=self.shoulder_loc)
@@ -122,16 +114,10 @@ class Shoulder01Rig(piece.Rig):
                                             uni_scale=uni_scale)
 
         name = self.naming("orbit", _s="ctl")
-        self.orbit_ctl, self.orbit_loc = self.create_ctl(context=context,
-                                                         parent=self.shoulder_loc,
-                                                         name=name,
-                                                         publish_name="orbit",
-                                                         parent_ctl=None,
-                                                         color=fk_color,
+        self.orbit_ctl, self.orbit_loc = self.create_ctl(context=context, parent=self.shoulder_loc, name=name,
+                                                         parent_ctl=None, color=fk_color,
                                                          keyable_attrs=["tx", "ty", "tz",
-                                                                        "rx", "ry", "rz"],
-                                                         m=orbit_m,
-                                                         shape="circle3",
+                                                                        "rx", "ry", "rz"], m=orbit_m, shape="circle3",
                                                          width=1.5)
         name = self.naming("orbit", "ref", _s="ctl")
         self.orbit_ref = self.create_ref(context=context, name=name, anchor=True, m=self.orbit_loc)

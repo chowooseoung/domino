@@ -211,39 +211,22 @@ class Assembly01Rig(piece.Rig):
 
         width = 3 + data["origin_ctl_size"]
         name = self.naming("origin", "", "ctl")
-        origin_ctl, origin_loc = self.create_ctl(context=context,
-                                                 parent=origin_rig,
-                                                 name=name,
-                                                 publish_name="origin",
-                                                 parent_ctl=None,
-                                                 color=dt.Color(1, 1, 0),
-                                                 keyable_attrs=["tx", "ty", "tz",
-                                                                "sx", "sy", "sz"],
-                                                 cns=False,
-                                                 m=m,
-                                                 shape="origin",
-                                                 width=width)
-        pm.connectAttr(origin_ctl.attr("message"), self.root.attr("host"))
+        origin_ctl, origin_loc = self.create_ctl(context=context, parent=origin_rig, name=name, parent_ctl=None,
+                                                 color=dt.Color(1, 1, 0), keyable_attrs=["tx", "ty", "tz",
+                                                                                         "sx", "sy", "sz"], m=m,
+                                                 shape="origin", cns=False, width=width)
+        host = self.create_host(context, origin_ctl)
         parent_loc = origin_loc
         parent_ctl = origin_ctl
         width = 3.5 + data["origin_ctl_size"]
         for i in range(data["origin_sub_ctl_count"]):
             width = width * 0.8
             name = self.naming(f"sub{i}", "", "ctl")
-            parent_ctl, parent_loc = self.create_ctl(context=context,
-                                                     parent=parent_loc,
-                                                     name=name,
-                                                     publish_name=f"sub{i}",
-                                                     parent_ctl=parent_ctl,
-                                                     color=dt.Color(
-                                                         0, 1, 1),
-                                                     keyable_attrs=["tx", "ty", "tz",
-                                                                    "rx", "ry", "rz", "ro",
-                                                                    "sx", "sy", "sz"],
-                                                     cns=False,
-                                                     m=m,
-                                                     shape="wave",
-                                                     width=width)
+            parent_ctl, parent_loc = self.create_ctl(context=context, parent=parent_loc, name=name,
+                                                     parent_ctl=parent_ctl, color=dt.Color(
+                    0, 1, 1), keyable_attrs=["tx", "ty", "tz",
+                                             "rx", "ry", "rz", "ro",
+                                             "sx", "sy", "sz"], m=m, shape="wave", cns=False, width=width)
 
         last_loc = parent_loc
         name = self.naming("origin", "ref", "ctl")

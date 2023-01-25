@@ -153,78 +153,37 @@ class Spine01Rig(piece.Rig):
 
         m = matrix.set_matrix_position(look_at_m, (end_pos - start_pos) * data["hip_position"] + start_pos)
         name = self.naming("hip", _s="ctl")
-        self.hip_ctl, self.hip_loc = self.create_ctl(context=context,
-                                                     parent=None,
-                                                     name=name,
-                                                     publish_name="hip",
-                                                     parent_ctl=None,
-                                                     color=fk_color,
-                                                     keyable_attrs=[
-                                                         "rx", "ry", "rz"],
-                                                     m=m,
-                                                     shape="circle",
-                                                     ro=(0, 0, 90),
-                                                     width=2,
-                                                     height=3.2,
-                                                     depth=3.2)
+        self.hip_ctl, self.hip_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=None,
+                                                     color=fk_color, keyable_attrs=[
+                "rx", "ry", "rz"], m=m, shape="circle", width=2, height=3.2, depth=3.2, ro=(0, 0, 90))
         m = matrix.set_matrix_position(look_at_ik_m, start_pos)
         name = self.naming("ik0", _s="ctl")
-        self.ik0_ctl, self.ik0_loc = self.create_ctl(context=context,
-                                                     parent=self.hip_loc,
-                                                     name=name,
-                                                     publish_name="ik0",
-                                                     parent_ctl=self.hip_ctl,
-                                                     color=ik_color,
+        self.ik0_ctl, self.ik0_loc = self.create_ctl(context=context, parent=self.hip_loc, name=name,
+                                                     parent_ctl=self.hip_ctl, color=ik_color,
                                                      keyable_attrs=["tx", "ty", "tz",
-                                                                    "rx", "ry", "rz", "ro"],
-                                                     m=m,
-                                                     shape="arrow4",
-                                                     width=5,
-                                                     ro=(0, 0, 90))
+                                                                    "rx", "ry", "rz", "ro"], m=m, shape="arrow4",
+                                                     width=5, ro=(0, 0, 90))
 
         m = matrix.set_matrix_position(look_at_m, start_pos - ((end_pos - start_pos) * 0.01))
         name = self.naming("pelvis", _s="ctl")
-        self.pelvis_ctl, self.pelvis_loc = self.create_ctl(context=context,
-                                                           parent=None,
-                                                           name=name,
-                                                           publish_name=f"pelvis",
-                                                           parent_ctl=self.ik0_ctl,
-                                                           color=fk_color,
-                                                           keyable_attrs=["rx", "ry", "rz", "ro"],
-                                                           m=m,
-                                                           shape="cube",
-                                                           height=2.2,
-                                                           depth=2.2)
+        self.pelvis_ctl, self.pelvis_loc = self.create_ctl(context=context, parent=None, name=name,
+                                                           parent_ctl=self.ik0_ctl, color=fk_color,
+                                                           keyable_attrs=["rx", "ry", "rz", "ro"], m=m, shape="cube",
+                                                           height=2.2, depth=2.2)
 
         m = matrix.set_matrix_position(look_at_ik_m, (end_pos - start_pos) * 0.5 + start_pos)
         name = self.naming("ik_tan", _s="ctl")
-        self.ik_tan_ctl, self.ik_tan_loc = self.create_ctl(context=context,
-                                                           parent=None,
-                                                           name=name,
-                                                           publish_name="ik_tan",
-                                                           parent_ctl=None,
-                                                           color=ik_color,
-                                                           keyable_attrs=[
-                                                               "tx", "ty", "tz"],
-                                                           m=m,
-                                                           shape="circle3",
-                                                           width=0.4)
+        self.ik_tan_ctl, self.ik_tan_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=None,
+                                                           color=ik_color, keyable_attrs=[
+                "tx", "ty", "tz"], m=m, shape="circle3", width=0.4)
 
         m = matrix.set_matrix_position(look_at_ik_m, end_pos)
         name = self.naming("direction", _s="ctl")
-        self.direction_ctl, self.direction_loc = self.create_ctl(context=context,
-                                                                 parent=None,
-                                                                 name=name,
-                                                                 publish_name="direction",
-                                                                 parent_ctl=None,
-                                                                 color=ik_color,
+        self.direction_ctl, self.direction_loc = self.create_ctl(context=context, parent=None, name=name,
+                                                                 parent_ctl=None, color=ik_color,
                                                                  keyable_attrs=["tx", "ty",
-                                                                                "tz", "rx"],
-                                                                 m=m,
-                                                                 shape="square",
-                                                                 width=2.5,
-                                                                 height=2.5,
-                                                                 ro=(0, 0, 90))
+                                                                                "tz", "rx"], m=m, shape="square",
+                                                                 width=2.5, height=2.5, ro=(0, 0, 90))
 
         name = self.naming("SC%s", _s="jnt")
         sc_normal = orient_xyz.y * -1
@@ -234,18 +193,11 @@ class Spine01Rig(piece.Rig):
 
         m = matrix.set_matrix_position(look_at_ik_m, end_pos)
         name = self.naming("ik1", _s="ctl")
-        self.ik1_ctl, self.ik1_loc = self.create_ctl(context=context,
-                                                     parent=self.sc_chain[0],
-                                                     name=name,
-                                                     publish_name="ik1",
-                                                     parent_ctl=self.direction_ctl,
-                                                     color=ik_color,
+        self.ik1_ctl, self.ik1_loc = self.create_ctl(context=context, parent=self.sc_chain[0], name=name,
+                                                     parent_ctl=self.direction_ctl, color=ik_color,
                                                      keyable_attrs=["tx", "ty", "tz",
-                                                                    "rx", "ry", "rz", "ro"],
-                                                     m=m,
-                                                     shape="arrow4",
-                                                     width=5,
-                                                     ro=(0, 0, 90))
+                                                                    "rx", "ry", "rz", "ro"], m=m, shape="arrow4",
+                                                     width=5, ro=(0, 0, 90))
         name = self.naming("ik1", "autoRot", _s="ctl")
         m = matrix.get_matrix_look_at(end_pos, start_pos, sc_normal, "-xz", False)
         self.ik1_auto_rotate = matrix.transform(self.sc_chain[-1], name, m, offsetParentMatrix=True)
@@ -253,17 +205,9 @@ class Spine01Rig(piece.Rig):
 
         m = matrix.set_matrix_position(look_at_ik_m, (end_pos - start_pos) * 0.4 + start_pos)
         name = self.naming("ik0_tan", _s="ctl")
-        self.ik0_tan_ctl, self.ik0_tan_loc = self.create_ctl(context=context,
-                                                             parent=self.ik0_loc,
-                                                             name=name,
-                                                             publish_name="ik0_tan",
-                                                             parent_ctl=self.ik0_ctl,
-                                                             color=ik_color,
-                                                             keyable_attrs=[
-                                                                 "tx", "ty", "tz"],
-                                                             m=m,
-                                                             shape="circle3",
-                                                             width=0.2)
+        self.ik0_tan_ctl, self.ik0_tan_loc = self.create_ctl(context=context, parent=self.ik0_loc, name=name,
+                                                             parent_ctl=self.ik0_ctl, color=ik_color, keyable_attrs=[
+                "tx", "ty", "tz"], m=m, shape="circle3", width=0.2)
         curve_points = [start_pos, m.translate]
         self.ik0_tan_npo = self.ik0_tan_ctl.getParent()
         name = self.naming("ik0_tan", "offset", _s="ctl")
@@ -271,17 +215,9 @@ class Spine01Rig(piece.Rig):
 
         m = matrix.set_matrix_position(look_at_ik_m, (end_pos - start_pos) * 0.6 + start_pos)
         name = self.naming("ik1_tan", _s="ctl")
-        self.ik1_tan_ctl, self.ik1_tan_loc = self.create_ctl(context=context,
-                                                             parent=self.ik1_loc,
-                                                             name=name,
-                                                             publish_name="ik1_tan",
-                                                             parent_ctl=self.ik1_ctl,
-                                                             color=ik_color,
-                                                             keyable_attrs=[
-                                                                 "tx", "ty", "tz"],
-                                                             m=m,
-                                                             shape="circle3",
-                                                             width=0.2)
+        self.ik1_tan_ctl, self.ik1_tan_loc = self.create_ctl(context=context, parent=self.ik1_loc, name=name,
+                                                             parent_ctl=self.ik1_ctl, color=ik_color, keyable_attrs=[
+                "tx", "ty", "tz"], m=m, shape="circle3", width=0.2)
         curve_points.append(m.translate)
         curve_points.append(end_pos)
         self.ik1_tan_npo = self.ik1_tan_ctl.getParent()
@@ -331,19 +267,10 @@ class Spine01Rig(piece.Rig):
         for i, m in enumerate(range(division + 1)):
             name = self.naming(f"fk{i}", _s="ctl")
             m = matrix.set_matrix_position(look_at_m, start_pos + fk_offset * i)
-            fk_ctl, fk_loc = self.create_ctl(context=context,
-                                             parent=parent,
-                                             name=name,
-                                             publish_name=f"fk{i}",
-                                             parent_ctl=parent_ctl,
-                                             color=fk_color,
-                                             keyable_attrs=["tx", "ty", "tz",
-                                                            "rx", "ry", "rz", "ro"],
-                                             m=m,
-                                             shape="cube",
-                                             width=0.1,
-                                             depth=3,
-                                             height=3)
+            fk_ctl, fk_loc = self.create_ctl(context=context, parent=parent, name=name, parent_ctl=parent_ctl,
+                                             color=fk_color, keyable_attrs=["tx", "ty", "tz",
+                                                                            "rx", "ry", "rz", "ro"], m=m, shape="cube",
+                                             width=0.1, height=3, depth=3)
             parent_ctl = fk_ctl
             parent = fk_ctl
             self.fk_ctls.append(fk_ctl)

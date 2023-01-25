@@ -1002,7 +1002,6 @@ class Rig:
     def create_host(self, context, ctl=None):
         if ctl:
             host = ctl
-            host.attr("description").set("host")
         else:
             name = str(self.ddata.identifier)
             host = icon.create(parent=self.root,
@@ -1020,10 +1019,6 @@ class Rig:
                           typ="bool",
                           value=True,
                           keyable=False)
-            attribute.add(host,
-                          longName="description",
-                          typ="string",
-                          value="host")
             attrs = ["tx", "ty", "tz",
                      "rx", "ry", "rz", "ro",
                      "sx", "sy", "sz", "v"]
@@ -1032,22 +1027,8 @@ class Rig:
         pm.connectAttr(host.attr("message"), self.root.attr("host"))
         return self.host()
 
-    def create_ctl(self,
-                   context,
-                   parent,
-                   name,
-                   publish_name,
-                   parent_ctl,
-                   color,
-                   keyable_attrs,
-                   m,
-                   shape,
-                   cns=False,
-                   width=1,
-                   height=1,
-                   depth=1,
-                   po=(0, 0, 0),
-                   ro=(0, 0, 0)):
+    def create_ctl(self, context, parent, name, parent_ctl, color, keyable_attrs, m, shape, cns=False, width=1,
+                   height=1, depth=1, po=(0, 0, 0), ro=(0, 0, 0)):
         assembly_data = self.data(DData.ASSEMBLY)
         data = self.data(DData.SELF)
         if parent is None:
@@ -1172,20 +1153,11 @@ class Rig:
                           longName="is_domino_ctl",
                           typ="bool",
                           value=True)
-            attribute.add(cns_ctl,
-                          longName="description",
-                          typ="string",
-                          value=f"{publish_name}_cns")
         context["ctls"].append(ctl)
         attribute.add(ctl,
                       longName="is_domino_ctl",
                       typ="bool",
                       value=True)
-        # this attribute be used asset publish name
-        attribute.add(ctl,
-                      longName="description",
-                      typ="string",
-                      value=publish_name)
         return ctl, loc
 
     def create_ref(self, context, name, anchor, m):
@@ -1482,8 +1454,6 @@ class Rig:
         hosts = [root.attr("host").inputs() for root in roots]
         hosts = list(set([host[0] for host in hosts if host]))
         for host in hosts:
-            description = host.attr("description").get()
-            description = f"{description}_" if description else ""
             publish_attrs = pm.listAttr(host,
                                         keyable=True,
                                         userDefined=True,
@@ -1493,7 +1463,7 @@ class Rig:
                                          shortNames=True) or []
             container = pm.container(query=True, findContainer=host)
             for attr in publish_attrs:
-                publish_name = description + "I_" + attr
+                publish_name = "hostI_" + attr
                 pm.container(container,
                              edit=True,
                              publishName=publish_name)
@@ -1508,13 +1478,12 @@ class Rig:
             if not ctl.exists():
                 context["ctls"].remove(ctl)
                 continue
-            description = ctl.attr("description").get()
-            description = f"{description}_" if description else ""
+            pub_name = ctl.nodeName()
             container = pm.container(query=True, findContainer=ctl)
             pm.containerPublish(container,
-                                publishNode=(description + "ctl", ""))
+                                publishNode=(pub_name, ""))
             pm.containerPublish(container,
-                                bindNode=(description + "ctl", ctl))
+                                bindNode=(pub_name, ctl))
 
             shapes = ctl.getShapes()
             for shape in shapes:

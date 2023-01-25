@@ -115,18 +115,10 @@ class Control01Rig(piece.Rig):
                      "sx", "sy", "sz"]
             key_attrs = [attr for attr in attrs if data["k_" + attr]]
             name = self.naming("", "", "ctl")
-            self.ctl, loc = self.create_ctl(context=context,
-                                            parent=root,
-                                            name=name,
-                                            publish_name="_01",
-                                            parent_ctl=None,
-                                            color=color,
-                                            keyable_attrs=key_attrs,
+            self.ctl, loc = self.create_ctl(context=context, parent=root, name=name, parent_ctl=None, color=color,
+                                            keyable_attrs=key_attrs, m=m, shape=data["icon"],
                                             cns=True if data["space_switch_array"] else False,
-                                            m=m,
-                                            shape=data["icon"],
-                                            width=data["ctl_size"] * mul_size,
-                                            height=data["ctl_size"] * mul_size,
+                                            width=data["ctl_size"] * mul_size, height=data["ctl_size"] * mul_size,
                                             depth=data["ctl_size"] * mul_size)
             self.create_host(context, self.ctl)
             name = self.naming("", "ref", "ctl")

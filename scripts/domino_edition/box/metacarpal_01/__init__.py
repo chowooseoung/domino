@@ -101,19 +101,11 @@ class Metacarpal01Rig(piece.Rig):
 
         name = self.naming("main", _s="ctl")
         distance = vector.get_distance(positions[0], positions[1])
-        self.main_ctl, self.main_loc = self.create_ctl(context=context,
-                                                       parent=root,
-                                                       name=name,
-                                                       publish_name="main",
-                                                       parent_ctl=None,
-                                                       color=fk_color,
-                                                       keyable_attrs=["tx", "ty", "tz",
-                                                                      "rx", "ry", "rz",
-                                                                      "sx", "sy", "sz"],
-                                                       m=matrices[0],
-                                                       shape="circle3",
-                                                       width=distance * 2,
-                                                       cns=False)
+        self.main_ctl, self.main_loc = self.create_ctl(context=context, parent=root, name=name, parent_ctl=None,
+                                                       color=fk_color, keyable_attrs=["tx", "ty", "tz",
+                                                                                      "rx", "ry", "rz",
+                                                                                      "sx", "sy", "sz"], m=matrices[0],
+                                                       shape="circle3", cns=False, width=distance * 2)
         self.ctls = []
         self.locs = []
         ctl = self.main_ctl
@@ -121,19 +113,9 @@ class Metacarpal01Rig(piece.Rig):
             name = self.naming(f"{i}", _s="ctl")
             index = i - 1 if i == len(matrices) - 1 else i + 1
             distance = vector.get_distance(positions[i], positions[index])
-            ctl, loc = self.create_ctl(context=context,
-                                       parent=root,
-                                       name=name,
-                                       publish_name=f"fk{i}",
-                                       parent_ctl=ctl,
-                                       color=fk_color,
-                                       keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
-                                       m=m,
-                                       shape="cube",
-                                       width=distance,
-                                       height=distance,
-                                       depth=distance,
-                                       cns=False)
+            ctl, loc = self.create_ctl(context=context, parent=root, name=name, parent_ctl=ctl, color=fk_color,
+                                       keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"], m=m,
+                                       shape="cube", cns=False, width=distance, height=distance, depth=distance)
             self.ctls.append(ctl)
             self.locs.append(loc)
 
