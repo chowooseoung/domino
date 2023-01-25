@@ -1027,8 +1027,21 @@ class Rig:
         pm.connectAttr(host.attr("message"), self.root.attr("host"))
         return self.host()
 
-    def create_ctl(self, context, parent, name, parent_ctl, color, keyable_attrs, m, shape, cns=False, width=1,
-                   height=1, depth=1, po=(0, 0, 0), ro=(0, 0, 0)):
+    def create_ctl(self,
+                   context,
+                   parent,
+                   name,
+                   parent_ctl,
+                   color,
+                   keyable_attrs,
+                   m,
+                   shape,
+                   cns=False,
+                   width=1,
+                   height=1,
+                   depth=1,
+                   po=(0, 0, 0),
+                   ro=(0, 0, 0)):
         assembly_data = self.data(DData.ASSEMBLY)
         data = self.data(DData.SELF)
         if parent is None:
