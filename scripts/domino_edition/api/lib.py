@@ -325,12 +325,13 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
             Rig.blackbox(context)
 
         # select
-        if "sets" in context:
-            pm.select(context["sets"], noExpand=True, replace=True)
-            if pm.objExists(context["asset"][0]):
-                pm.select(context["asset"][0], add=True)
-            if pm.objExists(context["asset"][1]):
-                pm.select(context["asset"][1], add=True)
+        sets = context["asset"][1].attr("sets").inputs()
+        if sets:
+            pm.select(sets, noExpand=True, replace=True)
+        if pm.objExists(context["asset"][0]):
+            pm.select(context["asset"][0], add=True)
+        if pm.objExists(context["asset"][1]):
+            pm.select(context["asset"][1], add=True)
 
         log.Logger.info("{:+^50}".format("CONTEXT"))
         for key, value in context.items():
