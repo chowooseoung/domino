@@ -124,17 +124,18 @@ class Shoulder01Rig(piece.Rig):
 
     def attributes(self, context):
         super(Shoulder01Rig, self).attributes(context)
-
-        host = self.create_host(context)
-        if "auto_clavicle" not in context:
-            context["auto_clavicle"] = {}
-        context["auto_clavicle"][str(self.ddata.identifier)] = [self.shoulder_ctl, self.root, host]
+        self.create_host(context)
 
     def operators(self, context):
         super(Shoulder01Rig, self).operators(context)
 
     def connections(self, context):
         super(Shoulder01Rig, self).connections(context)
+
+        host = self.host()
+        if "auto_clavicle" not in context:
+            context["auto_clavicle"] = {}
+        context["auto_clavicle"][str(self.ddata.identifier)] = [self.shoulder_ctl, self.root, host]
 
 
 class Shoulder01Piece(piece.AbstractPiece):
