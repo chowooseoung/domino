@@ -219,7 +219,7 @@ class Leg2Jnt01Rig(piece.Rig):
 
         name = self.naming("RP", "ikh", _s="jnt")
         self.ik_ikh = joint.ikh(self.ik_local_loc, name, self.ik_jnts, pole_vector=self.pole_vec_loc)
-        pm.orientConstraint(self.ik_local_loc, self.ik_jnts[-1], maintainOffset=True)
+        pm.orientConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
 
         # knee - pole vector display curve
         name = self.naming("display", "crv", _s="ctl")
@@ -328,8 +328,8 @@ class Leg2Jnt01Rig(piece.Rig):
         name = self.naming("lookAt", "ikh", _s="ctl")
         self.look_at_sc_ikh = joint.ikh(root, name, self.look_at_jnts, "ikSCsolver")
         pm.pointConstraint(self.ik_jnts[0], self.look_at_jnts[0])
-        pm.pointConstraint(self.ik_local_loc, self.look_at_sc_ikh)
-        pm.pointConstraint(self.ik_local_loc, self.stretch_value_jnt)
+        pm.pointConstraint(self.ik_ikh, self.look_at_sc_ikh)
+        pm.pointConstraint(self.ik_ikh, self.stretch_value_jnt)
 
         # SC jnts
         name = self.naming("upperSC", "offset", _s="ctl")
@@ -839,6 +839,13 @@ class Leg2Jnt01Rig(piece.Rig):
 
     def connections(self, context):
         super(Leg2Jnt01Rig, self).connections(context)
+
+        if "leg_2jnt_01" not in context:
+            context["leg_2jnt_01"] = {}
+        context["leg_2jnt_01"][str(self.ddata.identifier)] = [self.ik_local_loc,
+                                                              self.ik_ikh,
+                                                              self.refs[-1],
+                                                              self.fk_ik_attr]
 
 
 class Leg2Jnt01Piece(piece.AbstractPiece):

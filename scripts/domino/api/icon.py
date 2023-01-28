@@ -20,6 +20,34 @@ def create(parent, name, shape, color, m, **kwargs):
                     m=m,
                     po=kwargs["po"],
                     ro=kwargs["ro"])
+    elif shape == "cylinder":
+        return cylinder(parent=parent,
+                        name=name,
+                        color=color,
+                        thickness=kwargs["thickness"],
+                        width=kwargs["width"],
+                        height=kwargs["height"],
+                        m=m,
+                        po=kwargs["po"],
+                        ro=kwargs["ro"])
+    elif shape == "halfmoon":
+        return halfmoon(parent=parent,
+                        name=name,
+                        color=color,
+                        m=m,
+                        thickness=kwargs["thickness"],
+                        width=kwargs["width"],
+                        po=kwargs["po"],
+                        ro=kwargs["ro"])
+    elif shape == "half_circle":
+        return half_circle(parent=parent,
+                           name=name,
+                           color=color,
+                           m=m,
+                           thickness=kwargs["thickness"],
+                           width=kwargs["width"],
+                           po=kwargs["po"],
+                           ro=kwargs["ro"])
     elif shape == "circle":
         return circle(parent=parent,
                       name=name,
@@ -124,6 +152,17 @@ def create(parent, name, shape, color, m, **kwargs):
                      height=kwargs["height"],
                      po=kwargs["po"],
                      ro=kwargs["ro"])
+    elif shape == "dodecahedron":
+        return dodecahedron(parent=parent,
+                            name=name,
+                            color=color,
+                            m=m,
+                            thickness=kwargs["thickness"],
+                            width=kwargs["width"],
+                            height=kwargs["height"],
+                            depth=kwargs["depth"],
+                            po=kwargs["po"],
+                            ro=kwargs["ro"])
 
     obj = pm.createNode("transform", name=name, parent=parent)
     obj.setMatrix(m, worldSpace=True)
@@ -396,7 +435,7 @@ def wave(parent, name, color, m, thickness=1, width=1, po=(0, 0, 0), ro=(0, 0, 0
               [0.264842, 0.0, -0.211169],
               [0.363233, 0.0, -0.4555],
               [0.14698, 0.0, -0.305169]]
-    points = [dt.Vector(x) * width for x in points]
+    points = [dt.Vector(p) * width for p in points]
     obj = pm.createNode("transform", name=name, parent=parent)
     obj.setMatrix(m, worldSpace=True)
 
@@ -405,6 +444,73 @@ def wave(parent, name, color, m, thickness=1, width=1, po=(0, 0, 0), ro=(0, 0, 0
              degree=3,
              color=color,
              close=True,
+             thickness=thickness,
+             po=po,
+             ro=ro)
+    return obj
+
+
+def halfmoon(parent, name, color, m, thickness=1, width=1, po=(0, 0, 0), ro=(0, 0, 0)):
+    obj = pm.createNode("transform", name=name, parent=parent)
+    obj.setMatrix(m, worldSpace=True)
+
+    points = [[0.0, 0.0, -0.5],
+              [-0.065, 0.0, -0.5],
+              [-0.197, 0.0, -0.474],
+              [-0.363, 0.0, -0.363],
+              [-0.474, 0.0, -0.196],
+              [-0.513, -0.0, 0.0],
+              [-0.474, -0.0, 0.196],
+              [-0.363, -0.0, 0.363],
+              [-0.197, -0.0, 0.474],
+              [-0.065, -0.0, 0.5],
+              [0.0, -0.0, 0.5]]
+    points = [dt.Vector(p) * width for p in points]
+    generate(obj=obj,
+             points=points,
+             degree=3,
+             color=color,
+             close=False,
+             thickness=thickness,
+             po=po,
+             ro=ro)
+
+    points = [[0.0, 0.0, -0.5],
+              [0.0, -0.0, 0.5]]
+    points = [dt.Vector(p) * width for p in points]
+    generate(obj=obj,
+             points=points,
+             degree=1,
+             color=color,
+             close=False,
+             thickness=thickness,
+             po=po,
+             ro=ro)
+    return obj
+
+
+def half_circle(parent, name, color, m, thickness=1, width=1, po=(0, 0, 0), ro=(0, 0, 0)):
+    points = [[0.0, 0.0, -0.5],
+              [-0.065, 0.0, -0.5],
+              [-0.197, 0.0, -0.474],
+              [-0.363, 0.0, -0.363],
+              [-0.474, 0.0, -0.196],
+              [-0.513, -0.0, 0.0],
+              [-0.474, -0.0, 0.196],
+              [-0.363, -0.0, 0.363],
+              [-0.197, -0.0, 0.474],
+              [-0.065, -0.0, 0.5],
+              [0.0, -0.0, 0.5]]
+    points = [dt.Vector(p) * width for p in points]
+
+    obj = pm.createNode("transform", name=name, parent=parent)
+    obj.setMatrix(m, worldSpace=True)
+
+    generate(obj=obj,
+             points=points,
+             degree=3,
+             color=color,
+             close=False,
              thickness=thickness,
              po=po,
              ro=ro)
@@ -509,7 +615,9 @@ def cube(parent,
          width=1,
          height=1,
          depth=1,
-         m=dt.Matrix(), po=(0, 0, 0), ro=(0, 0, 0)):
+         m=dt.Matrix(),
+         po=(0, 0, 0),
+         ro=(0, 0, 0)):
     dlen = 0.5
     v0 = dt.Vector(dlen * width, dlen * height, dlen * depth)
     v1 = dt.Vector(dlen * width, dlen * height, -dlen * depth)
@@ -531,6 +639,60 @@ def cube(parent,
              degree=1,
              color=color,
              thickness=thickness)
+    return obj
+
+
+def cylinder(parent,
+             name,
+             color,
+             thickness=1,
+             width=1,
+             height=1,
+             m=dt.Matrix(),
+             po=(0, 0, 0),
+             ro=(0, 0, 0)):
+    dlen = 0.5
+    v0 = dt.Vector(0, 0, -dlen * 1.108) * width
+    v1 = dt.Vector(dlen * .78, 0, -dlen * .78) * width
+    v2 = dt.Vector(dlen * 1.108, 0, 0) * width
+    v3 = dt.Vector(dlen * .78, 0, dlen * .78) * width
+    v4 = dt.Vector(0, 0, dlen * 1.108) * width
+    v5 = dt.Vector(-dlen * .78, 0, dlen * .78) * width
+    v6 = dt.Vector(-dlen * 1.108, 0, 0) * width
+    v7 = dt.Vector(-dlen * .78, 0, -dlen * .78) * width
+    up_circle_points = [p + dt.Vector(0, height / 2.0, 0) for p in [v0, v1, v2, v3, v4, v5, v6, v7]]
+    down_circle_points = [p + dt.Vector(0, height / -2.0, 0) for p in [v0, v1, v2, v3, v4, v5, v6, v7]]
+
+    points = [[0.354, 0.5, 0.354],
+              [0.354, -0.5, 0.354]]
+    line_points = [p * dt.Vector(width, height, width) for p in points]
+
+    obj = pm.createNode("transform", name=name, parent=parent)
+    obj.setMatrix(m, worldSpace=True)
+
+    points = get_point_array_with_offset(up_circle_points, po, ro)
+    generate(obj=obj,
+             points=points,
+             degree=3,
+             color=color,
+             close=True,
+             thickness=thickness)
+    points = get_point_array_with_offset(down_circle_points, po, ro)
+    generate(obj=obj,
+             points=points,
+             degree=3,
+             color=color,
+             close=True,
+             thickness=thickness)
+    _ro = 45
+    for i in range(8):
+        points = get_point_array_with_offset(line_points, (0, 0, 0), (0, 45 * i, 0))
+        points = get_point_array_with_offset(points, po, ro)
+        generate(obj=obj,
+                 points=points,
+                 degree=1,
+                 color=color,
+                 thickness=thickness)
     return obj
 
 
@@ -592,6 +754,96 @@ def angle(parent, name, color, thickness=1, width=1, height=1, m=dt.Matrix(), po
              degree=1,
              color=color,
              thickness=thickness)
+    return obj
+
+
+def dodecahedron(parent,
+                 name,
+                 color,
+                 thickness=1,
+                 width=1,
+                 height=1,
+                 depth=1,
+                 m=dt.Matrix(),
+                 po=(0, 0, 0),
+                 ro=(0, 0, 0)):
+    shapes = [[[-0.19, 0.496, 0.0],
+               [0.19, 0.496, 0.0],
+               [0.307, 0.307, -0.307],
+               [0.0, 0.19, -0.496],
+               [-0.307, 0.307, -0.307],
+               [-0.19, 0.496, 0.0]],
+              [[0.19, 0.496, 0.0],
+               [0.307, 0.307, -0.307],
+               [0.496, 0.0, -0.19],
+               [0.496, 0.0, 0.19],
+               [0.307, 0.307, 0.307],
+               [0.19, 0.496, 0.0]],
+              [[-0.19, 0.496, 0.0],
+               [0.19, 0.496, 0.0],
+               [0.307, 0.307, 0.307],
+               [0.0, 0.19, 0.496],
+               [-0.307, 0.307, 0.307],
+               [-0.19, 0.496, 0.0]],
+              [[0.496, 0.0, 0.19],
+               [0.307, 0.307, 0.307],
+               [0.0, 0.19, 0.496],
+               [0.0, -0.19, 0.496],
+               [0.307, -0.307, 0.307],
+               [0.496, 0.0, 0.19]],
+              [[-0.307, 0.307, 0.307],
+               [0.0, 0.19, 0.496],
+               [0.0, -0.19, 0.496],
+               [-0.307, -0.307, 0.307],
+               [-0.496, 0.0, 0.19],
+               [-0.307, 0.307, 0.307]],
+              [[-0.307, 0.307, 0.307],
+               [-0.496, 0.0, 0.19],
+               [-0.496, 0.0, -0.19],
+               [-0.307, 0.307, -0.307],
+               [-0.19, 0.496, 0.0]],
+              [[-0.496, 0.0, -0.19],
+               [-0.496, 0.0, 0.19],
+               [-0.307, -0.307, 0.307],
+               [-0.19, -0.496, 0.0],
+               [-0.307, -0.307, -0.307],
+               [-0.496, 0.0, -0.19]],
+              [[-0.307, 0.307, -0.307],
+               [0.0, 0.19, -0.496],
+               [0.0, -0.19, -0.496],
+               [-0.307, -0.307, -0.307],
+               [-0.496, 0.0, -0.19],
+               [-0.307, 0.307, -0.307]],
+              [[-0.19, -0.496, 0.0],
+               [0.19, -0.496, 0.0],
+               [0.307, -0.307, -0.307],
+               [0.0, -0.19, -0.496],
+               [-0.307, -0.307, -0.307],
+               [-0.19, -0.496, 0.0]],
+              [[0.0, 0.19, -0.496],
+               [0.307, 0.307, -0.307],
+               [0.496, 0.0, -0.19],
+               [0.307, -0.307, -0.307],
+               [0.0, -0.19, -0.496],
+               [0.0, 0.19, -0.496]],
+              [[0.496, 0.0, -0.19],
+               [0.496, 0.0, 0.19],
+               [0.307, -0.307, 0.307],
+               [0.19, -0.496, 0.0],
+               [0.307, -0.307, -0.307],
+               [0.496, 0.0, -0.19]]]
+
+    obj = pm.createNode("transform", name=name, parent=parent)
+    obj.setMatrix(m, worldSpace=True)
+
+    for shape in shapes:
+        points = [s * dt.Vector((width, height, depth)) for s in shape]
+        points = get_point_array_with_offset(points, po, ro)
+        generate(obj=obj,
+                 points=points,
+                 degree=1,
+                 color=color,
+                 thickness=thickness)
     return obj
 
 
