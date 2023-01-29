@@ -7,8 +7,7 @@ from functools import partial
 # gui
 from domino_edition.ui import (DominoDialog,
                                UiFunctionSet)
-from . import (settings_ui,
-               character_set_settings_ui)
+from . import settings_ui
 from PySide2 import QtCore
 
 
@@ -220,7 +219,3 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
         elif index == 2:
             size = QtCore.QSize(370, 574)
             self.resize(size)
-
-
-class CharacterSetSettings(DominoDialog, character_set_settings_ui.Ui_Dialog):
-    pass
