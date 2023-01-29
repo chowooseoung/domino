@@ -485,8 +485,14 @@ class Arm2jnt01Rig(piece.Rig):
                                   sorted(upper_jnt_v_values),
                                   upper_bind_jnts,
                                   mid0_uniform_attr,
-                                  self.arm_output_objs[:len(upper_jnt_v_values)],
+                                  self.arm_output_objs[:len(lower_jnt_v_values) * -1],
                                   negate=self.ddata.negate)
+            index = len(upper_jnt_v_values) - 1
+            aim_m = self.arm_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
+            aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
+            pm.connectAttr(self.arm_output_objs[index + 1].attr("matrix"),
+                           aim_m.attr("primaryTargetMatrix"),
+                           force=True)
         else:
             pm.parentConstraint(self.upper_start_bind, self.arm_output_objs[0])
         if data["support_elbow_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
@@ -512,15 +518,11 @@ class Arm2jnt01Rig(piece.Rig):
                                   mid1_uniform_attr,
                                   self.arm_output_objs[len(upper_jnt_v_values):],
                                   negate=self.ddata.negate)
-            aim_m = \
-                self.arm_output_objs[len(upper_jnt_v_values) - 1].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
-            aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-            pm.connectAttr(uvpin2.attr("outputMatrix")[0], aim_m.attr("primaryTargetMatrix"), force=True)
             aim_m = self.arm_output_objs[-2].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
             aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
             pm.connectAttr(self.arm_output_objs[-1].attr("matrix"), aim_m.attr("primaryTargetMatrix"), force=True)
         else:
-            pm.parentConstraint(self.lower_start_bind, self.arm_output_objs[1])
+            pm.parentConstraint(self.lower_start_bind, self.arm_output_objs[-2])
 
         pm.parentConstraint(self.blend_objs[-1], obj, maintainOffset=True)
 
@@ -545,17 +547,20 @@ class Arm2jnt01Rig(piece.Rig):
             uni_scale = True
 
         parent = None
+        jnt = None
         for i, ref in enumerate(self.refs):
+            if i == 1 or i == len(upper_jnt_v_values) + 1:
+                parent = jnt
             name = self.naming(f"{i}", _s="jnt")
             m = ref.getMatrix(worldSpace=True)
-            parent = self.create_jnt(context=context,
-                                     parent=parent,
-                                     name=name,
-                                     description=f"{i}",
-                                     ref=ref,
-                                     m=m,
-                                     leaf=False,
-                                     uni_scale=uni_scale)
+            jnt = self.create_jnt(context=context,
+                                  parent=parent,
+                                  name=name,
+                                  description=f"{i}",
+                                  ref=ref,
+                                  m=m,
+                                  leaf=False,
+                                  uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Arm2jnt01Rig, self).attributes(context)
@@ -781,7 +786,7 @@ class Arm2jnt01Rig(piece.Rig):
                          self.arm_output_objs)
 
         # auto elbow thickness
-        if data["support_elbow_jnt"]:
+        if data["support_elbow_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
             distance1 = self.ik_jnts[1].attr("tx").get()
             distance2 = self.ik_jnts[2].attr("tx").get()
             if distance1 < 0:

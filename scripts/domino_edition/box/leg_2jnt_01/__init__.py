@@ -455,17 +455,17 @@ class Leg2Jnt01Rig(piece.Rig):
             cons.attr("interpType").set(2)
 
         # ribbon
-        self.arm_output_objs = []
+        self.leg_output_objs = []
         m = root.getMatrix(worldSpace=True)
         for i in range(len(upper_jnt_v_values)):
             name = self.naming(str(i), "space", _s="ctl")
-            self.arm_output_objs.append(matrix.transform(root, name, m))
+            self.leg_output_objs.append(matrix.transform(root, name, m))
         for i in range(len(lower_jnt_v_values) - 1):
             name = self.naming(str(i + len(upper_jnt_v_values)), "space", _s="ctl")
-            self.arm_output_objs.append(matrix.transform(root, name, m))
-        name = self.naming(f"{len(self.arm_output_objs)}", "space", _s="ctl")
+            self.leg_output_objs.append(matrix.transform(root, name, m))
+        name = self.naming(f"{len(self.leg_output_objs)}", "space", _s="ctl")
         obj = matrix.transform(root, name, fk2_m)
-        self.arm_output_objs.append(obj)
+        self.leg_output_objs.append(obj)
         if data["upper_division"] > 1:
             mid0_uniform_attr = attribute.add(self.mid0_ctl,
                                               longName="uniform",
@@ -482,14 +482,20 @@ class Leg2Jnt01Rig(piece.Rig):
                                   sorted(upper_jnt_v_values),
                                   upper_bind_jnts,
                                   mid0_uniform_attr,
-                                  self.arm_output_objs[:len(upper_jnt_v_values)],
+                                  self.leg_output_objs[:len(lower_jnt_v_values) * -1],
                                   negate=self.ddata.negate)
+            index = len(upper_jnt_v_values) - 1
+            aim_m = self.leg_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
+            aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
+            pm.connectAttr(self.leg_output_objs[index + 1].attr("matrix"),
+                           aim_m.attr("primaryTargetMatrix"),
+                           force=True)
         else:
-            pm.parentConstraint(self.upper_start_bind, self.arm_output_objs[0])
+            pm.parentConstraint(self.upper_start_bind, self.leg_output_objs[0])
         if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
             mid_index = len(upper_jnt_v_values)
-            cons = pm.orientConstraint([self.arm_output_objs[mid_index - 1], self.arm_output_objs[mid_index + 1]],
-                                       self.arm_output_objs[mid_index])
+            cons = pm.orientConstraint([self.leg_output_objs[mid_index - 1], self.leg_output_objs[mid_index + 1]],
+                                       self.leg_output_objs[mid_index])
             cons.attr("interpType").set(2)
         if data["lower_division"] > 1:
             mid1_uniform_attr = attribute.add(self.mid1_ctl,
@@ -507,17 +513,13 @@ class Leg2Jnt01Rig(piece.Rig):
                                   sorted(lower_jnt_v_values)[:-1],
                                   lower_bind_jnts,
                                   mid1_uniform_attr,
-                                  self.arm_output_objs[len(upper_jnt_v_values):],
+                                  self.leg_output_objs[len(upper_jnt_v_values):],
                                   negate=self.ddata.negate)
-            aim_m = \
-                self.arm_output_objs[len(upper_jnt_v_values) - 1].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
+            aim_m = self.leg_output_objs[-2].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
             aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-            pm.connectAttr(uvpin2.attr("outputMatrix")[0], aim_m.attr("primaryTargetMatrix"), force=True)
-            aim_m = self.arm_output_objs[-2].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
-            aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-            pm.connectAttr(self.arm_output_objs[-1].attr("matrix"), aim_m.attr("primaryTargetMatrix"), force=True)
+            pm.connectAttr(self.leg_output_objs[-1].attr("matrix"), aim_m.attr("primaryTargetMatrix"), force=True)
         else:
-            pm.parentConstraint(self.lower_start_bind, self.arm_output_objs[1])
+            pm.parentConstraint(self.lower_start_bind, self.leg_output_objs[1])
 
         pm.parentConstraint(self.blend_objs[-1], obj, maintainOffset=True)
 
@@ -526,9 +528,9 @@ class Leg2Jnt01Rig(piece.Rig):
 
         # refs
         self.refs = []
-        for i, obj in enumerate(self.arm_output_objs):
+        for i, obj in enumerate(self.leg_output_objs):
             name = self.naming(f"{i}", "ref", _s="ctl")
-            if i == 0 or i == len(self.arm_output_objs) - 1 or i == len(upper_jnt_v_values):
+            if i == 0 or i == len(self.leg_output_objs) - 1 or i == len(upper_jnt_v_values):
                 anchor = True
             else:
                 anchor = False
@@ -542,7 +544,10 @@ class Leg2Jnt01Rig(piece.Rig):
             uni_scale = True
 
         parent = None
+        jnt = None
         for i, ref in enumerate(self.refs):
+            if i == 1 or i == len(upper_jnt_v_values) + 1:
+                parent = jnt
             name = self.naming(f"{i}", _s="jnt")
             m = ref.getMatrix(worldSpace=True)
             parent = self.create_jnt(context=context,
@@ -775,10 +780,10 @@ class Leg2Jnt01Rig(piece.Rig):
                          self.squash_attrs,
                          self.stretch_attrs,
                          self.volume_attr,
-                         self.arm_output_objs)
+                         self.leg_output_objs)
 
         # auto knee thickness
-        if data["support_knee_jnt"]:
+        if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
             distance1 = self.ik_jnts[1].attr("tx").get()
             distance2 = self.ik_jnts[2].attr("tx").get()
             if distance1 < 0:
