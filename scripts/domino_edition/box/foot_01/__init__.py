@@ -345,6 +345,7 @@ class Foot01Rig(piece.Rig):
             attr = attribute.add(host,
                                  f"{name}_angle{i}",
                                  "float",
+                                 shortName=f"angle{i}",
                                  value=data["roll_angle"],
                                  defaultValue=data["roll_angle"],
                                  keyable=True)
