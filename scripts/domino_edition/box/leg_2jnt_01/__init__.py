@@ -484,12 +484,13 @@ class Leg2Jnt01Rig(piece.Rig):
                                   mid0_uniform_attr,
                                   self.leg_output_objs[:len(lower_jnt_v_values) * -1],
                                   negate=self.ddata.negate)
-            index = len(upper_jnt_v_values) - 1
-            aim_m = self.leg_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
-            aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-            pm.connectAttr(self.leg_output_objs[index + 1].attr("matrix"),
-                           aim_m.attr("primaryTargetMatrix"),
-                           force=True)
+            if not (data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1):
+                index = len(upper_jnt_v_values) - 1
+                aim_m = self.leg_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
+                aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
+                pm.connectAttr(self.leg_output_objs[index + 1].attr("matrix"),
+                               aim_m.attr("primaryTargetMatrix"),
+                               force=True)
         else:
             pm.parentConstraint(self.upper_start_bind, self.leg_output_objs[0])
         if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
@@ -545,19 +546,31 @@ class Leg2Jnt01Rig(piece.Rig):
 
         parent = None
         jnt = None
+        twist_index = 0
         for i, ref in enumerate(self.refs):
             if i == 1 or i == len(upper_jnt_v_values) + 1:
                 parent = jnt
-            name = self.naming(f"{i}", _s="jnt")
+            if i == 0:
+                name = self.naming("thigh", _s="jnt")
+            elif i == len(upper_jnt_v_values):
+                name = self.naming("knee", _s="jnt")
+                twist_index = 0
+            elif i == len(self.refs) - 1:
+                name = self.naming("ankle", _s="jnt")
+            elif i < len(upper_jnt_v_values):
+                name = self.naming(f"upperTwist{twist_index}", _s="jnt")
+            else:
+                name = self.naming(f"lowerTwist{twist_index}", _s="jnt")
             m = ref.getMatrix(worldSpace=True)
-            parent = self.create_jnt(context=context,
-                                     parent=parent,
-                                     name=name,
-                                     description=f"{i}",
-                                     ref=ref,
-                                     m=m,
-                                     leaf=False,
-                                     uni_scale=uni_scale)
+            jnt = self.create_jnt(context=context,
+                                  parent=parent,
+                                  name=name,
+                                  description=f"{i}",
+                                  ref=ref,
+                                  m=m,
+                                  leaf=False,
+                                  uni_scale=uni_scale)
+            twist_index += 1
 
     def attributes(self, context):
         super(Leg2Jnt01Rig, self).attributes(context)
