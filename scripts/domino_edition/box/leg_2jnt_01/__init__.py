@@ -647,7 +647,7 @@ class Leg2Jnt01Rig(piece.Rig):
                                                           keyable=True,
                                                           minValue=0,
                                                           maxValue=2,
-                                                          defaultValue=0)
+                                                          defaultValue=1)
         if data["upper_division"] > 1:
             self.upper_uniform_attr = attribute.add(self.mid0_ctl,
                                                     longName="uniform",
@@ -797,7 +797,7 @@ class Leg2Jnt01Rig(piece.Rig):
             pm.setDrivenKeyframe(md.attr("input2X"),
                                  currentDriver=self.blend_objs[1].attr("rz"),
                                  driverValue=-180,
-                                 value=length / float(distance2) / 3,
+                                 value=length / float(distance2) / 5,
                                  inTangentType="linear",
                                  outTangentType="linear")
 
