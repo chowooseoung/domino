@@ -4,19 +4,17 @@ import logging
 
 
 class Logger:
-
     logger = None
-    formatter = logging.Formatter('[%(asctime)s][%(levelname)s] %(message)s',
-                                  "%y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter('[%(asctime)s][%(levelname)s] %(message)s', "%y-%m-%d %H:%M:%S")
 
-    @ classmethod
+    @classmethod
     def LOGGER(cls):
         if cls.logger is None:
             cls.logger = logging.getLogger("domino")
             cls.logger.propagate = False
             cls.DEBUG(False)
 
-    @ classmethod
+    @classmethod
     def DEBUG(cls, status):
         if cls.logger:
             handlers = cls.logger.handlers.copy()
@@ -37,27 +35,27 @@ class Logger:
             file_handler.setFormatter(cls.formatter)
             cls.logger.addHandler(file_handler)
 
-    @ classmethod
+    @classmethod
     def info(cls, msg):
         cls.logger.info(msg)
 
-    @ classmethod
+    @classmethod
     def warn(cls, msg):
         cls.logger.warn(msg)
 
-    @ classmethod
+    @classmethod
     def warning(cls, msg):
         cls.logger.warning(msg)
 
-    @ classmethod
+    @classmethod
     def error(cls, msg):
         cls.logger.error(msg)
 
-    @ classmethod
+    @classmethod
     def critical(cls, msg):
         cls.logger.critical(msg)
 
-    @ classmethod
+    @classmethod
     def debug(cls, msg):
         cls.logger.debug(msg)
 

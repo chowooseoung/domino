@@ -55,7 +55,6 @@ def child(obj, name=None, shape="cube", **kwargs):
     return ctl
 
 
-
 def get_child_controller(obj):
     child = pm.controller(obj, query=True, children=True)
     children = []
