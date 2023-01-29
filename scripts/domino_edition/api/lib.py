@@ -325,9 +325,10 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
             Rig.blackbox(context)
 
         # select
-        sets = context["asset"][1].attr("sets").inputs()
-        if sets:
-            pm.select(sets, noExpand=True, replace=True)
+        if context["asset"][1].hasAttr("sets"):
+            sets = context["asset"][1].attr("sets").inputs()
+            if sets:
+                pm.select(sets, noExpand=True, replace=True)
         if pm.objExists(context["asset"][0]):
             pm.select(context["asset"][0], add=True)
         if pm.objExists(context["asset"][1]):
