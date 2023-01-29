@@ -559,7 +559,6 @@ class Leg2Jnt01Rig(piece.Rig):
         host = self.create_host(context)
 
         data = self.data(Leg2Jnt01Data.SELF)
-        name = str(self.ddata.identifier)
         self.fk0_length_attr = attribute.add(self.fk0_ctl,
                                              "length",
                                              "float",
@@ -575,53 +574,46 @@ class Leg2Jnt01Rig(piece.Rig):
                                              defaultValue=1,
                                              keyable=True)
         self.fk_ik_attr = attribute.add(host,
-                                        f"{name}_fk_ik",
+                                        f"fk_ik",
                                         "float",
-                                        shortName="fk_ik",
                                         keyable=True,
                                         minValue=0,
                                         maxValue=1,
                                         defaultValue=data["fk_ik"])
         self.roll_attr = attribute.add(host,
-                                       f"{name}_roll",
+                                       f"roll",
                                        "float",
-                                       shortName="roll",
                                        keyable=True,
                                        defaultValue=0)
         self.armpit_roll_attr = attribute.add(host,
-                                              f"{name}_armpit_roll",
+                                              f"armpit_roll",
                                               "float",
-                                              shortName="armpit_roll",
                                               keyable=True,
                                               defaultValue=0)
         self.scale_attr = attribute.add(host,
-                                        f"{name}_scale",
+                                        f"scale_",
                                         "float",
-                                        shortName="_scale",
                                         keyable=True,
                                         minValue=0.01,
                                         maxValue=999,
                                         defaultValue=1)
         self.slide_attr = attribute.add(host,
-                                        f"{name}_slide",
+                                        f"slide",
                                         "float",
-                                        shortName="slide",
                                         keyable=True,
                                         minValue=0,
                                         maxValue=1,
                                         defaultValue=0.5)
         self.max_stretch_attr = attribute.add(host,
-                                              f"{name}_max_stretch",
+                                              f"max_stretch",
                                               "float",
-                                              shortName="max_stretch",
                                               keyable=True,
                                               minValue=1,
                                               maxValue=999,
                                               defaultValue=data["max_stretch"])
         self.volume_attr = attribute.add(host,
-                                         f"{name}_volume",
+                                         f"volume",
                                          "float",
-                                         shortName="volume",
                                          keyable=True,
                                          minValue=0,
                                          maxValue=1,
@@ -650,9 +642,8 @@ class Leg2Jnt01Rig(piece.Rig):
                                                    defaultValue=value))
         if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
             self.auto_knee_thickness_attr = attribute.add(host,
-                                                          f"{name}_auto_knee_thickness",
+                                                          f"auto_knee_thickness",
                                                           "float",
-                                                          shortName="auto_knee_thickness",
                                                           keyable=True,
                                                           minValue=0,
                                                           maxValue=2,

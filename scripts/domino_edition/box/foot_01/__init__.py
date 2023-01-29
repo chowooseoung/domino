@@ -339,13 +339,11 @@ class Foot01Rig(piece.Rig):
         host = self.create_host(context)
 
         data = self.data(Foot01Data.SELF)
-        name = str(self.ddata.identifier)
         self.roll_angle_attrs = []
         for i, ctl in enumerate(self.fk_ctls):
             attr = attribute.add(host,
-                                 f"{name}_angle{i}",
+                                 f"angle{i}",
                                  "float",
-                                 shortName=f"angle{i}",
                                  value=data["roll_angle"],
                                  defaultValue=data["roll_angle"],
                                  keyable=True)
