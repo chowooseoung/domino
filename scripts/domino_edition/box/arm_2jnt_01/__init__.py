@@ -970,6 +970,7 @@ class Arm2jnt01Rig(piece.Rig):
             pm.poseInterpolator(interpolator, edit=True, addPose="FRONT140_pose")
             pm.matchTransform(self.auto_clavicle_jnts[0], arm_back_140_target, rotation=True)
             pm.poseInterpolator(interpolator, edit=True, addPose="BACK140_pose")
+            self.auto_clavicle_jnts[0].attr("rotate").set((0, 0, 0))
             mds = []
             values = [0,  # neutral
                       0,  # t
