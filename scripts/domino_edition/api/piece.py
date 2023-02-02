@@ -447,7 +447,7 @@ class DData:
                             # matrices
                             m_attr = self.node.attr("support_jnt_matrices")
                             _attr_index = self.node.attr(_attr).index()
-                            matrices.append(pm.getAttr(m_attr[_attr_index]))
+                            matrices.append(attribute._get(m_attr[_attr_index]))
                 if is_blended:
                     data["blended_jnt_names"] = \
                         ",".join([str(x) for x in names])
@@ -1432,12 +1432,9 @@ class Rig:
         blended_jnt_names = data["blended_jnt_names"].split(",")
         support_jnt_names = data["support_jnt_names"].split(",")
         support_jnt_descriptions = data["support_jnt_descriptions"].split(",")
-        blended_jnt_indices = [
-            int(x) for x in data["blended_jnt_indices"].split(",") if x]
-        support_jnt_indices = [
-            int(x) for x in data["support_jnt_indices"].split(",") if x]
-        support_jnt_matrices = [
-            dt.Matrix(x) for x in data["support_jnt_matrices"]]
+        blended_jnt_indices = [int(x) for x in data["blended_jnt_indices"].split(",") if x]
+        support_jnt_indices = [int(x) for x in data["support_jnt_indices"].split(",") if x]
+        support_jnt_matrices = [dt.Matrix(x) for x in data["support_jnt_matrices"]]
 
         # blend
         name = ""
