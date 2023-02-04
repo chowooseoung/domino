@@ -627,6 +627,7 @@ class Guide:
     def create_locator(self, parent):
         loc = pm.spaceLocator()
         pm.parent(loc, parent)
+        pm.matchTransform(loc, parent, position=True, rotation=True, scale=True)
         loc.rename(f"{str(self.ddata.identifier)}_{naming.GUIDE_LOC_EXT}")
         loc.attr("hiddenInOutliner").set(True)
         loc.attr("overrideEnabled").set(1)
