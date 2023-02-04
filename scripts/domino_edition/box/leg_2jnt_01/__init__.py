@@ -546,12 +546,9 @@ class Leg2Jnt01Rig(piece.Rig):
         if assembly_data["force_uni_scale"]:
             uni_scale = True
 
-        parent = None
         jnt = None
         twist_index = 0
         for i, ref in enumerate(self.refs):
-            if i == 1 or i == len(upper_jnt_v_values) + 1:
-                parent = jnt
             if i == 0:
                 name = self.naming("thigh", _s="jnt")
             elif i == len(upper_jnt_v_values):
@@ -565,7 +562,7 @@ class Leg2Jnt01Rig(piece.Rig):
                 name = self.naming(f"lowerTwist{twist_index}", _s="jnt")
             m = ref.getMatrix(worldSpace=True)
             jnt = self.create_jnt(context=context,
-                                  parent=parent,
+                                  parent=jnt,
                                   name=name,
                                   description=f"{i}",
                                   ref=ref,
