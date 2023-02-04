@@ -347,17 +347,22 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.rig_page, u"Rig Settings")
         self.sub_piece_page = QWidget()
         self.sub_piece_page.setObjectName(u"sub_piece_page")
-        self.sub_piece_page.setGeometry(QRect(0, 0, 172, 211))
+        self.sub_piece_page.setGeometry(QRect(0, 0, 372, 519))
         self.gridLayout_4 = QGridLayout(self.sub_piece_page)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.run_sub_pieces_checkBox = QCheckBox(self.sub_piece_page)
+        self.run_sub_pieces_checkBox.setObjectName(u"run_sub_pieces_checkBox")
+
+        self.gridLayout_4.addWidget(self.run_sub_pieces_checkBox, 0, 0, 1, 2)
+
         self.verticalSpacer_2 = QSpacerItem(20, 46, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout_4.addItem(self.verticalSpacer_2, 7, 1, 1, 1)
+        self.gridLayout_4.addItem(self.verticalSpacer_2, 8, 1, 1, 1)
 
-        self.sub_pieces_new_pushButton = QPushButton(self.sub_piece_page)
-        self.sub_pieces_new_pushButton.setObjectName(u"sub_pieces_new_pushButton")
+        self.sub_pieces_remove_pushButton = QPushButton(self.sub_piece_page)
+        self.sub_pieces_remove_pushButton.setObjectName(u"sub_pieces_remove_pushButton")
 
-        self.gridLayout_4.addWidget(self.sub_pieces_new_pushButton, 3, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.sub_pieces_remove_pushButton, 5, 1, 1, 1)
 
         self.sub_pieces_listWidget = QListWidget(self.sub_piece_page)
         QListWidgetItem(self.sub_pieces_listWidget)
@@ -366,43 +371,47 @@ class Ui_Dialog(object):
         QListWidgetItem(self.sub_pieces_listWidget)
         QListWidgetItem(self.sub_pieces_listWidget)
         self.sub_pieces_listWidget.setObjectName(u"sub_pieces_listWidget")
+        self.sub_pieces_listWidget.setDragEnabled(True)
+        self.sub_pieces_listWidget.setDragDropMode(QAbstractItemView.InternalMove)
+        self.sub_pieces_listWidget.setAlternatingRowColors(True)
+        self.sub_pieces_listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        self.gridLayout_4.addWidget(self.sub_pieces_listWidget, 2, 0, 6, 1)
-
-        self.sub_pieces_run_sel_pushButton = QPushButton(self.sub_piece_page)
-        self.sub_pieces_run_sel_pushButton.setObjectName(u"sub_pieces_run_sel_pushButton")
-
-        self.gridLayout_4.addWidget(self.sub_pieces_run_sel_pushButton, 6, 1, 1, 1)
-
-        self.sub_pieces_add_pushButton = QPushButton(self.sub_piece_page)
-        self.sub_pieces_add_pushButton.setObjectName(u"sub_pieces_add_pushButton")
-
-        self.gridLayout_4.addWidget(self.sub_pieces_add_pushButton, 2, 1, 1, 1)
-
-        self.run_sub_pieces_checkBox = QCheckBox(self.sub_piece_page)
-        self.run_sub_pieces_checkBox.setObjectName(u"run_sub_pieces_checkBox")
-
-        self.gridLayout_4.addWidget(self.run_sub_pieces_checkBox, 0, 0, 1, 2)
-
-        self.sub_pieces_edit_pushButton = QPushButton(self.sub_piece_page)
-        self.sub_pieces_edit_pushButton.setObjectName(u"sub_pieces_edit_pushButton")
-
-        self.gridLayout_4.addWidget(self.sub_pieces_edit_pushButton, 4, 1, 1, 1)
-
-        self.sub_pieces_remove_pushButton = QPushButton(self.sub_piece_page)
-        self.sub_pieces_remove_pushButton.setObjectName(u"sub_pieces_remove_pushButton")
-
-        self.gridLayout_4.addWidget(self.sub_pieces_remove_pushButton, 5, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.sub_pieces_listWidget, 2, 0, 7, 1)
 
         self.search_lineEdit = QLineEdit(self.sub_piece_page)
         self.search_lineEdit.setObjectName(u"search_lineEdit")
 
         self.gridLayout_4.addWidget(self.search_lineEdit, 1, 0, 1, 2)
 
+        self.sub_pieces_add_pushButton = QPushButton(self.sub_piece_page)
+        self.sub_pieces_add_pushButton.setObjectName(u"sub_pieces_add_pushButton")
+
+        self.gridLayout_4.addWidget(self.sub_pieces_add_pushButton, 2, 1, 1, 1)
+
+        self.sub_pieces_new_pushButton = QPushButton(self.sub_piece_page)
+        self.sub_pieces_new_pushButton.setObjectName(u"sub_pieces_new_pushButton")
+
+        self.gridLayout_4.addWidget(self.sub_pieces_new_pushButton, 3, 1, 1, 1)
+
+        self.sub_pieces_run_sel_pushButton = QPushButton(self.sub_piece_page)
+        self.sub_pieces_run_sel_pushButton.setObjectName(u"sub_pieces_run_sel_pushButton")
+
+        self.gridLayout_4.addWidget(self.sub_pieces_run_sel_pushButton, 6, 1, 1, 1)
+
+        self.sub_pieces_edit_pushButton = QPushButton(self.sub_piece_page)
+        self.sub_pieces_edit_pushButton.setObjectName(u"sub_pieces_edit_pushButton")
+
+        self.gridLayout_4.addWidget(self.sub_pieces_edit_pushButton, 4, 1, 1, 1)
+
+        self.localizing_pushButton = QPushButton(self.sub_piece_page)
+        self.localizing_pushButton.setObjectName(u"localizing_pushButton")
+
+        self.gridLayout_4.addWidget(self.localizing_pushButton, 7, 1, 1, 1)
+
         self.toolBox.addItem(self.sub_piece_page, u"Sub Piece Settings")
         self.name_rule_page = QWidget()
         self.name_rule_page.setObjectName(u"name_rule_page")
-        self.name_rule_page.setGeometry(QRect(0, 0, 313, 452))
+        self.name_rule_page.setGeometry(QRect(0, 0, 372, 519))
         self.gridLayout_8 = QGridLayout(self.name_rule_page)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.groupBox_6 = QGroupBox(self.name_rule_page)
@@ -718,7 +727,8 @@ class Ui_Dialog(object):
         self.label_6.setText(QCoreApplication.translate("Dialog", u"Center", None))
         self.use_RGB_colors_checkBox.setText(QCoreApplication.translate("Dialog", u"Use RGB Colors", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.rig_page), QCoreApplication.translate("Dialog", u"Rig Settings", None))
-        self.sub_pieces_new_pushButton.setText(QCoreApplication.translate("Dialog", u"New", None))
+        self.run_sub_pieces_checkBox.setText(QCoreApplication.translate("Dialog", u"Run sub pieces", None))
+        self.sub_pieces_remove_pushButton.setText(QCoreApplication.translate("Dialog", u"Remove", None))
 
         __sortingEnabled = self.sub_pieces_listWidget.isSortingEnabled()
         self.sub_pieces_listWidget.setSortingEnabled(False)
@@ -734,11 +744,11 @@ class Ui_Dialog(object):
         ___qlistwidgetitem4.setText(QCoreApplication.translate("Dialog", u"cleanup", None));
         self.sub_pieces_listWidget.setSortingEnabled(__sortingEnabled)
 
-        self.sub_pieces_run_sel_pushButton.setText(QCoreApplication.translate("Dialog", u"Run. Sel", None))
         self.sub_pieces_add_pushButton.setText(QCoreApplication.translate("Dialog", u"Add", None))
-        self.run_sub_pieces_checkBox.setText(QCoreApplication.translate("Dialog", u"Run sub pieces", None))
+        self.sub_pieces_new_pushButton.setText(QCoreApplication.translate("Dialog", u"New", None))
+        self.sub_pieces_run_sel_pushButton.setText(QCoreApplication.translate("Dialog", u"Run. Sel", None))
         self.sub_pieces_edit_pushButton.setText(QCoreApplication.translate("Dialog", u"Edit", None))
-        self.sub_pieces_remove_pushButton.setText(QCoreApplication.translate("Dialog", u"Remove", None))
+        self.localizing_pushButton.setText(QCoreApplication.translate("Dialog", u"Localizing", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.sub_piece_page), QCoreApplication.translate("Dialog", u"Sub Piece Settings", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("Dialog", u"Controls Naming Rule", None))
         self.ctl_name_rule_reset_pushButton.setText(QCoreApplication.translate("Dialog", u"Reset", None))

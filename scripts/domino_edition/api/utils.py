@@ -12,8 +12,13 @@ from . import piece
 from pymel import core as pm
 
 # gui
-from PySide2 import QtWidgets
-from PySide2 import QtCore
+from PySide2 import (QtWidgets,
+                     QtCore)
+
+DOMINO_DEFAULT_EDITION = "DOMINO_DEFAULT_EDITION"
+DOMINO_CUSTOM_EDITION = "DOMINO_CUSTOM_EDITION"
+DOMINO_TEMPLATE_DIR = "DOMINO_TEMPLATE_DIR"
+DOMINO_SUB_PIECE_DIR = "DOMINO_SUB_PIECE_DIR"
 
 
 def collect_piece(guide, rig, datas, include_assembly=False):
@@ -54,17 +59,17 @@ def collect_piece(guide, rig, datas, include_assembly=False):
 
 def register_editions():
     dir_name = os.path.dirname(__file__)
-    os.environ["DOMINO_DEFAULT_EDITION"] = os.path.join(dir_name, "..", "box")
-    custom_edition_dir = os.getenv("DOMINO_CUSTOM_EDITION", None)
+    os.environ[DOMINO_DEFAULT_EDITION] = os.path.join(dir_name, "..", "box")
+    custom_edition_dir = os.getenv(DOMINO_CUSTOM_EDITION, None)
     if custom_edition_dir and custom_edition_dir not in sys.path:
         log.Logger.info(f"append custom edition path '{custom_edition_dir}'")
         sys.path.append(custom_edition_dir)
-    os.environ["DOMINO_TEMPLATES_DIR"] = os.path.normpath(os.path.join(dir_name, "..", "..", "templates"))
+    os.environ[DOMINO_TEMPLATE_DIR] = os.path.normpath(os.path.join(dir_name, "..", "..", "..", "templates"))
 
 
 def import_piece_module(name):
     box_dir = "domino_edition.box"
-    custom_dir = os.getenv("DOMINO_CUSTOM_EDITION", None)
+    custom_dir = os.getenv(DOMINO_CUSTOM_EDITION, None)
     try:
         module = importlib.import_module(f"{box_dir}.{name}")
         importlib.reload(module)
@@ -87,7 +92,7 @@ def import_piece_module(name):
 
 def import_piece_settings(name):
     box_dir = "domino_edition.box"
-    custom_dir = os.getenv("DOMINO_CUSTOM_EDITION", None)
+    custom_dir = os.getenv(DOMINO_CUSTOM_EDITION, None)
     try:
         module = importlib.import_module(f"{box_dir}.{name}.settings")
         importlib.reload(module)

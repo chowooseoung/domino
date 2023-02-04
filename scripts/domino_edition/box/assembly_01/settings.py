@@ -1,18 +1,36 @@
 # domino
+import sys
+
+from domino.api import log
 from domino_edition.api import naming
+from domino_edition.api.utils import DOMINO_SUB_PIECE_DIR
+from ...api import lib
 
 # built-ins
 from functools import partial
+import os
+import subprocess
 
 # gui
 from domino_edition.ui import (DominoDialog,
                                UiFunctionSet)
 from . import settings_ui
-from PySide2 import QtCore
+from PySide2 import (QtWidgets,
+                     QtCore,
+                     QtGui)
+
+# maya
+from pymel import core as pm
 
 
 class Settings(DominoDialog, settings_ui.Ui_Dialog):
     title_name = "Assembly Settings"
+
+    green_brush = QtGui.QColor(0, 160, 0)
+    red_brush = QtGui.QColor(180, 0, 0)
+    white_brush = QtGui.QColor(255, 255, 255)
+    white_down_brush = QtGui.QColor(160, 160, 160)
+    orange_brush = QtGui.QColor(240, 160, 0)
 
     def __init__(self, parent=None):
         super(Settings, self).__init__(parent=parent)
@@ -105,6 +123,12 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
         self.ui_funcs.install_checkBox(
             ui.run_sub_pieces_checkBox,
             "run_sub_pieces")
+
+        ui.sub_pieces_add_pushButton.clicked.connect(self.add_sub_piece)
+        ui.sub_pieces_new_pushButton.clicked.connect(self.new_sub_piece)
+        ui.sub_pieces_edit_pushButton.clicked.connect(self.edit_sub_piece)
+        ui.sub_pieces_remove_pushButton.clicked.connect(self.delete_sub_piece)
+        ui.sub_pieces_run_sel_pushButton.clicked.connect(self.run_sub_piece)
 
         ui.ctl_name_rule_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
@@ -208,10 +232,16 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
             ui.jnt_extensions_name_lineEdit,
             "jnt_name_ext")
 
+        # right click menu
+        self.ui_funcs.init_listWidget(ui.sub_pieces_listWidget, "sub_pieces")
+        ui.sub_pieces_listWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        ui.sub_pieces_listWidget.customContextMenuRequested.connect(partial(self.sub_piece_context_menu))
+        ui.sub_pieces_listWidget.installEventFilter(self)
+
     def resize_window(self):
         index = self.toolBox.currentIndex()
         if index == 0:
-            size = QtCore.QSize(370, 601)
+            size = QtCore.QSize(370, 605)
             self.resize(size)
         elif index == 1:
             size = QtCore.QSize(370, 510)
@@ -219,3 +249,167 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
         elif index == 2:
             size = QtCore.QSize(370, 574)
             self.resize(size)
+
+    def add_sub_piece(self):
+        sub_piece_dir = os.getenv(DOMINO_SUB_PIECE_DIR, "")
+        directory = sub_piece_dir if sub_piece_dir else pm.workspace(q=True, rootDirectory=True)
+
+        file_path = pm.fileDialog2(fileMode=1,
+                                   startingDirectory=directory,
+                                   okc="Add",
+                                   fileFilter="Sub piece .py (*.py)")
+        if not file_path:
+            return
+        file_path = file_path[0]
+        file_name = os.path.splitext(os.path.basename(file_path))[0]
+
+        # Quick clean the first empty item
+        items_list = [i.text() for i in self.sub_pieces_listWidget.findItems("", QtCore.Qt.MatchContains)]
+        if items_list and not items_list[0]:
+            self.sub_pieces_listWidget.takeItem(0)
+
+        if sub_piece_dir:
+            file_path = os.path.abspath(file_path)
+            base_path = os.path.abspath(sub_piece_dir)
+            file_path = file_path.replace(base_path, "").replace("\\", "/")
+            if file_path.startswith("/"):
+                file_path = file_path[1:]
+
+        item_data = file_name + " | " + file_path
+        item = QtWidgets.QListWidgetItem(item_data)
+        self.sub_pieces_listWidget.addItem(item)
+        self.ui_funcs.update_listWidget(self.sub_pieces_listWidget, "sub_pieces")
+
+    def new_sub_piece(self):
+        sub_piece_dir = os.getenv(DOMINO_SUB_PIECE_DIR, "")
+        directory = sub_piece_dir if sub_piece_dir else pm.workspace(q=True, rootDirectory=True)
+
+        file_path = pm.fileDialog2(fileMode=0,
+                                   startingDirectory=directory,
+                                   okc="Add",
+                                   fileFilter="Sub piece .py (*.py)")
+        if not file_path:
+            return
+        file_path = file_path[0]
+        file_name = os.path.splitext(os.path.basename(file_path))[0]
+
+        # Quick clean the first empty item
+        items_list = [i.text() for i in self.sub_pieces_listWidget.findItems("", QtCore.Qt.MatchContains)]
+        if items_list and not items_list[0]:
+            self.sub_pieces_listWidget.takeItem(0)
+
+        content = """# domino 
+import domino_edition.api.piece as p
+
+        
+class SubPiece(p.AbstractSubPiece):
+
+    def run(self, context):
+        ...
+"""
+        with open(file_path, "w") as f:
+            f.write(content)
+
+        if sub_piece_dir:
+            file_path = os.path.abspath(file_path)
+            base_path = os.path.abspath(sub_piece_dir)
+            file_path = file_path.replace(base_path, "").replace("\\", "/")
+            if file_path.startswith("/"):
+                file_path = file_path[1:]
+
+        item_data = file_name + " | " + file_path
+        item = QtWidgets.QListWidgetItem(item_data)
+        self.sub_pieces_listWidget.addItem(item)
+        self.ui_funcs.update_listWidget(self.sub_pieces_listWidget, "sub_pieces")
+
+    def edit_sub_piece(self):
+        items = self.sub_pieces_listWidget.selectedItems()
+        if not items:
+            return
+        data = items[0].text()
+        full_path = data.split(" | ")[-1]
+
+        if full_path:
+            try:
+                if sys.platform.startswith("darwin"):
+                    subprocess.call(("open", full_path))
+                elif os.name == "nt":
+                    os.startfile(full_path)
+                elif os.name == "posix":
+                    subprocess.call("xdg-open", full_path)
+            except Exception:
+                log.Logger.error(f"'{full_path}' can't be find")
+
+    def delete_sub_piece(self):
+        for item in self.sub_pieces_listWidget.selectedItems():
+            if item.text() in ["objects", "attributes", "operators", "connections", "cleanup"]:
+                item.setSelected(False)
+        self.ui_funcs.remove_items_listWidget(self.sub_pieces_listWidget, "sub_pieces")
+
+    def run_sub_piece(self):
+        items = self.sub_pieces_listWidget.selectedItems()
+        if items:
+            lib.run_sub_pieces({"run_sub_pieces": True}, [i.text() for i in items])
+
+    def sub_piece_context_menu(self, QPos):
+        current_item = self.sub_pieces_listWidget.currentItem()
+        if current_item is None:
+            return None
+        self.sub_piece_menu = QtWidgets.QMenu()
+        parent_position = self.sub_pieces_listWidget.mapToGlobal(QtCore.QPoint(0, 0))
+        menu_item_01 = self.sub_piece_menu.addAction("Toggle Sub Piece")
+        self.sub_piece_menu.addSeparator()
+        menu_item_02 = self.sub_piece_menu.addAction("Turn OFF Selected")
+        menu_item_03 = self.sub_piece_menu.addAction("Turn ON Selected")
+        self.sub_piece_menu.addSeparator()
+        menu_item_04 = self.sub_piece_menu.addAction("Turn OFF All")
+        menu_item_05 = self.sub_piece_menu.addAction("Turn ON All")
+
+        menu_item_01.triggered.connect(self.toggle_status_sub_piece)
+        menu_item_02.triggered.connect(partial(self.set_status_sub_piece, False, True))
+        menu_item_03.triggered.connect(partial(self.set_status_sub_piece, True, True))
+        menu_item_04.triggered.connect(partial(self.set_status_sub_piece, False, False))
+        menu_item_05.triggered.connect(partial(self.set_status_sub_piece, True, False))
+
+        self.sub_piece_menu.move(parent_position + QPos)
+        self.sub_piece_menu.show()
+
+    def toggle_status_sub_piece(self):
+        items = self.sub_pieces_listWidget.selectedItems()
+        for item in items:
+            if item.text().startswith("*"):
+                item.setText(item.text()[1:])
+            else:
+                item.setText("*" + item.text())
+        self.ui_funcs.update_listWidget(self.sub_pieces_listWidget, "sub_pieces")
+
+    def set_status_sub_piece(self, status, selected):
+        if selected:
+            items = self.sub_pieces_listWidget.selectedItems()
+        else:
+            items = [self.sub_pieces_listWidget.item(i) for i in range(self.sub_pieces_listWidget.count())]
+
+        for item in items:
+            off = item.text().startswith("*")
+            if status and off:
+                item.setText(item.text()[1:])
+            elif not status and not off:
+                item.setText("*" + item.text())
+        self.ui_funcs.update_listWidget(self.sub_pieces_listWidget, "sub_pieces")
+
+    def eventFilter(self, sender, event):
+        if event.type() == QtCore.QEvent.ChildRemoved:
+            if sender == self.sub_pieces_listWidget:
+                datas = [i.text() for i in self.sub_pieces_listWidget.selectedItems()]
+                const_check = False
+                for const in ["objects", "attributes", "operators", "connections", "cleanup"]:
+                    if const in datas:
+                        const_check = True
+                        break
+                if const_check:
+                    self.ui_funcs.init_listWidget(sender, "sub_pieces")
+                else:
+                    self.ui_funcs.update_listWidget(sender, "sub_pieces")
+            return True
+        else:
+            return QtWidgets.QDialog.eventFilter(self, sender, event)

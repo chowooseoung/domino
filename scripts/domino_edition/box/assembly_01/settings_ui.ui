@@ -595,15 +595,22 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>172</width>
-        <height>211</height>
+        <width>372</width>
+        <height>519</height>
        </rect>
       </property>
       <attribute name="label">
        <string>Sub Piece Settings</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="7" column="1">
+       <item row="0" column="0" colspan="2">
+        <widget class="QCheckBox" name="run_sub_pieces_checkBox">
+         <property name="text">
+          <string>Run sub pieces</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -616,15 +623,27 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
          </property>
         </spacer>
        </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="sub_pieces_new_pushButton">
+       <item row="5" column="1">
+        <widget class="QPushButton" name="sub_pieces_remove_pushButton">
          <property name="text">
-          <string>New</string>
+          <string>Remove</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" rowspan="6">
+       <item row="2" column="0" rowspan="7">
         <widget class="QListWidget" name="sub_pieces_listWidget">
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
          <item>
           <property name="text">
            <string>objects</string>
@@ -652,12 +671,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
          </item>
         </widget>
        </item>
-       <item row="6" column="1">
-        <widget class="QPushButton" name="sub_pieces_run_sel_pushButton">
-         <property name="text">
-          <string>Run. Sel</string>
-         </property>
-        </widget>
+       <item row="1" column="0" colspan="2">
+        <widget class="QLineEdit" name="search_lineEdit"/>
        </item>
        <item row="2" column="1">
         <widget class="QPushButton" name="sub_pieces_add_pushButton">
@@ -666,10 +681,17 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="run_sub_pieces_checkBox">
+       <item row="3" column="1">
+        <widget class="QPushButton" name="sub_pieces_new_pushButton">
          <property name="text">
-          <string>Run sub pieces</string>
+          <string>New</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QPushButton" name="sub_pieces_run_sel_pushButton">
+         <property name="text">
+          <string>Run. Sel</string>
          </property>
         </widget>
        </item>
@@ -680,15 +702,12 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="QPushButton" name="sub_pieces_remove_pushButton">
+       <item row="7" column="1">
+        <widget class="QPushButton" name="localizing_pushButton">
          <property name="text">
-          <string>Remove</string>
+          <string>Localizing</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QLineEdit" name="search_lineEdit"/>
        </item>
       </layout>
      </widget>
@@ -697,8 +716,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>313</width>
-        <height>452</height>
+        <width>372</width>
+        <height>519</height>
        </rect>
       </property>
       <attribute name="label">

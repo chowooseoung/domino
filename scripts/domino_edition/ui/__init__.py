@@ -94,29 +94,29 @@ class UiFunctionSet:
             self.closed = True
 
     def get_attr_from_piece(self, attr):
-        at = pm.attributeQuery(attr, node=self._root, attributeType=True)
+        at = pm.attributeQuery(attr, node=self.root, attributeType=True)
         if at == "enum":
-            return pm.getAttr(f"{self._root}.{attr}", asString=True)
-        return pm.getAttr(f"{self._root}.{attr}")
+            return pm.getAttr(f"{self.root}.{attr}", asString=True)
+        return pm.getAttr(f"{self.root}.{attr}")
 
     def set_attr_to_piece(self, attr, value):
-        at = pm.attributeQuery(attr, node=self._root, attributeType=True)
+        at = pm.attributeQuery(attr, node=self.root, attributeType=True)
         if at == "typed":
-            pm.setAttr(f"{self._root}.{attr}",
+            pm.setAttr(f"{self.root}.{attr}",
                        value,
                        type="string")
         elif at == "enum":
             en = pm.attributeQuery(attr,
-                                   node=self._root,
+                                   node=self.root,
                                    listEnum=True)[0]
             enum_names = en.split(":")
             index = enum_names.index(value)
-            pm.setAttr(f"{self._root}.{attr}", index)
+            pm.setAttr(f"{self.root}.{attr}", index)
         else:
             if isinstance(value, (list, tuple)):
-                pm.setAttr(f"{self._root}.{attr}", *value)
+                pm.setAttr(f"{self.root}.{attr}", *value)
             else:
-                pm.setAttr(f"{self._root}.{attr}", value)
+                pm.setAttr(f"{self.root}.{attr}", value)
 
     def is_valid_identifier(self, name, side, index):
         valid_identifier = True
@@ -584,6 +584,30 @@ class UiFunctionSet:
     def open_graph_editor(self):
         pm.select(self.root)
         pm.mel.eval("GraphEditor;")
+
+    def update_listWidget(self, list_widget, target_attr):
+        items_list = [i for i in list_widget.findItems("", QtCore.Qt.MatchContains)]
+        if items_list and not items_list[0]:
+            self.sub_pieces_listWidget.takeItem(0)
+        items_data = ",".join([i.text() for i in items_list])
+        self.set_attr_to_piece(target_attr, items_data)
+
+    def remove_items_listWidget(self, list_widget, target_attr):
+        for item in list_widget.selectedItems():
+            list_widget.takeItem(list_widget.row(item))
+        if target_attr:
+            self.update_listWidget(list_widget, target_attr)
+
+    def init_listWidget(self, list_widget, target_attr):
+        # initialize
+        items = [list_widget.item(i) for i in range(list_widget.count())]
+        for item in items:
+            list_widget.takeItem(list_widget.row(item))
+
+        data = self.get_attr_from_piece(target_attr)
+        items_data = data.split(",")
+        for d in items_data:
+            list_widget.addItem(d)
 
 
 class CommonPieceSettingUI(QtWidgets.QWidget, common_piece_settings_ui.Ui_Form):

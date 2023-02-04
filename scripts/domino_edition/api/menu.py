@@ -1,5 +1,6 @@
 # domino
 from domino.api import menu
+from domino_edition.api import utils
 
 # built-ins
 import os
@@ -63,7 +64,7 @@ domino_edition.api.lib.load(r"{}", True, False)"""
 
 
 def templates_menu(parent_menu_id):
-    template_dir = os.getenv("DOMINO_TEMPLATES_DIR", None)
+    template_dir = os.getenv(utils.DOMINO_TEMPLATE_DIR, None)
     template_list = os.listdir(template_dir)
     template_path_list = [os.path.normpath(os.path.join(template_dir, x)) for x in template_list]
     commands = []

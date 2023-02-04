@@ -17,6 +17,7 @@ from .piece import (AbstractSubPiece,
                     Rig)
 from domino.api import (log,
                         matrix)
+from .utils import DOMINO_SUB_PIECE_DIR
 
 dt = pm.datatypes
 
@@ -185,43 +186,47 @@ def mirror_guide(guide):
     return 0
 
 
-def create_rig(guide=None, rig=None, datas=None, context=None):
-    def sub_pieces(_context, _sub_pieces):
-        if not context["run_sub_pieces"]:
-            return 0
-        for _p in _sub_pieces.copy():
-            if _p in ["objects",
-                      "attributes",
-                      "operators",
-                      "connections",
-                      "cleanup"]:
-                break
-            name, path = _p.split(" | ")
-            if name.startswith("*"):
-                log.Logger.info(f"Skip Sub Piece[{name[1:]} {path}]...")
-                continue
-            n = f"domino.sub_piece.{name}"
-            spec = spec_from_loader(n, SourceFileLoader(n, path))
-            if spec:
-                module = module_from_spec(spec)
-                spec.loader.exec_module(module)
-                utils.reload_module(module)
-            _cls = False
-            if module:
-                log.Logger.info(f"Play Sub Piece[{name} {path}]...")
-                for a in dir(module):
-                    sub_piece = getattr(module, a)
-                    if inspect.isclass(sub_piece):
-                        if issubclass(sub_piece, AbstractSubPiece):
-                            _cls = sub_piece()
-                            _cls.run(_context)
-                            break
-            if not _cls:
-                log.Logger.error(f"Sub Piece[{name} {path}]...")
-            _sub_pieces.pop(0)
-        if _sub_pieces:
-            _sub_pieces.pop(0)
+def run_sub_pieces(context, sub_pieces):
+    if not context["run_sub_pieces"]:
+        return 0
+    for _p in sub_pieces.copy():
+        if _p in ["objects", "attributes", "operators", "connections", "cleanup"]:
+            break
+        name, path = _p.split(" | ")
+        if not os.path.exists(path):
+            sub_piece_dir = os.path.abspath(os.getenv(DOMINO_SUB_PIECE_DIR, None))
+            if sub_piece_dir:
+                path = os.path.join(sub_piece_dir, path[1:])
+        if name.startswith("*"):
+            log.Logger.info(f"Skip Sub Piece[{name[1:]} {path}]...")
+            continue
+        elif not os.path.isfile(path) or not os.path.splitext(path)[-1] == ".py":
+            log.Logger.info(f"Plz confirm [{name[1:]} {path}]...")
+            continue
+        n = f"domino.sub_piece.{name}"
+        spec = spec_from_loader(n, SourceFileLoader(n, path))
+        if spec:
+            module = module_from_spec(spec)
+            spec.loader.exec_module(module)
+            utils.reload_module(module)
+        _cls = False
+        if module:
+            log.Logger.info(f"Run Sub Piece[{name} {path}]...")
+            for a in dir(module):
+                sub_piece = getattr(module, a)
+                if inspect.isclass(sub_piece):
+                    if issubclass(sub_piece, AbstractSubPiece):
+                        _cls = sub_piece()
+                        _cls.run(context)
+                        break
+        if not _cls:
+            log.Logger.error(f"Sub Piece[{name} {path}]...")
+        sub_pieces.pop(0)
+    if sub_pieces:
+        sub_pieces.pop(0)
 
+
+def create_rig(guide=None, rig=None, datas=None, context=None):
     if context is None:
         context = dict()
 
@@ -249,7 +254,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
     log.Logger.info("{: ^50}".format("- domino -"))
     try:
         with pm.UndoChunk():
-            ### domino ###
+            # domino #
             assembly_data = pieces[0].ddata.data(pieces[0].ddata.ASSEMBLY)
             subs = [x for x in assembly_data["sub_pieces"].split(",")]
 
@@ -258,7 +263,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                 p.rig.create_container(context)
 
             context["run_sub_pieces"] = assembly_data["run_sub_pieces"]
-            sub_pieces(context, subs)
+            run_sub_pieces(context, subs)
 
             # objects
             for p in pieces:
@@ -268,7 +273,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                 p.rig.sub_jnt(context)
             assert assembly_data["end_point"] != "objects", AssertionError("End Point : objects")
 
-            sub_pieces(context, subs)
+            run_sub_pieces(context, subs)
 
             # attributes
             for p in pieces:
@@ -277,7 +282,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                 p.rig.attributes(context)
             assert assembly_data["end_point"] != "attributes", AssertionError("End Point : attributes")
 
-            sub_pieces(context, subs)
+            run_sub_pieces(context, subs)
 
             # operators
             for p in pieces:
@@ -286,7 +291,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                 p.rig.operators(context)
             assert assembly_data["end_point"] != "operators", AssertionError("End Point : operators")
 
-            sub_pieces(context, subs)
+            run_sub_pieces(context, subs)
 
             # connections
             for p in pieces:
@@ -295,7 +300,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                 p.rig.connections(context)
             assert assembly_data["end_point"] != "connections", AssertionError("End Point : connections")
 
-            sub_pieces(context, subs)
+            run_sub_pieces(context, subs)
 
             pm.mel.eval("ClearCurrentContainer;")
 
@@ -309,7 +314,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
 
             assert assembly_data["end_point"] != "cleanup", AssertionError("End Point : cleanup")
 
-            sub_pieces(context, subs)
+            run_sub_pieces(context, subs)
 
     except AssertionError as e:
         log.Logger.info(e)
@@ -502,6 +507,7 @@ def save(dotfile):
         selected = [pm.container(selected[0],
                                  query=True,
                                  publishAsRoot=True)]
+
     root = selected[0].getParent(generations=-1)
     is_guide = root.hasAttr("is_domino_guide")
     is_rig = root.hasAttr("is_domino_asset")
