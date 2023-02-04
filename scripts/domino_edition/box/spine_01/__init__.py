@@ -1,6 +1,7 @@
 # domino
 from domino.api import (nurbs,
                         fcurve,
+                        icon,
                         matrix,
                         controller,
                         joint,
@@ -179,11 +180,27 @@ class Spine01Rig(piece.Rig):
 
         m = matrix.set_matrix_position(look_at_ik_m, end_pos)
         name = self.naming("direction", _s="ctl")
-        self.direction_ctl, self.direction_loc = self.create_ctl(context=context, parent=None, name=name,
-                                                                 parent_ctl=None, color=ik_color,
-                                                                 keyable_attrs=["tx", "ty",
-                                                                                "tz", "rx"], m=m, shape="square",
-                                                                 width=2.5, height=2.5, ro=(0, 0, 90))
+        self.direction_ctl, self.direction_loc = self.create_ctl(context=context,
+                                                                 parent=None,
+                                                                 name=name,
+                                                                 parent_ctl=None,
+                                                                 color=ik_color,
+                                                                 keyable_attrs=["tx", "ty", "tz", "rx"],
+                                                                 m=m,
+                                                                 shape="circle3",
+                                                                 width=0.5)
+        name = self.naming("display", "crv", _s="ctl")
+        self.display_curve = matrix.transform(root, name, dt.Matrix())
+        icon.generate(self.display_curve,
+                      [(0, 0, 0), (0, 0, 0)],
+                      1,
+                      dt.Color(0.55, 0.55, 0.55, 0.55),
+                      thickness=1)
+        nurbs.constraint(self.display_curve, [self.pelvis_loc, self.direction_loc])
+        self.display_curve.getShape().attr("overrideDisplayType").set(2)
+        self.display_curve.attr("inheritsTransform").set(0)
+        self.display_curve.attr("translate").set((0, 0, 0))
+        self.display_curve.attr("rotate").set((0, 0, 0))
 
         name = self.naming("SC%s", _s="jnt")
         sc_normal = orient_xyz.y * -1
