@@ -220,6 +220,7 @@ class Leg2Jnt01Rig(piece.Rig):
         name = self.naming("RP", "ikh", _s="jnt")
         self.ik_ikh = joint.ikh(self.ik_local_loc, name, self.ik_jnts, pole_vector=self.pole_vec_loc)
         pm.orientConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
+        pm.scaleConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
 
         # knee - pole vector display curve
         name = self.naming("display", "crv", _s="ctl")
@@ -523,6 +524,7 @@ class Leg2Jnt01Rig(piece.Rig):
             pm.parentConstraint(self.lower_start_bind, self.leg_output_objs[1])
 
         pm.parentConstraint(self.blend_objs[-1], obj, maintainOffset=True)
+        pm.scaleConstraint(self.blend_objs[-1], obj, maintainOffset=True)
 
         self.volume_inputs = upper_jnt_v_values + [x + 1 for x in lower_jnt_v_values]
         self.volume_inputs = sorted([x / 2.0 for x in self.volume_inputs])
@@ -793,7 +795,7 @@ class Leg2Jnt01Rig(piece.Rig):
                          self.squash_attrs,
                          self.stretch_attrs,
                          self.volume_attr,
-                         self.leg_output_objs)
+                         self.leg_output_objs[:-1])
 
         # auto knee thickness
         if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:

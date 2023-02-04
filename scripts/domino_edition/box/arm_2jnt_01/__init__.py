@@ -222,7 +222,8 @@ class Arm2jnt01Rig(piece.Rig):
 
         name = self.naming("RP", "ikh", _s="jnt")
         self.ik_ikh = joint.ikh(self.ik_local_loc, name, self.ik_jnts, pole_vector=self.pole_vec_loc)
-        pm.orientConstraint(self.ik_local_loc, self.ik_jnts[-1], maintainOffset=True)
+        pm.orientConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
+        pm.scaleConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
 
         # elbow - pole vector display curve
         name = self.naming("display", "crv", _s="ctl")
@@ -526,6 +527,7 @@ class Arm2jnt01Rig(piece.Rig):
             pm.parentConstraint(self.lower_start_bind, self.arm_output_objs[-2])
 
         pm.parentConstraint(self.blend_objs[-1], obj, maintainOffset=True)
+        pm.scaleConstraint(self.blend_objs[-1], obj, maintainOffset=True)
 
         self.volume_inputs = upper_jnt_v_values + [x + 1 for x in lower_jnt_v_values]
         self.volume_inputs = sorted([x / 2.0 for x in self.volume_inputs])
@@ -796,7 +798,7 @@ class Arm2jnt01Rig(piece.Rig):
                          self.squash_attrs,
                          self.stretch_attrs,
                          self.volume_attr,
-                         self.arm_output_objs)
+                         self.arm_output_objs[:-1])
 
         # auto elbow thickness
         if data["support_elbow_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
