@@ -1313,6 +1313,7 @@ class Rig:
                        data["side"],
                        data["index"],
                        description)
+        pm.disconnectAttr(obj.attr("inverseScale"))
 
         # jnts connect
         pm.connectAttr(obj.attr("message"),
