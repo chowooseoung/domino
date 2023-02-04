@@ -64,7 +64,8 @@ def register_editions():
     if custom_edition_dir and custom_edition_dir not in sys.path:
         log.Logger.info(f"append custom edition path '{custom_edition_dir}'")
         sys.path.append(custom_edition_dir)
-    os.environ[DOMINO_TEMPLATE_DIR] = os.path.normpath(os.path.join(dir_name, "..", "..", "..", "templates"))
+    if os.getenv(DOMINO_TEMPLATE_DIR, None) is None:
+        os.environ[DOMINO_TEMPLATE_DIR] = os.path.normpath(os.path.join(dir_name, "..", "..", "..", "templates"))
 
 
 def import_piece_module(name):

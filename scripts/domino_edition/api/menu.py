@@ -60,7 +60,8 @@ def install():
 
 
 cb_load_template = """import domino_edition.api.lib
-domino_edition.api.lib.load(r"{}", True, False)"""
+print("Load template", r"{path}")
+domino_edition.api.lib.load(r"{path}", True, False)"""
 
 
 def templates_menu(parent_menu_id):
@@ -69,6 +70,5 @@ def templates_menu(parent_menu_id):
     template_path_list = [os.path.normpath(os.path.join(template_dir, x)) for x in template_list]
     commands = []
     for i, name in enumerate(template_list):
-        commands.append((name.split(".")[0], cb_load_template.format(template_path_list[i], "")))
+        commands.append((name.split(".")[0], cb_load_template.format(path=template_path_list[i])))
     menu.add("Templates", commands, parent_menu_id)
-
