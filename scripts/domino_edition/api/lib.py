@@ -258,12 +258,12 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
             assembly_data = pieces[0].ddata.data(pieces[0].ddata.ASSEMBLY)
             subs = [x for x in assembly_data["sub_pieces"].split(",")]
 
+            context["run_sub_pieces"] = assembly_data["run_sub_pieces"]
+            run_sub_pieces(context, subs)
+
             pieces[0].rig.create_asset(context)
             for p in pieces:
                 p.rig.create_container(context)
-
-            context["run_sub_pieces"] = assembly_data["run_sub_pieces"]
-            run_sub_pieces(context, subs)
 
             # objects
             for p in pieces:
