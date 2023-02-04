@@ -46,6 +46,6 @@ def rigging_menu():
 
 def motion_capture_menu():
     commands = (
-        ("MotionCaptureCmd", "qwer", ""),
+        ("MotionCaptureCmd", "print('TODO')", ""),
     )
     menu.add("Motion Capture Tools", commands)
