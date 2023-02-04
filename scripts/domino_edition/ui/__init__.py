@@ -825,6 +825,7 @@ class Manager(ManagerUI):
         model.selectionChanged.connect(self.refresh_description)
 
         self.settings_pushButton.clicked.connect(partial(open_settings))
+        self.extract_ctl_shapes_pushButton.clicked.connect(self.extract_ctl_shapes)
         self.copy_pushButton.clicked.connect(self.copy_guide)
         self.mirror_pushButton.clicked.connect(self.mirror_guide)
         self.build_pushButton.clicked.connect(self.build_from_guide)
@@ -844,10 +845,8 @@ class Manager(ManagerUI):
         pieces.update(box_pieces)
 
         if custom_edition_dirs:
-            print(custom_edition_dirs)
             dir_list = [os.path.join(custom_edition_dirs, x) for x in os.listdir(custom_edition_dirs)
                         if os.path.isdir(os.path.join(custom_edition_dirs, x))]
-            print(dir_list)
             for d in dir_list:
                 base_name = os.path.basename(d)
                 custom_pieces = {base_name: {x: None for x in os.listdir(d) if os.path.isdir(os.path.join(d, x))}}
@@ -904,14 +903,20 @@ class Manager(ManagerUI):
         self.proxy_model.setFilterRegExp(reg_exp)
         self.description_textEdit.setPlainText("")
 
+    def extract_ctl_shapes(self):
+        selected = pm.ls(selection=True)
+        if selected:
+            with pm.UndoChunk():
+                lib.extract_ctl_shapes(selected)
+
     def copy_guide(self):
-        selected = pm.ls(sl=1)
+        selected = pm.ls(selection=True)
         if selected:
             with pm.UndoChunk():
                 lib.copy_guide(selected[0])
 
     def mirror_guide(self):
-        selected = pm.ls(sl=1)
+        selected = pm.ls(selection=True)
         if selected:
             with pm.UndoChunk():
                 lib.mirror_guide(selected[0])
