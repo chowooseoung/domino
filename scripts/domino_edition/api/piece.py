@@ -1005,15 +1005,7 @@ class Rig:
             host = ctl
         else:
             name = str(self.ddata.identifier)
-            host = icon.create(parent=self.root,
-                               name=f"{name}_host",
-                               shape="host",
-                               color=dt.Color(1, 1, 0),
-                               m=self.root.getMatrix(worldSpace=True),
-                               thickness=1,
-                               width=1,
-                               ro=(0, 0, 0),
-                               po=(0, 0, 0))
+            host = matrix.transform(parent=self.root, name=f"{name}_host", m=self.root.getMatrix(worldSpace=True))
             context["ctls"].insert(0, host)
             attribute.add(host,
                           longName="is_domino_ctl",
