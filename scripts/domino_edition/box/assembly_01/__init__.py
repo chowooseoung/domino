@@ -262,7 +262,7 @@ class Assembly01Rig(piece.Rig):
                                        longName="ctl_x_ray",
                                        typ="bool",
                                        channelBox=True,
-                                       value=False)
+                                       value=True)
         jnt_vis_attr = attribute.add(asset_root,
                                      longName="jnt_vis",
                                      typ="bool",
@@ -271,17 +271,27 @@ class Assembly01Rig(piece.Rig):
         model_display_type_attr = attribute.add(asset_root,
                                                 longName="model_dp_type",
                                                 typ="enum",
-                                                enumName=["normal", "template", "reference"],
+                                                enumName=["normal", "reference"],
                                                 defaultValue=2,
                                                 channelBox=True)
         skeleton_display_type_attr = attribute.add(asset_root,
                                                    longName="skeleton_dp_type",
                                                    typ="enum",
-                                                   enumName=["normal", "template", "reference"],
+                                                   enumName=["normal", "reference"],
                                                    defaultValue=2,
                                                    channelBox=True)
-        pm.connectAttr(model_display_type_attr, context["model"].attr("overrideDisplayType"))
-        pm.connectAttr(skeleton_display_type_attr, context["skeleton"].attr("overrideDisplayType"))
+        condition = pm.createNode("condition")
+        pm.connectAttr(model_display_type_attr, condition.attr("firstTerm"))
+        condition.attr("secondTerm").set(0)
+        condition.attr("colorIfTrueR").set(0)
+        condition.attr("colorIfFalseR").set(2)
+        pm.connectAttr(condition.attr("outColorR"), context["model"].attr("overrideDisplayType"))
+        condition = pm.createNode("condition")
+        pm.connectAttr(skeleton_display_type_attr, condition.attr("firstTerm"))
+        condition.attr("secondTerm").set(0)
+        condition.attr("colorIfTrueR").set(0)
+        condition.attr("colorIfFalseR").set(2)
+        pm.connectAttr(condition.attr("outColorR"), context["skeleton"].attr("overrideDisplayType"))
 
         pm.container(asset_container,
                      edit=True,
