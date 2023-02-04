@@ -272,13 +272,13 @@ class Assembly01Rig(piece.Rig):
                                                 longName="model_dp_type",
                                                 typ="enum",
                                                 enumName=["normal", "reference"],
-                                                defaultValue=2,
+                                                defaultValue=1,
                                                 channelBox=True)
         skeleton_display_type_attr = attribute.add(asset_root,
                                                    longName="skeleton_dp_type",
                                                    typ="enum",
                                                    enumName=["normal", "reference"],
-                                                   defaultValue=2,
+                                                   defaultValue=1,
                                                    channelBox=True)
         condition = pm.createNode("condition")
         pm.connectAttr(model_display_type_attr, condition.attr("firstTerm"))
