@@ -330,8 +330,8 @@ class Leg2Jnt01Rig(piece.Rig):
         name = self.naming("lookAt", "ikh", _s="ctl")
         self.look_at_sc_ikh = joint.ikh(root, name, self.look_at_jnts, "ikSCsolver")
         pm.pointConstraint(self.ik_jnts[0], self.look_at_jnts[0])
-        pm.pointConstraint(self.ik_ikh, self.look_at_sc_ikh)
-        pm.pointConstraint(self.ik_ikh, self.stretch_value_jnt)
+        pm.pointConstraint(self.ik_local_loc, self.look_at_sc_ikh)
+        pm.pointConstraint(self.ik_local_loc, self.stretch_value_jnt)
 
         # SC jnts
         name = self.naming("upperSC", "offset", _s="ctl")
