@@ -79,10 +79,10 @@ class SpaceSwitch:
             switch_value = mc.getAttr(self.host + "." + self.switch_attr)
             if value != switch_value:
                 self.switch()
-            mc.select(selected)
         except Exception as e:
             print(e)
         finally:
+            mc.select(selected)
             mc.undoInfo(closeChunk=True)
             
 
