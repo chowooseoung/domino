@@ -296,10 +296,15 @@ class Arm2jnt01Rig(piece.Rig):
         name = self.naming("pin", _s="ctl")
         pin_m = matrix.get_matrix_look_at(positions[0], positions[2], normal, "xz", self.ddata.negate)
         pin_m = matrix.set_matrix_position(pin_m, positions[1])
-        self.pin_ctl, self.pin_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=self.ik_ctl,
+        self.pin_ctl, self.pin_loc = self.create_ctl(context=context,
+                                                     parent=None,
+                                                     name=name,
+                                                     parent_ctl=self.ik_ctl,
                                                      color=ik_color,
                                                      keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx"],
-                                                     m=pin_m, shape="angle", cns=True,
+                                                     m=pin_m,
+                                                     shape="angle",
+                                                     cns=True,
                                                      ro=(90, 0, 225) if self.ddata.negate else (90, 0, 45))
         # support elbow ctl
         self.elbow_loc = self.pin_loc
@@ -309,10 +314,15 @@ class Arm2jnt01Rig(piece.Rig):
             elbow_m = matrix.get_matrix_look_at(positions[0], positions[2], normal, "xz", False)
             elbow_m = matrix.set_matrix_position(elbow_m, positions[1])
             name = self.naming("elbowThickness", _s="ctl")
-            self.thickness_elbow_ctl, self.thickness_elbow_loc = self.create_ctl(context=context, parent=self.pin_loc,
-                                                                                 name=name, parent_ctl=self.pin_ctl,
-                                                                                 color=ik_color, keyable_attrs=["tx"],
-                                                                                 m=elbow_m, shape="arrow", cns=False)
+            self.thickness_elbow_ctl, self.thickness_elbow_loc = self.create_ctl(context=context,
+                                                                                 parent=self.pin_loc,
+                                                                                 name=name,
+                                                                                 parent_ctl=self.pin_ctl,
+                                                                                 color=ik_color,
+                                                                                 keyable_attrs=["tx"],
+                                                                                 m=elbow_m,
+                                                                                 shape="arrow",
+                                                                                 cns=False)
             self.elbow_loc = self.thickness_elbow_loc
 
         # lookAt jnts
@@ -835,13 +845,15 @@ class Arm2jnt01Rig(piece.Rig):
             context["callbacks"].append(self.ik_ctl_script_node)
         if data["pv_space_switch_array"]:
             source_ctls = self.find_ctls(data["pv_space_switch_array"])
-            operators.space_switch(source_ctls, self.pole_vec_ctl, host, attr_name="pv_space_switch")
-            script_node = callback.space_switch(source_ctls,
-                                                self.pole_vec_ctl,
-                                                host,
-                                                switch_attr_name="pv_space_switch")
-            context["callbacks"].append(script_node)
+            self.pv_ctl_cons = operators.space_switch(source_ctls, self.pole_vec_ctl, host, attr_name="pv_space_switch")
+            self.pv_ctl_script_node = callback.space_switch(source_ctls,
+                                                            self.pole_vec_ctl,
+                                                            host,
+                                                            switch_attr_name="pv_space_switch")
+            context["callbacks"].append(self.pv_ctl_script_node)
         if data["pin_space_switch_array"]:
+            name = self.naming("pin", "spaceSwitch", _s="ctl")
+            controller.npo(self.pin_ctl.getParent(), name=name)
             source_ctls = self.find_ctls(data["pin_space_switch_array"])
             operators.space_switch(source_ctls, self.pin_ctl, host, attr_name="pin_space_switch")
             script_node = callback.space_switch(source_ctls, self.pin_ctl, host, switch_attr_name="pin_space_switch")
@@ -1040,6 +1052,16 @@ class Arm2jnt01Rig(piece.Rig):
                 source_ctls = self.find_ctls(data["ik_space_switch_array"])
                 operators.space_switch(source_ctls, self.ik_ctl, host, attr_name="ik_space_switch")
                 script_node = callback.space_switch(source_ctls, self.ik_ctl, host, switch_attr_name="ik_space_switch")
+                context["callbacks"].append(script_node)
+            if data["pv_space_switch_array"]:
+                context["callbacks"].remove(self.pv_ctl_script_node)
+                pm.delete([self.pv_ctl_cons, self.pv_ctl_script_node])
+                source_ctls = self.find_ctls(data["pv_space_switch_array"])
+                operators.space_switch(source_ctls, self.pole_vec_ctl, host, attr_name="pv_space_switch")
+                script_node = callback.space_switch(source_ctls,
+                                                    self.pole_vec_ctl,
+                                                    host,
+                                                    switch_attr_name="pv_space_switch")
                 context["callbacks"].append(script_node)
 
 

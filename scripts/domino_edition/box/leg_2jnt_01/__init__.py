@@ -4,6 +4,7 @@ from domino.api import (matrix,
                         icon,
                         nurbs,
                         attribute,
+                        controller,
                         operators,
                         callback,
                         fcurve,
@@ -839,6 +840,8 @@ class Leg2Jnt01Rig(piece.Rig):
             if script_node:
                 context["callbacks"].append(script_node)
         if data["pin_space_switch_array"]:
+            name = self.naming("pin", "spaceSwitch", _s="ctl")
+            controller.npo(self.pin_ctl.getParent(), name=name)
             source_ctls = self.find_ctls(data["pin_space_switch_array"])
             operators.space_switch(source_ctls, self.pin_ctl, host, attr_name="pin_space_switch")
             script_node = callback.space_switch(source_ctls, self.pin_ctl, host, switch_attr_name="pin_space_switch")
