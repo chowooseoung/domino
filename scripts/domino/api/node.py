@@ -52,36 +52,3 @@ def create_pairblend(obj1,
         if "t" in trs:
             pm.connectAttr(pair_b.attr("outTranslate"), output.attr("t"))
     return pair_b
-
-
-def ref_to_jnt(ref, jnt):
-    ref = pm.PyNode(ref)
-    jnt = pm.PyNode(jnt)
-    mult_m = create_mult_matrix(ref.attr("worldMatrix")[0],
-                                jnt.attr("parentInverseMatrix"),
-                                None)
-    decom_m = create_decom_matrix(mult_m.attr("matrixSum"))
-    pm.connectAttr(decom_m.attr("outputTranslate"), jnt.attr("t"))
-    pm.connectAttr(decom_m.attr("outputScale"), jnt.attr("s"))
-    pm.connectAttr(decom_m.attr("outputShear"), jnt.attr("shear"))
-
-    m = mult_m.attr("matrixSum").get()
-    i_m = m.inverse()
-
-    tm = pm.datatypes.TransformationMatrix(m)
-    j_orient = pm.datatypes.degrees(tm.getRotation())
-
-    jnt.attr("jointOrient").set(j_orient)
-
-    mult_m2 = create_mult_matrix(mult_m.attr("matrixSum"), i_m, None)
-    decom_m2 = create_decom_matrix(mult_m2.attr("matrixSum"))
-    pm.connectAttr(decom_m2.attr("outputRotate"), jnt.attr("r"))
-
-    # if uni_scale:
-    #     pm.disconnectAttr(jnt.attr("s"))
-    #     pm.connectAttr(decom_m.attr("outputScaleZ"),
-    #                    jnt.attr("sx"))
-    #     pm.connectAttr(decom_m.attr("outputScaleZ"),
-    #                    jnt.attr("sy"))
-    #     pm.connectAttr(decom_m.attr("outputScaleZ"),
-    #                    jnt.attr("sz"))

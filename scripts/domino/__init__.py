@@ -10,5 +10,5 @@ __version_str__ = ". ".join([str(x) for x in __version__])
 def install():
     log.Logger.info("Domino Installing...")
 
-    edition_utils.register_editions()  # DOMINO_DEFAULT_EDITION, DOMINO_CUSTOM_EDITION
+    edition_utils.register_editions()  # DOMINO_DEFAULT_EDITION, DOMINO_CUSTOM_EDITION, DOMINO_TEMPLATE_DIR
     menu.install()

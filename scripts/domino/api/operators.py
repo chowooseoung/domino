@@ -171,7 +171,3 @@ def volume(original_distance_attr, delta_distance_attr, squash_attrs, stretch_at
         pm.connectAttr(md.attr("outputX"), pma.attr("input3D[1].input3Dz"))
 
         pm.connectAttr(pma.attr("output3D"), obj.attr("s"))
-
-
-def auto_clavicle():
-    pass
