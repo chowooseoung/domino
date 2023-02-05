@@ -1555,26 +1555,26 @@ import maya.api.OpenMaya as om2
 import traceback
 
 
-def destory_cb(*args):  # all callback clear
-    global domino_destory_new_id
-    global domino_destory_open_id
-    global domino_destory_remove_ref_id
-    global domino_destory_unload_ref_id
+def destroy_cb(*args):  # all callback clear
+    global domino_destroy_new_id
+    global domino_destroy_open_id
+    global domino_destroy_remove_ref_id
+    global domino_destroy_unload_ref_id
     global domino_character_cb_registry
     global domino_character_namespace_registry
     try:
         for array in domino_character_cb_registry:
             om2.MNodeMessage.removeCallback(array[1])
-        om2.MSceneMessage.removeCallback(domino_destory_new_id)
-        om2.MSceneMessage.removeCallback(domino_destory_open_id)
-        om2.MSceneMessage.removeCallback(domino_destory_remove_ref_id)
-        om2.MSceneMessage.removeCallback(domino_destory_unload_ref_id)
+        om2.MSceneMessage.removeCallback(domino_destroy_new_id)
+        om2.MSceneMessage.removeCallback(domino_destroy_open_id)
+        om2.MSceneMessage.removeCallback(domino_destroy_remove_ref_id)
+        om2.MSceneMessage.removeCallback(domino_destroy_unload_ref_id)
         del domino_character_cb_registry
         del domino_character_namespace_registry
-        del domino_destory_new_id
-        del domino_destory_open_id
-        del domino_destory_remove_ref_id
-        del domino_destory_unload_ref_id
+        del domino_destroy_new_id
+        del domino_destroy_open_id
+        del domino_destroy_remove_ref_id
+        del domino_destroy_unload_ref_id
     except:
         traceback.print_exc()
 
@@ -1596,7 +1596,7 @@ def refresh_registry(*argc):  # refresh registry at reference unload, remove
 
 
 def run_callback_root():
-    global domino_destory_id
+    global domino_destroy_id
     global domino_character_cb_registry
     global domino_character_namespace_registry
     try:
@@ -1631,35 +1631,34 @@ def run_callback_root():
                 mc.scriptNode(cb, executeBefore=True)
             domino_character_namespace_registry.append(namespace)
 
-
 run_callback_root()
 try:
-    om2.MSceneMessage.removeCallback(domino_destory_new_id)
+    om2.MSceneMessage.removeCallback(domino_destroy_new_id)
 except:
     pass
 finally:
-    domino_destory_new_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterNew, destory_cb)
+    domino_destroy_new_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterNew, destroy_cb)
 
 try:
-    om2.MSceneMessage.removeCallback(domino_destory_open_id)
+    om2.MSceneMessage.removeCallback(domino_destroy_open_id)
 except:
     pass
 finally:
-    domino_destory_open_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterOpen, destory_cb)
+    domino_destroy_open_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterOpen, destroy_cb)
 
 try:
-    om2.MSceneMessage.removeCallback(domino_destory_remove_ref_id)
+    om2.MSceneMessage.removeCallback(domino_destroy_remove_ref_id)
 except:
     pass
 finally:
-    domino_destory_remove_ref_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterRemoveReference, refresh_registry)
+    domino_destroy_remove_ref_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterRemoveReference, refresh_registry)
     
 try:
-    om2.MSceneMessage.removeCallback(domino_destory_unload_ref_id)
+    om2.MSceneMessage.removeCallback(domino_destroy_unload_ref_id)
 except:
     pass
 finally:
-    domino_destory_unload_ref_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterUnloadReference, refresh_registry)"""
+    domino_destroy_unload_ref_id = om2.MSceneMessage.addCallback(om2.MSceneMessage.kAfterUnloadReference, refresh_registry)"""
         pm.scriptNode(callback_root, edit=True, beforeScript=before_script_code)
         pm.scriptNode(callback_root, executeBefore=True)
         context["callbacks"].append(callback_root)
