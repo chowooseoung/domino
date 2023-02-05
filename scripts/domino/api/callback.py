@@ -69,9 +69,8 @@ class SpaceSwitch:
         mc.delete(temp_obj)
 
     def space_switch(self):
-        mc.undoInfo(openChunk=True)
-        
         try:
+            mc.undoInfo(openChunk=True)
             selected = mc.ls(selection=True)
             value = mc.getAttr(self.host + "." + self.match_attr)
             if value not in {range(len(enum_name) + 1)}:
@@ -79,11 +78,13 @@ class SpaceSwitch:
             switch_value = mc.getAttr(self.host + "." + self.switch_attr)
             if value != switch_value:
                 self.switch()
+            mc.undoInfo(closeChunk=True)
         except Exception as e:
+            mc.undoInfo(closeChunk=True)
+            mc.undo()
             print(e)
         finally:
             mc.select(selected)
-            mc.undoInfo(closeChunk=True)
             
 
 def cb_run(msg, plug1, plug2, client_data):
