@@ -4,6 +4,17 @@ from pymel import core as pm
 # domino
 from . import attribute
 
+# built-ins
+import uuid
+
+
+def create_script_node(d_id):
+    sn = pm.createNode("script")
+    script_node_id = str(uuid.uuid4())
+    attribute.add(sn, "d_id", "string", value=d_id)
+    attribute.add(sn, "sn_id", "string", value=script_node_id)
+    return sn, script_node_id
+
 
 def space_switch(source_ctls, target_ctl, host, switch_attr_name="space_switch"):
     """
@@ -14,24 +25,14 @@ def space_switch(source_ctls, target_ctl, host, switch_attr_name="space_switch")
     # add host 
     enum_name = ["this"] + [x.nodeName() for x in source_ctls]
     match_attr_name = switch_attr_name + "_match"
-    attribute.add(host,
-                  match_attr_name,
-                  "enum",
-                  enumName=enum_name,
-                  channelBox=True)
+    attribute.add(host, match_attr_name, "enum", enumName=enum_name, channelBox=True)
 
     container = pm.container(query=True, findContainer=host)
     root = pm.PyNode(pm.container(container, query=True, publishAsRoot=True))
 
     d_id = root.attr("d_id").get()
-    script_node = pm.createNode("script")
-    attribute.add(script_node,
-                  "root",
-                  "message")
-    attribute.add(script_node,
-                  "d_id",
-                  "string",
-                  value=d_id)
+    script_node, script_node_id = create_script_node(d_id)
+    attribute.add(script_node, "root", "message")
     script_node.attr("sourceType").set(1)
     script_node.attr("scriptType").set(0)
 
@@ -111,29 +112,29 @@ def register_cb(namespace):
 
 def run_space_switch_callback():
     global domino_character_cb_registry
+    global domino_script_node_id_registry
     global domino_character_namespace_registry
 
     d_id = "{d_id}"
+    sn_id = "{script_node_id}"
 
     script_nodes = [x for x in mc.ls(type="script") if mc.objExists(x + ".d_id")]
     script_nodes = [x for x in script_nodes if mc.getAttr(x + ".d_id") == d_id]
+    script_nodes = [x for x in script_nodes if mc.getAttr(x + ".sn_id") == sn_id]
 
     if not script_nodes:
         return None
-
     for sc_node in script_nodes:
         namespace = mc.ls(sc_node, showNamespace=True)[1]
         namespace = "" if namespace == ":" else namespace
-        if namespace not in domino_character_namespace_registry:
+        script_node_id = mc.getAttr(sc_node + ".sn_id")
+        if namespace not in domino_character_namespace_registry and script_node_id not in domino_script_node_id_registry:
             try:
                 domino_character_cb_registry.append(register_cb(namespace))
             except:
                 domino_character_cb_registry = []
                 domino_character_cb_registry.append(register_cb(namespace))
+            domino_script_node_id_registry.append(script_node_id)
 run_space_switch_callback()"""
     pm.scriptNode(script_node, edit=True, beforeScript=script_code)
     return script_node
-
-
-def match_ik_fk():
-    pass

@@ -1596,13 +1596,14 @@ def refresh_registry(*argc):  # refresh registry at reference unload, remove
 
 
 def run_callback_root():
+    global domino_script_node_id_registry
     global domino_destroy_id
-    global domino_character_cb_registry
     global domino_character_namespace_registry
     try:
         domino_character_namespace_registry
     except:
         domino_character_namespace_registry = []
+    domino_script_node_id_registry = []
 
     d_id = '{d_id}'
 
@@ -1610,7 +1611,7 @@ def run_callback_root():
              for c in mc.ls(type="container")]
     roots = [r for r in roots if r and mc.objExists(r + ".d_id")]
     roots = [r for r in roots if mc.getAttr(r + ".d_id") == d_id]
-
+    
     if "" in domino_character_namespace_registry:
         domino_character_namespace_registry.remove("")
     if not roots:
