@@ -579,9 +579,9 @@ class Guide:
         aim = pm.aimConstraint(target,
                                ori,
                                aimVector=(1, 0, 0),
-                               upVector=(0, 1, 0),
+                               upVector=(0, 0, 1),
                                worldUpType="objectrotation",
-                               worldUpVector=(0, 1, 0),
+                               worldUpVector=(0, 0, 1),
                                worldUpObject=parent)
         pm.connectAttr(parent.attr("offset"), aim.attr("offsetX"))
         pm.connectAttr(ori.attr("worldMatrix")[0], parent.attr("offset_matrix"))
@@ -987,8 +987,7 @@ class Rig:
                         ref = pm.listConnections(parent_root.attr("refs")[0],
                                                  destination=False,
                                                  source=True)[0]
-                    pm.connectAttr(ref.attr("worldMatrix")[0],
-                                   self.root.attr("offsetParentMatrix"))
+                    pm.connectAttr(ref.attr("worldMatrix")[0], self.root.attr("offsetParentMatrix"))
 
         m0 = dt.Matrix(data["anchors"][0])
         pm.xform(self.root, translation=t, worldSpace=True)
