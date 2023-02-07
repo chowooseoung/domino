@@ -292,7 +292,7 @@ class Foot01Rig(piece.Rig):
                                        height=offset,
                                        depth=1,
                                        po=(po, 0, 0))
-            name = self.naming("inv", "rot", _s="ctl")
+            name = self.naming(f"rot{i}", "inv", _s="ctl")
             controller.npo(ctl, name)
             self.fk_ctls.append(ctl)
             self.fk_locs.append(loc)
