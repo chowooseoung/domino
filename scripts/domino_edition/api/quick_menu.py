@@ -187,7 +187,7 @@ def __quick_menu(parent_menu, current_control):
                                     query=True,
                                     bindNode=True)[roots_grp_index + 1]
     for i in mc.listRelatives(roots_grp, children=True, fullPath=True):
-        if mc.getAttr(f"{i}.module") == "assembly_01":
+        if mc.getAttr(f"{i}.piece") == "assembly_01":
             break
     notes = mc.getAttr(i + ".publish_notes")
     mc.menuItem(parent=parent_menu, divider=True)

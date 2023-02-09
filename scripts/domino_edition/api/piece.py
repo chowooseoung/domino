@@ -35,7 +35,7 @@ def find_guide_from_identifier(root, identifier):
             name = c.attr("name").get()
             side = None
             index = None
-            if c.attr("module").get() != "assembly_01":
+            if c.attr("piece").get() != "assembly_01":
                 side = c.attr("side").get(asString=True)
                 index = c.attr("index").get()
             if Identifier.to_str(name, side, index) == identifier:
@@ -77,7 +77,7 @@ def find_rig_from_identifier(root, identifier):
             name = c.attr("name").get()
             side = None
             index = None
-            if c.attr("module").get() != "assembly_01":
+            if c.attr("piece").get() != "assembly_01":
                 side = c.attr("side").get(asString=True)
                 index = c.attr("index").get()
             if Identifier.to_str(name, side, index) == identifier:
@@ -97,8 +97,8 @@ class Identifier:
             raise NotImplementedError("Implement property 'side'")
         if not hasattr(cls, "index"):
             raise NotImplementedError("Implement property 'index'")
-        if not hasattr(cls, "module"):
-            raise NotImplementedError("Implement property 'module'")
+        if not hasattr(cls, "piece"):
+            raise NotImplementedError("Implement property 'piece'")
         if not hasattr(cls, "version"):
             raise NotImplementedError("Implement property 'version'")
         if not hasattr(cls, "description"):
@@ -107,7 +107,7 @@ class Identifier:
             raise NotImplementedError("Implement property 'madeBy'")
 
     def __str__(self):
-        if self._ddata._data["module"] == "assembly_01":
+        if self._ddata._data["piece"] == "assembly_01":
             return self.to_str(self._ddata._data["name"], None, None)
         name = self._ddata._data["name"]
         side = self._ddata._data["side"]
@@ -193,10 +193,10 @@ class DData:
             self._preset = {
                 "d_id": {"typ": "string",
                          "value": str(uuid.uuid4())},
-                "module": {"typ": "string",
-                           "value": f"{self.identifier.module}"},
-                "module_version": {"typ": "string",
-                                   "value": ". ".join([str(x) for x in self.identifier.version])},
+                "piece": {"typ": "string",
+                          "value": f"{self.identifier.piece}"},
+                "piece_version": {"typ": "string",
+                                  "value": ". ".join([str(x) for x in self.identifier.version])},
                 "name": {"typ": "string",
                          "value": f"{self.identifier.name}"},
                 "side": {"typ": "enum",
@@ -666,7 +666,7 @@ class Guide:
         indexes = []
         for p in pieces:
             data = p.ddata.data(DData.SELF)
-            if data["module"] == "assembly_01":
+            if data["piece"] == "assembly_01":
                 continue
             if remove_self:
                 if self_data["name"] == data["name"] \
@@ -945,12 +945,12 @@ class Rig:
                       typ="message")
 
         if asset_container:
-            if self.root.attr("module").get() != "assembly_01":
+            if self.root.attr("piece").get() != "assembly_01":
                 parent_d_id, ref_anchor = data["parent_anchor"].split(",")
                 parent_container, parent_root = find_rig_from_id(
                     asset_root, parent_d_id)
                 if parent_container:
-                    if parent_root.attr("module").get() != "assembly_01":
+                    if parent_root.attr("piece").get() != "assembly_01":
                         custom_ref_index = data["custom_ref_index"]
                         refs_element = pm.listAttr(parent_root.attr("refs"),
                                                    multi=True)
@@ -1124,7 +1124,7 @@ class Rig:
                                                                      parent_d_id)
                     if not parent_container:
                         break
-                    if parent_root.attr("module").get() == "assembly_01":
+                    if parent_root.attr("piece").get() == "assembly_01":
                         index = len(pm.listAttr(parent_root.attr("ctls"), multi=True)) - 1
                         parent_ctl = pm.listConnections(parent_root.attr("ctls")[index],
                                                         destination=False,
@@ -1190,7 +1190,7 @@ class Rig:
             pm.connectAttr(obj.attr("message"),
                            self.root.attr("ref_anchors")[a_index])
         context["refs"].append(obj)
-        if self.root.attr("module").get() != "assembly_01":
+        if self.root.attr("piece").get() != "assembly_01":
             offset_rotate = (data["offset_orient_x"],
                              data["offset_orient_y"],
                              data["offset_orient_z"])
@@ -1225,7 +1225,7 @@ class Rig:
                     parent = skeleton_grp
                     break
                 # assembly_01 piece
-                if parent_root.attr("module").get() == "assembly_01":
+                if parent_root.attr("piece").get() == "assembly_01":
                     parent = pm.listConnections(parent_root.attr("jnts")[0],
                                                 destination=False,
                                                 source=True)[0]

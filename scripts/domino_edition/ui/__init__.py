@@ -144,7 +144,7 @@ class UiFunctionSet:
         elif state in [-1, 1, 2]:  # default, hide, close
             with pm.UndoChunk():
                 new_name = l_edit.text()
-                if self.get_attr_from_piece("module") != "assembly_01":
+                if self.get_attr_from_piece("piece") != "assembly_01":
                     side = self.get_attr_from_piece("side")
                     index = self.get_attr_from_piece("index")
                     valid_identifier = self.is_valid_identifier(
@@ -472,7 +472,7 @@ class UiFunctionSet:
                                           source=False,
                                           plugs=True)[0]
             root = ctl_attr.node()
-            if root.attr("module").get() == "assembly_01":
+            if root.attr("piece").get() == "assembly_01":
                 identifier = \
                     Identifier.to_str(root.attr("name").get(), None, None)
             else:
@@ -943,8 +943,8 @@ def open_settings():
     selected = pm.ls(selection=True)
     if not selected:
         return 0
-    if not pm.attributeQuery("module", node=selected[0], exists=True):
+    if not pm.attributeQuery("piece", node=selected[0], exists=True):
         return 0
-    ui = utils.import_piece_settings(selected[0].attr("module").get())
+    ui = utils.import_piece_settings(selected[0].attr("piece").get())
     if ui is not None:
         utils.show_dialog(ui, parent=None)

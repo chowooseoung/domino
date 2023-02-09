@@ -37,12 +37,12 @@ def collect_piece(guide, rig, datas, include_assembly=False):
                                           type="transform")
             containers = [x for x in containers if x.hasAttr("d_id")]
         for container in containers:
-            module_name = container.attr("module").get()
+            module_name = container.attr("piece").get()
             modules.append(import_piece_module(module_name))
         argument.extend([{"node": n} for n in containers])
     elif datas:
         for data in datas:
-            modules.append(import_piece_module(data["module"]))
+            modules.append(import_piece_module(data["piece"]))
         argument.extend([{"data": data} for data in datas])
 
     pieces = []

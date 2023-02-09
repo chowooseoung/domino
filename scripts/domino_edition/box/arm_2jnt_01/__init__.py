@@ -23,7 +23,7 @@ dt = pm.datatypes
 class Arm2jnt01Identifier(piece.Identifier):
     madeBy = "chowooseung"
     contact = "main.wooseung@gmail.com"
-    module = os.path.split(os.path.dirname(__file__))[-1]
+    piece = os.path.split(os.path.dirname(__file__))[-1]
     version = (1, 0, 0)
     name = "arm"
     side = "C"
@@ -866,7 +866,7 @@ class Arm2jnt01Rig(piece.Rig):
         data = self.data(Arm2jnt01Data.SELF)
         parent_component = self.ddata.parent
         parent_data = parent_component.data(parent_component.SELF)
-        if data["connector"] == "shoulder_01" and parent_data["module"] == "shoulder_01":
+        if data["connector"] == "shoulder_01" and parent_data["piece"] == "shoulder_01":
             auto_clavicle_data = context["auto_clavicle"][str(parent_component.identifier)]
             shoulder_root = auto_clavicle_data[1]
             shoulder_ctl = auto_clavicle_data[0]

@@ -21,7 +21,7 @@ dt = pm.datatypes
 class Foot01Identifier(piece.Identifier):
     madeBy = "chowooseung"
     contact = "main.wooseung@gmail.com"
-    module = os.path.split(os.path.dirname(__file__))[-1]
+    piece = os.path.split(os.path.dirname(__file__))[-1]
     version = (1, 0, 0)
     name = "foot"
     side = "C"
@@ -448,7 +448,7 @@ class Foot01Rig(piece.Rig):
         data = self.data(Foot01Data.SELF)
         parent_component = self.ddata.parent
         parent_data = parent_component.data(parent_component.SELF)
-        if data["connector"] == "leg_2jnt_01" and parent_data["module"] == "leg_2jnt_01":
+        if data["connector"] == "leg_2jnt_01" and parent_data["piece"] == "leg_2jnt_01":
             connector_data = context["leg_2jnt_01"][str(parent_component.identifier)]
             ik_local_loc, ikh, last_ref, fk_ik_attr = connector_data
 

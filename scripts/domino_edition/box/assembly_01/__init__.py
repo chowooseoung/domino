@@ -19,7 +19,7 @@ dt = pm.datatypes
 class Assembly01Identifier(piece.Identifier):
     madeBy = "Chowooseung"
     contact = "main.wooseung@gmail.com"
-    module = os.path.split(os.path.dirname(__file__))[-1]
+    piece = os.path.split(os.path.dirname(__file__))[-1]
     version = (1, 0, 0)
     name = "noname"
     side = "C"
@@ -46,15 +46,15 @@ class Assembly01Data(piece.DData):
         return {
             "d_id": {"typ": "string",
                      "value": str(uuid.uuid4())},
-            "module": {"typ": "string",
-                       "value": f"{self.identifier.module}"},
+            "piece": {"typ": "string",
+                      "value": f"{self.identifier.piece}"},
             "maya_version": {"typ": "string",
                              "value": (f"{pm.about(query=True, majorVersion=True)}."
                                        f"{pm.about(query=True, minorVersion=True)}")},
             "domino_version": {"typ": "string",
                                "value": domino.__version_str__},
-            "module_version": {"typ": "string",
-                               "value": ". ".join([str(x) for x in self.identifier.version])},
+            "piece_version": {"typ": "string",
+                              "value": ". ".join([str(x) for x in self.identifier.version])},
             "name": {"typ": "string",
                      "value": f"{self.identifier.name}"},
             "anchors": {"typ": "matrix",

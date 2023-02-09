@@ -230,3 +230,17 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
         pm.connectAttr(uvpin.attr("outputMatrix")[next_i], aim_m.attr("secondaryTargetMatrix"))
         pm.connectAttr(aim_m.attr("outputMatrix"), outputs[i].attr("offsetParentMatrix"))
     return uvpin
+
+
+def point_on_curve(crv, division):
+    shape = crv.getShape()
+    mp = pm.createNode("motionPath")
+    mp.attr("fractionMode").set(True)
+    pm.connectAttr(shape.attr("worldSpace")[0], mp.attr("geometryPath"))
+
+    ratio = 1.0 / division
+    positions = []
+    for i in range(division + 1):
+        mp.attr("uValue").set(ratio * i)
+        positions.append(mp.attr("allCoordinates").get())
+    return positions

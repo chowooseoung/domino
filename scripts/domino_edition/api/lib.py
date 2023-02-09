@@ -69,7 +69,7 @@ def create_guide(module=None, datas=None, parent=None):
                                      source=False,
                                      type="dagContainer")[0]
     side = None
-    if parent_root.attr("module").get() != "assembly_01":
+    if parent_root.attr("piece").get() != "assembly_01":
         side = parent_root.attr("side").get(asString=True)
     top_node = parent.getParent(generations=-1)
     pieces = utils.collect_piece(guide=top_node, rig=None, datas=None)
@@ -115,7 +115,7 @@ def copy_guide(guide):
 def mirror_guide(guide):
     if not guide.hasAttr("d_id"):
         return None
-    if guide.attr("module").get() == "assembly_01":
+    if guide.attr("piece").get() == "assembly_01":
         return None
     child_pieces = pm.ls(guide, dagObjects=True, type="dagContainer")
     for child in child_pieces:

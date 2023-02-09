@@ -23,7 +23,7 @@ dt = pm.datatypes
 class Leg2Jnt01Identifier(piece.Identifier):
     madeBy = "chowooseung"
     contact = "main.wooseung@gmail.com"
-    module = os.path.split(os.path.dirname(__file__))[-1]
+    piece = os.path.split(os.path.dirname(__file__))[-1]
     version = (1, 0, 0)
     name = "leg"
     side = "C"
