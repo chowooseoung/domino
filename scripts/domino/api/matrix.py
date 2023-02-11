@@ -114,7 +114,7 @@ def get_chain_matrix(positions, normal, negate=False):
     return transforms
 
 
-def get_mirror_matrix(t, axis="yz"):
+def get_mirror_matrix(m, axis="yz"):
     if axis == "yz":
         # mirror = dt.TransformationMatrix(
         #     1, 0, 0, 0,
@@ -137,8 +137,8 @@ def get_mirror_matrix(t, axis="yz"):
     #                                                0, -1, 0, 0,
     #                                                0, 0, 1, 0,
     #                                                0, 0, 0, 1)
-    t *= mirror
-    return t
+    m *= mirror
+    return m
 
 
 def set_matrix_position(in_m, pos):

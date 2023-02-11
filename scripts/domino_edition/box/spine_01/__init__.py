@@ -136,7 +136,7 @@ class Spine01Rig(piece.Rig):
         fk_color = self.get_fk_ctl_color()
 
         orient_xyz = matrix.OrientXYZ(dt.Matrix(data["offset_matrix"]))
-        normal = orient_xyz.z
+        normal = orient_xyz.y
 
         start_pos, end_pos = [dt.Matrix(x).translate for x in data["anchors"]]
 
@@ -388,7 +388,6 @@ class Spine01Rig(piece.Rig):
     def attributes(self, context):
         super(Spine01Rig, self).attributes(context)
         host = self.create_host(context)
-
         data = self.data(Spine01Data.SELF)
 
         self.position = attribute.add(host,
