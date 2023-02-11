@@ -1,5 +1,6 @@
 # domino
-from domino.api import matrix
+from domino.api import (matrix,
+                        vector)
 from domino_edition.api import piece
 
 # built-ins
@@ -23,9 +24,9 @@ class Head01Identifier(piece.Identifier):
 
 
 class Head01Data(piece.DData):
-    _m1 = matrix.get_matrix_from_pos((0, 0, 0))
-    _m2 = matrix.get_matrix_from_pos((0, 2, 0))
-    _m3 = matrix.get_matrix_from_pos((0, 0, 0.2))
+    _m1 = matrix.get_matrix_from_pos((0, 0, 0))  # root
+    _m2 = matrix.get_matrix_from_pos((0, 2, 0))  # end
+    _m3 = matrix.get_matrix_from_pos((0, 0, 0.2))  # aim
 
     def __init__(self, node=None, data=None):
         self._identifier = Head01Identifier(self)
@@ -42,6 +43,8 @@ class Head01Data(piece.DData):
             "anchors": {"typ": "matrix",
                         "value": [self._m1, self._m2, self._m3],
                         "multi": True},
+            "head_aim_array": {"typ": "string",
+                               "value": ""},
         })
         return preset
 
@@ -64,6 +67,50 @@ class Head01Rig(piece.Rig):
 
         data = self.data(Head01Data.SELF)
         assembly_data = self.data(Head01Data.ASSEMBLY)
+
+        uni_scale = False
+        if assembly_data["force_uni_scale"]:
+            uni_scale = True
+
+        m0 = dt.Matrix(data["anchors"][0])
+        m1 = dt.Matrix(data["anchors"][1])
+        m2 = dt.Matrix(data["anchors"][2])
+
+        root = self.create_root(context, m0.translate)
+        fk_color = self.get_fk_ctl_color()
+
+        normal = m1.translate - m0.translate
+        distance = vector.get_distance(m0.translate, m1.translate)
+        m = matrix.get_matrix_look_at(m0.translate, m2.translate, normal, "-yx", self.ddata.negate)
+        name = self.naming(_s="ctl")
+        self.ctl, self.loc = self.create_ctl(context=context,
+                                             parent=None,
+                                             name=name,
+                                             parent_ctl=None,
+                                             color=fk_color,
+                                             keyable_attrs=["tx", "ty", "tz",
+                                                            "rx", "ry", "rz", "ro",
+                                                            "sx", "sy", "sz"],
+                                             m=m,
+                                             shape="cube",
+                                             cns=False,
+                                             width=distance,
+                                             po=(distance / 3.0, 0, 0))
+
+        name = self.naming("", "ref", _s="ctl")
+        self.ref = self.create_ref(context=context,
+                                   name=name,
+                                   anchor=True,
+                                   m=self.loc)
+        name = self.naming(_s="jnt")
+        self.jnt = self.create_jnt(context=context,
+                                   parent=None,
+                                   name=name,
+                                   description="",
+                                   ref=self.ref,
+                                   m=m,
+                                   leaf=False,
+                                   uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Head01Rig, self).attributes(context)
