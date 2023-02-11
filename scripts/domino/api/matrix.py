@@ -88,6 +88,10 @@ def get_matrix_look_at(pos, lookat, normal, axis="xy", negate=False):
         X = -a
         Y = b
         Z = c
+    elif axis == "-yx":
+        Y = -a
+        X = b
+        Z = c
 
     m = dt.Matrix()
     m[0] = [X[0], X[1], X[2], 0.0]
