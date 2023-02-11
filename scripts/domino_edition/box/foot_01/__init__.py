@@ -57,7 +57,7 @@ class Foot01Data(piece.DData):
             "anchors": {"typ": "matrix",
                         "value": [],
                         "multi": True},
-            "roll_angle": {"typ": "float",
+            "roll_angle": {"typ": "double",
                            "value": 20},
             "connector": {"typ": "string",
                           "value": "default"}
@@ -343,7 +343,7 @@ class Foot01Rig(piece.Rig):
         for i, ctl in enumerate(self.fk_ctls):
             attr = attribute.add(host,
                                  f"angle{i}",
-                                 "float",
+                                 "double",
                                  value=data["roll_angle"],
                                  defaultValue=data["roll_angle"],
                                  keyable=True)

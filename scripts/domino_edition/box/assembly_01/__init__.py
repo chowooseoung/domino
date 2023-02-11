@@ -62,7 +62,7 @@ class Assembly01Data(piece.DData):
                         "multi": True},
             "origin_sub_ctl_count": {"typ": "long",
                                      "value": 2},
-            "origin_ctl_size": {"typ": "float",
+            "origin_ctl_size": {"typ": "double",
                                 "value": 1},
             "mode": {"typ": "enum",
                      "enumName": ["DEBUG", "WIP", "PUB"],

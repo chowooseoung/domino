@@ -46,7 +46,7 @@ class Finger02Data(piece.DData):
             "anchors": {"typ": "matrix",
                         "value": [self._m1, self._m2, self._m3, self._m4],
                         "multi": True},
-            "offset_pole_vec": {"typ": "float",
+            "offset_pole_vec": {"typ": "double",
                                 "value": 1,
                                 "channelBox": True},
             "offset_pole_vec_matrix": {"typ": "matrix",
@@ -189,7 +189,7 @@ class Finger02Rig(piece.Rig):
 
         self.roll_attr = attribute.add(self.ik_ctl,
                                        "roll",
-                                       typ="float",
+                                       typ="double",
                                        defaultValue=0,
                                        keyable=True)
 
