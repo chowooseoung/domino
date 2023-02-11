@@ -1,7 +1,6 @@
 # built-ins
 import os
 import uuid
-import json
 
 # maya
 from pymel import core as pm
