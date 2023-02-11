@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>328</width>
+    <height>502</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="leaf_joint_checkBox">
+        <property name="text">
+         <string>Leaf Joint</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="uni_scale_checkBox">
+        <property name="text">
+         <string>Uni Scale</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Icon</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QComboBox" name="icon_comboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string>origin</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>host</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>arrow</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>arrow4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>square</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>wave</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>circle</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>circle3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>locator</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>cube</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>angle</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Ctl Size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="nothing_checkBox">
+        <property name="text">
+         <string>Nothing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="ctl_size_doubleSpinBox">
+        <property name="minimum">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="joint_checkBox">
+        <property name="text">
+         <string>Joint</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="neutral_rotation_checkBox">
+        <property name="text">
+         <string>Neutral Rotation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="mirror_behaviour_checkBox">
+        <property name="text">
+         <string>Mirror Behaviour</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Keyable</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="rotate_pushButton">
+        <property name="text">
+         <string>Rotate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="tx_checkBox">
+        <property name="text">
+         <string>tx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QCheckBox" name="sy_checkBox">
+        <property name="text">
+         <string>sy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="ty_checkBox">
+        <property name="text">
+         <string>ty</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="tz_checkBox">
+        <property name="text">
+         <string>tz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="ry_checkBox">
+        <property name="text">
+         <string>ry</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="sx_checkBox">
+        <property name="text">
+         <string>sx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="rx_checkBox">
+        <property name="text">
+         <string>rx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="sz_checkBox">
+        <property name="text">
+         <string>sz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="translate_pushButton">
+        <property name="text">
+         <string>Translate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="scale_pushButton">
+        <property name="text">
+         <string>Scale</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="rz_checkBox">
+        <property name="text">
+         <string>rz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QCheckBox" name="ro_checkBox">
+        <property name="text">
+         <string>ro</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="ro_comboBox">
+        <item>
+         <property name="text">
+          <string>xyz</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>yzx</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>zxy</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>xzy</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>yxz</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>zyx</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Space Switch</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="remove_pushButton">
+        <property name="text">
+         <string>&gt;&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>100</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="add_pushButton">
+        <property name="text">
+         <string>&lt;&lt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" rowspan="3">
+       <widget class="QListWidget" name="listWidget"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
