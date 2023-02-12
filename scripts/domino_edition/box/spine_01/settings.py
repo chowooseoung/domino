@@ -48,10 +48,12 @@ class Settings(CommonPieceSettings):
 
         self.ui_funcs.install_spinBox(
             ui.stretch_spinBox,
-            "max_stretch")
+            "max_stretch",
+            0.01)
         self.ui_funcs.install_slider(
             ui.stretch_horizontalSlider,
-            "max_stretch")
+            "max_stretch",
+            0.01)
 
         self.ui_funcs.install_spinBox(
             ui.squash_spinBox,
