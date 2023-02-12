@@ -93,31 +93,59 @@ class Finger02Rig(piece.Rig):
         name = self.naming("fk0", "", _s="ctl")
         offset = ((positions[1] - positions[0]) / 2.0).length()
         po = offset * -1 if self.ddata.negate else offset
-        self.fk0_ctl, self.fk0_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=None,
+        height_depth = offset
+        self.fk0_ctl, self.fk0_loc = self.create_ctl(context=context,
+                                                     parent=None,
+                                                     name=name,
+                                                     parent_ctl=None,
                                                      color=fk_color,
-                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"], m=fk0_m,
-                                                     shape="cube", cns=False, width=offset * 2, height=offset,
-                                                     depth=offset, po=(po, 0, 0))
+                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"],
+                                                     m=fk0_m,
+                                                     shape="cube",
+                                                     cns=False,
+                                                     width=offset * 2,
+                                                     height=height_depth,
+                                                     depth=height_depth,
+                                                     po=(po, 0, 0))
 
         fk1_m = matrix.get_matrix_look_at(positions[1], positions[2], normal, "xz", self.ddata.negate)
         name = self.naming("fk1", "", _s="ctl")
         offset = ((positions[2] - positions[1]) / 2.0).length()
         po = offset * -1 if self.ddata.negate else offset
-        self.fk1_ctl, self.fk1_loc = self.create_ctl(context=context, parent=self.fk0_loc, name=name,
-                                                     parent_ctl=self.fk0_ctl, color=fk_color,
-                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"], m=fk1_m,
-                                                     shape="cube", cns=False, width=offset * 2, height=offset,
-                                                     depth=offset, po=(po, 0, 0))
+        height_depth *= 0.9
+        self.fk1_ctl, self.fk1_loc = self.create_ctl(context=context,
+                                                     parent=self.fk0_loc,
+                                                     name=name,
+                                                     parent_ctl=self.fk0_ctl,
+                                                     color=fk_color,
+                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"],
+                                                     m=fk1_m,
+                                                     shape="cube",
+                                                     cns=False,
+                                                     width=offset * 2,
+                                                     height=height_depth,
+                                                     depth=height_depth,
+                                                     po=(po, 0, 0))
         fk2_m = matrix.get_matrix_look_at(positions[2], positions[3], normal, "xz", self.ddata.negate)
         name = self.naming("fk2", "", _s="ctl")
         offset = ((positions[3] - positions[2]) / 2.0).length()
         po = offset * -1 if self.ddata.negate else offset
-        self.fk2_ctl, self.fk2_loc = self.create_ctl(context=context, parent=self.fk1_loc, name=name,
-                                                     parent_ctl=self.fk1_ctl, color=fk_color,
+        height_depth *= 0.9
+        self.fk2_ctl, self.fk2_loc = self.create_ctl(context=context,
+                                                     parent=self.fk1_loc,
+                                                     name=name,
+                                                     parent_ctl=self.fk1_ctl,
+                                                     color=fk_color,
                                                      keyable_attrs=["tx", "ty", "tz",
                                                                     "rx", "ry", "rz", "ro",
-                                                                    "sx", "sy", "sz"], m=fk2_m, shape="cube", cns=False,
-                                                     width=offset * 2, height=offset, depth=offset, po=(po, 0, 0))
+                                                                    "sx", "sy", "sz"],
+                                                     m=fk2_m,
+                                                     shape="cube",
+                                                     cns=False,
+                                                     width=offset * 2,
+                                                     height=height_depth,
+                                                     depth=height_depth,
+                                                     po=(po, 0, 0))
 
         # ik ctl
         axis = "xz" if self.ddata.negate else "-xz"
