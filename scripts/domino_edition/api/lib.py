@@ -237,12 +237,8 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
     if rig:
         root = rig.getParent(generations=-1)
         asset_container = pm.container(query=True, findContainer=root)
-        roots_grp_index = pm.containerPublish(asset_container,
-                                              query=True,
-                                              bindNode=True).index("roots")
-        roots_grp = pm.containerPublish(asset_container,
-                                        query=True,
-                                        bindNode=True)[roots_grp_index + 1]
+        roots_grp_index = pm.containerPublish(asset_container, query=True, bindNode=True).index("roots")
+        roots_grp = pm.containerPublish(asset_container, query=True, bindNode=True)[roots_grp_index + 1]
         if not roots_grp:
             raise RuntimeError(f"rig arg must be rigging dag node")
 
@@ -364,32 +360,21 @@ def add_blended_jnt():
     selected_root = plug[0].node()
     asset = selected[0].getParent(generations=-1)
     container = pm.container(query=True, findContainer=asset)
-    roots_index = pm.containerPublish(container,
-                                      query=True,
-                                      bindNode=True).index("roots")
-    roots_grp = pm.containerPublish(container,
-                                    query=True,
-                                    bindNode=True)[roots_index + 1]
-    pieces = utils.collect_piece(guide=None,
-                                 rig=roots_grp,
-                                 datas=None)
+    roots_index = pm.containerPublish(container, query=True, bindNode=True).index("roots")
+    roots_grp = pm.containerPublish(container, query=True, bindNode=True)[roots_index + 1]
+    pieces = utils.collect_piece(guide=None, rig=roots_grp, datas=None)
     d_id = selected_root.attr("d_id").get()
     piece = [p for p in pieces if p.ddata._data["d_id"] == d_id][0]
-    selected_container = pm.container(query=True,
-                                      findContainer=selected_root)
+    selected_container = pm.container(query=True, findContainer=selected_root)
     pm.container(selected_container, edit=True, current=True)
     piece.rig.root = selected_root
     jnt = piece.rig.create_blended_jnt(name="", index=index)
 
     if jnt is not None:
         pm.select(jnt)
-        sets = pm.listConnections(asset.attr("sets"),
-                                  type="objectSet",
-                                  destination=False,
-                                  source=True)
+        sets = pm.listConnections(asset.attr("sets"), type="objectSet", destination=False, source=True)
         if sets:
-            child_sets = [x for x in pm.sets(sets[0], query=True)
-                          if x.type() == "objectSet"]
+            child_sets = [x for x in pm.sets(sets[0], query=True) if x.type() == "objectSet"]
             sets.extend(child_sets)
             for s in sets:
                 if pm.sets(s, isMember=selected[0]):
@@ -431,27 +416,18 @@ def add_support_jnt():
     selected_root = plug[0].node()
 
     count = 0
-    while pm.listConnections(selected_root.attr("support_jnts")[count],
-                             source=True,
-                             destination=False):
+    while pm.listConnections(selected_root.attr("support_jnts")[count], source=True, destination=False):
         count += 1
 
     asset = selected[0].getParent(generations=-1)
     container = pm.container(query=True, findContainer=asset)
-    roots_index = pm.containerPublish(container,
-                                      query=True,
-                                      bindNode=True).index("roots")
-    roots_grp = pm.containerPublish(container,
-                                    query=True,
-                                    bindNode=True)[roots_index + 1]
-    pieces = utils.collect_piece(guide=None,
-                                 rig=roots_grp,
-                                 datas=None)
+    roots_index = pm.containerPublish(container, query=True, bindNode=True).index("roots")
+    roots_grp = pm.containerPublish(container, query=True, bindNode=True)[roots_index + 1]
+    pieces = utils.collect_piece(guide=None, rig=roots_grp, datas=None)
     d_id = selected_root.attr("d_id").get()
     piece = [p for p in pieces if p.ddata._data["d_id"] == d_id][0]
     m = selected[0].getMatrix(worldSpace=True)
-    selected_container = pm.container(query=True,
-                                      findContainer=selected_root)
+    selected_container = pm.container(query=True, findContainer=selected_root)
     pm.container(selected_container, edit=True, current=True)
     piece.rig.root = selected_root
     jnt = piece.rig.create_support_jnt(name="",
@@ -461,13 +437,9 @@ def add_support_jnt():
                                        m=dt.Matrix(m))
     if jnt is not None:
         pm.select(jnt)
-        sets = pm.listConnections(asset.attr("sets"),
-                                  type="objectSet",
-                                  destination=False,
-                                  source=True)
+        sets = pm.listConnections(asset.attr("sets"), type="objectSet", destination=False, source=True)
         if sets:
-            child_sets = [x for x in pm.sets(sets[0], query=True)
-                          if x.type() == "objectSet"]
+            child_sets = [x for x in pm.sets(sets[0], query=True) if x.type() == "objectSet"]
             sets.extend(child_sets)
             for s in sets:
                 if pm.sets(s, isMember=selected[0]):
@@ -484,11 +456,7 @@ def extract_ctl_shapes(ctls):
     for ctl in ctls:
         if not ctl.hasAttr("is_domino_ctl"):
             continue
-        plugs = pm.listConnections(f"{ctl}.message",
-                                   destination=True,
-                                   source=False,
-                                   plugs=True,
-                                   type="transform")[0]
+        plugs = pm.listConnections(f"{ctl}.message", destination=True, source=False, plugs=True, type="transform")[0]
         if plugs.attrName() != "ctls":
             continue
         index = plugs.index()
@@ -515,12 +483,8 @@ def save(dotfile):
         raise RuntimeError("select domino guide or rig")
     if is_rig:
         asset_container = pm.container(query=True, findContainer=root)
-        roots_grp_index = pm.containerPublish(asset_container,
-                                              query=True,
-                                              bindNode=True).index("roots")
-        root = pm.containerPublish(asset_container,
-                                   query=True,
-                                   bindNode=True)[roots_grp_index + 1]
+        roots_grp_index = pm.containerPublish(asset_container, query=True, bindNode=True).index("roots")
+        root = pm.containerPublish(asset_container, query=True, bindNode=True)[roots_grp_index + 1]
     argument = {"guide": root if is_guide else None,
                 "rig": root if is_rig else None,
                 "datas": None}

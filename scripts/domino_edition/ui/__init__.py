@@ -453,9 +453,6 @@ class UiFunctionSet:
             self.set_attr_to_piece(attr, values[index])
         self.ui.visibilitySignal.emit(0)
 
-    def toggle_values(self, target_attrs, values):
-        pass
-
     def add_space_switch_listWidget(self, list_widget, target_attr):
         items = pm.ls(selection=True, long=True)
         registered_items = [i.text() for i in
