@@ -55,7 +55,7 @@ class Spine01Data(piece.DData):
             "offset_matrix": {"typ": "matrix",
                               "value": self._m1},
             "division": {"typ": "long",
-                         "value": 5,
+                         "value": 3,
                          "keyable": False},
             "position": {"typ": "double",
                          "value": 0,
