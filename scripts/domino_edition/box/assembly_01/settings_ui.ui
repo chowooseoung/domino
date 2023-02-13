@@ -353,6 +353,9 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
              <number>31</number>
             </property>
@@ -375,6 +378,9 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
             <property name="maximum">
              <number>31</number>
@@ -408,6 +414,9 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
             <property name="maximum">
              <number>31</number>
@@ -524,6 +533,9 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
              <number>31</number>
             </property>
@@ -536,6 +548,9 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
             <property name="maximum">
              <number>31</number>
@@ -559,6 +574,9 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
             <property name="maximum">
              <number>31</number>
@@ -595,8 +613,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>372</width>
-        <height>519</height>
+        <width>172</width>
+        <height>240</height>
        </rect>
       </property>
       <attribute name="label">
@@ -716,8 +734,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>372</width>
-        <height>519</height>
+        <width>313</width>
+        <height>452</height>
        </rect>
       </property>
       <attribute name="label">

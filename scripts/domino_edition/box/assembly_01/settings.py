@@ -132,47 +132,47 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
 
         ui.ctl_name_rule_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
-                    ["ctl_name_rule",
-                     "ctl_description_letter_case"],
+                    [ui.ctl_name_rule_lineEdit,
+                     ui.ctl_description_letter_case_comboBox],
                     [naming.DEFAULT_NAMING_RULE,
                      "default"]))
 
         ui.jnt_name_rule_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
-                    ['jnt_name_rule',
-                     "jnt_description_letter_case"],
+                    [ui.jnt_name_rule_lineEdit,
+                     ui.jnt_description_letter_case_comboBox],
                     [naming.DEFAULT_NAMING_RULE,
                      "default"]))
 
         ui.ctl_side_name_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
-                    ["ctl_left_name",
-                     "ctl_right_name",
-                     "ctl_center_name"],
+                    [ui.l_ctl_side_name_lineEdit,
+                     ui.r_ctl_side_name_lineEdit,
+                     ui.c_ctl_side_name_lineEdit],
                     [naming.DEFAULT_SIDE_L_NAME,
                      naming.DEFAULT_SIDE_R_NAME,
                      naming.DEFAULT_SIDE_C_NAME]))
 
         ui.jnt_side_name_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
-                    ["jnt_left_name",
-                     "jnt_right_name",
-                     "jnt_center_name"],
+                    [ui.l_jnt_side_name_lineEdit,
+                     ui.r_jnt_side_name_lineEdit,
+                     ui.c_jnt_side_name_lineEdit],
                     [naming.DEFAULT_SIDE_L_NAME,
                      naming.DEFAULT_SIDE_R_NAME,
                      naming.DEFAULT_SIDE_C_NAME]))
 
         ui.index_padding_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
-                    ["ctl_index_padding",
-                     "jnt_index_padding"],
+                    [ui.ctl_index_padding_spinBox,
+                     ui.jnt_index_padding_spinBox],
                     [naming.DEFAULT_CTL_INDEX_PADDING,
                      naming.DEFAULT_JNT_INDEX_PADDING]))
 
         ui.extensions_name_reset_pushButton.clicked.connect(
             partial(self.ui_funcs.reset_values,
-                    ["ctl_name_ext",
-                     "jnt_name_ext"],
+                    [ui.ctl_extensions_name_lineEdit,
+                     ui.jnt_extensions_name_lineEdit],
                     [naming.DEFAULT_CTL_EXT_NAME,
                      naming.DEFAULT_JOINT_EXT_NAME]))
 

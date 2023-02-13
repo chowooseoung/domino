@@ -216,6 +216,7 @@ class Ui_Dialog(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.left_color_ik_spinBox.sizePolicy().hasHeightForWidth())
         self.left_color_ik_spinBox.setSizePolicy(sizePolicy1)
+        self.left_color_ik_spinBox.setMinimum(1)
         self.left_color_ik_spinBox.setMaximum(31)
 
         self.gridLayout_2.addWidget(self.left_color_ik_spinBox, 2, 3, 1, 1)
@@ -231,6 +232,7 @@ class Ui_Dialog(object):
         self.left_color_fk_spinBox.setObjectName(u"left_color_fk_spinBox")
         sizePolicy1.setHeightForWidth(self.left_color_fk_spinBox.sizePolicy().hasHeightForWidth())
         self.left_color_fk_spinBox.setSizePolicy(sizePolicy1)
+        self.left_color_fk_spinBox.setMinimum(1)
         self.left_color_fk_spinBox.setMaximum(31)
 
         self.gridLayout_2.addWidget(self.left_color_fk_spinBox, 1, 3, 1, 1)
@@ -253,6 +255,7 @@ class Ui_Dialog(object):
         self.center_color_fk_spinBox.setObjectName(u"center_color_fk_spinBox")
         sizePolicy1.setHeightForWidth(self.center_color_fk_spinBox.sizePolicy().hasHeightForWidth())
         self.center_color_fk_spinBox.setSizePolicy(sizePolicy1)
+        self.center_color_fk_spinBox.setMinimum(1)
         self.center_color_fk_spinBox.setMaximum(31)
 
         self.gridLayout_2.addWidget(self.center_color_fk_spinBox, 1, 6, 1, 1)
@@ -306,6 +309,7 @@ class Ui_Dialog(object):
         self.right_color_ik_spinBox.setObjectName(u"right_color_ik_spinBox")
         sizePolicy1.setHeightForWidth(self.right_color_ik_spinBox.sizePolicy().hasHeightForWidth())
         self.right_color_ik_spinBox.setSizePolicy(sizePolicy1)
+        self.right_color_ik_spinBox.setMinimum(1)
         self.right_color_ik_spinBox.setMaximum(31)
 
         self.gridLayout_2.addWidget(self.right_color_ik_spinBox, 2, 9, 1, 1)
@@ -314,6 +318,7 @@ class Ui_Dialog(object):
         self.right_color_fk_spinBox.setObjectName(u"right_color_fk_spinBox")
         sizePolicy1.setHeightForWidth(self.right_color_fk_spinBox.sizePolicy().hasHeightForWidth())
         self.right_color_fk_spinBox.setSizePolicy(sizePolicy1)
+        self.right_color_fk_spinBox.setMinimum(1)
         self.right_color_fk_spinBox.setMaximum(31)
 
         self.gridLayout_2.addWidget(self.right_color_fk_spinBox, 1, 9, 1, 1)
@@ -328,6 +333,7 @@ class Ui_Dialog(object):
         self.center_color_ik_spinBox.setObjectName(u"center_color_ik_spinBox")
         sizePolicy1.setHeightForWidth(self.center_color_ik_spinBox.sizePolicy().hasHeightForWidth())
         self.center_color_ik_spinBox.setSizePolicy(sizePolicy1)
+        self.center_color_ik_spinBox.setMinimum(1)
         self.center_color_ik_spinBox.setMaximum(31)
 
         self.gridLayout_2.addWidget(self.center_color_ik_spinBox, 2, 6, 1, 1)
@@ -347,7 +353,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.rig_page, u"Rig Settings")
         self.sub_piece_page = QWidget()
         self.sub_piece_page.setObjectName(u"sub_piece_page")
-        self.sub_piece_page.setGeometry(QRect(0, 0, 372, 519))
+        self.sub_piece_page.setGeometry(QRect(0, 0, 172, 240))
         self.gridLayout_4 = QGridLayout(self.sub_piece_page)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.run_sub_pieces_checkBox = QCheckBox(self.sub_piece_page)
@@ -411,7 +417,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.sub_piece_page, u"Sub Piece Settings")
         self.name_rule_page = QWidget()
         self.name_rule_page.setObjectName(u"name_rule_page")
-        self.name_rule_page.setGeometry(QRect(0, 0, 372, 519))
+        self.name_rule_page.setGeometry(QRect(0, 0, 313, 452))
         self.gridLayout_8 = QGridLayout(self.name_rule_page)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.groupBox_6 = QGroupBox(self.name_rule_page)

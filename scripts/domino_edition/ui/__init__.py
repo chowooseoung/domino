@@ -49,8 +49,6 @@ class UiFunctionSet:
         self._root = None
         self._piece = None
         self._pieces = None
-        self.closed = True
-        self.ui.visibilitySignal.connect(self.initialize)
 
     @property
     def root(self):
@@ -82,16 +80,6 @@ class UiFunctionSet:
                                                rig=None,
                                                datas=None)
         return self._pieces
-
-    def initialize(self, state):
-        if state == 0 and self.closed:
-            self._root = None
-            self._piece = None
-            self._pieces = None
-            self.closed = False
-            log.Logger.info(f"root : {self.root.nodeName()}")
-        elif state in [1, 2]:
-            self.closed = True
 
     def get_attr_from_piece(self, attr):
         at = pm.attributeQuery(attr, node=self.root, attributeType=True)
@@ -131,29 +119,24 @@ class UiFunctionSet:
             d_name = container.attr("name").get()
             d_side = container.attr("side").get(asString=True)
             d_index = container.attr("index").get()
-            if name == d_name and \
-                    side == d_side and \
-                    index == d_index:
+            if name == d_name and side == d_side and index == d_index:
                 valid_identifier = False
                 break
         return valid_identifier
 
-    def update_name_lineEdit(self, state, l_edit, target_attr):
-        if state == 0:  # show
-            l_edit.setText(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_name_lineEdit(self, l_edit, target_attr):
+        orig_name = self.get_attr_from_piece(target_attr)
+        new_name = l_edit.text()
+        if orig_name != new_name:
             with pm.UndoChunk():
-                new_name = l_edit.text()
                 if self.get_attr_from_piece("piece") != "assembly_01":
                     side = self.get_attr_from_piece("side")
                     index = self.get_attr_from_piece("index")
-                    valid_identifier = self.is_valid_identifier(
-                        new_name, side, index)
+                    valid_identifier = self.is_valid_identifier(new_name, side, index)
                 else:
-                    valid_identifier = self.is_valid_identifier(
-                        new_name, "", "")
+                    valid_identifier = self.is_valid_identifier(new_name, "", "")
                 if not valid_identifier:
-                    l_edit.setText(self.get_attr_from_piece(target_attr))
+                    l_edit.setText(orig_name)
                 else:
                     self.set_attr_to_piece(target_attr, new_name)
                     self.piece.ddata.sync()
@@ -161,29 +144,22 @@ class UiFunctionSet:
                 self.ui.setup_window_title()
 
     def install_name_lineEdit(self, l_edit, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_name_lineEdit,
-                    l_edit=l_edit,
-                    target_attr=target_attr))
+        l_edit.setText(self.get_attr_from_piece(target_attr))
         l_edit.editingFinished.connect(
             partial(self.update_name_lineEdit,
-                    state=-1,
                     l_edit=l_edit,
                     target_attr=target_attr))
 
-    def update_side_comboBox(self, state, c_box, target_attr):
-        if state == 0:  # show
-            c_box.setCurrentText(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_side_comboBox(self, c_box, target_attr):
+        orig_side = self.get_attr_from_piece(target_attr)
+        new_side = c_box.currentText()
+        if orig_side != new_side:
             with pm.UndoChunk():
                 name = self.get_attr_from_piece("name")
-                new_side = c_box.currentText()
                 index = self.get_attr_from_piece("index")
-                valid_identifier = self.is_valid_identifier(name,
-                                                            new_side,
-                                                            index)
+                valid_identifier = self.is_valid_identifier(name, new_side, index)
                 if not valid_identifier:
-                    c_box.setCurrentText(self.get_attr_from_piece(target_attr))
+                    c_box.setCurrentText(orig_side)
                 else:
                     self.set_attr_to_piece(target_attr, new_side)
                     self.piece.ddata.sync()
@@ -191,29 +167,22 @@ class UiFunctionSet:
                 self.ui.setup_window_title()
 
     def install_side_comboBox(self, c_box, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_side_comboBox,
-                    c_box=c_box,
-                    target_attr=target_attr))
+        c_box.setCurrentText(self.get_attr_from_piece(target_attr))
         c_box.currentTextChanged.connect(
             lambda _: self.update_side_comboBox(
-                state=-1,
                 c_box=c_box,
                 target_attr=target_attr))
 
-    def update_index_spinBox(self, state, s_box, target_attr):
-        if state == 0:  # show
-            s_box.setValue(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_index_spinBox(self, s_box, target_attr):
+        orig_index = self.get_attr_from_piece(target_attr)
+        new_index = s_box.value()
+        if orig_index != new_index:
             with pm.UndoChunk():
                 name = self.get_attr_from_piece("name")
                 side = self.get_attr_from_piece("side")
-                new_index = s_box.value()
-                valid_identifier = self.is_valid_identifier(name,
-                                                            side,
-                                                            new_index)
+                valid_identifier = self.is_valid_identifier(name, side, new_index)
                 if not valid_identifier:
-                    s_box.setValue(self.get_attr_from_piece(target_attr))
+                    s_box.setValue(orig_index)
                 else:
                     self.set_attr_to_piece(target_attr, new_index)
                     self.piece.ddata.sync()
@@ -221,131 +190,104 @@ class UiFunctionSet:
                 self.ui.setup_window_title()
 
     def install_index_spinBox(self, s_box, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_index_spinBox,
-                    s_box=s_box,
-                    target_attr=target_attr))
+        s_box.setValue(self.get_attr_from_piece(target_attr))
         s_box.valueChanged.connect(
             lambda _: self.update_index_spinBox(
-                state=-1,
                 s_box=s_box,
                 target_attr=target_attr))
 
-    def update_spinBox(self, s_box, target_attr, _factor, state, *args):
-        if state == 0:  # show
-            s_box.setValue(self.get_attr_from_piece(target_attr) / _factor)
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_spinBox(self, s_box, target_attr, _factor, *args):
+        orig_value = self.get_attr_from_piece(target_attr)
+        new_value = s_box.value() / _factor
+        if orig_value != new_value:
             with pm.UndoChunk():
-                self.set_attr_to_piece(target_attr, s_box.value() * _factor)
+                self.set_attr_to_piece(target_attr, new_value)
 
     def install_spinBox(self, s_box, target_attr, factor=1):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_spinBox,
-                    s_box,
-                    target_attr,
-                    factor))
+        s_box.setValue(self.get_attr_from_piece(target_attr) / factor)
         s_box.valueChanged.connect(
             partial(self.update_spinBox,
                     s_box,
                     target_attr,
-                    factor,
-                    -1))
+                    factor))
 
-    def update_lineEdit(self, state, l_edit, target_attr):
-        if state == 0:  # show
-            l_edit.setText(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_lineEdit(self, l_edit, target_attr):
+        orig_value = self.get_attr_from_piece(target_attr)
+        new_value = l_edit.text()
+        if orig_value != new_value:
             with pm.UndoChunk():
-                name = l_edit.text()
-                self.set_attr_to_piece(target_attr, name)
+                self.set_attr_to_piece(target_attr, new_value)
 
     def install_lineEdit(self, l_edit, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_lineEdit,
-                    l_edit=l_edit,
-                    target_attr=target_attr))
+        l_edit.setText(self.get_attr_from_piece(target_attr))
         l_edit.editingFinished.connect(
             partial(self.update_lineEdit,
-                    state=-1,
                     l_edit=l_edit,
                     target_attr=target_attr))
 
-    def update_comboBox(self, c_box, target_attr, state, *args):
-        if state == 0:  # show
-            c_box.setCurrentText(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_comboBox(self, c_box, target_attr, *args):
+        orig_value = self.get_attr_from_piece(target_attr)
+        new_value = c_box.currentText()
+        if orig_value != new_value:
             with pm.UndoChunk():
-                value = c_box.currentText()
-                self.set_attr_to_piece(target_attr, value)
+                self.set_attr_to_piece(target_attr, new_value)
 
     def install_comboBox(self, c_box, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_comboBox,
-                    c_box,
-                    target_attr))
+        c_box.setCurrentText(self.get_attr_from_piece(target_attr))
         c_box.currentTextChanged.connect(
             partial(self.update_comboBox,
                     c_box,
-                    target_attr,
-                    -1))
+                    target_attr))
 
-    def update_checkBox(self, state, c_box, target_attr):
-        if state == 0:  # show
-            c_box.setChecked(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_checkBox(self, c_box, target_attr, *args):
+        orig_value = self.get_attr_from_piece(target_attr)
+        new_value = c_box.isChecked()
+        if orig_value != new_value:
             with pm.UndoChunk():
-                self.set_attr_to_piece(target_attr, c_box.isChecked())
+                self.set_attr_to_piece(target_attr, new_value)
 
     def install_checkBox(self, c_box, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_checkBox,
-                    c_box=c_box,
-                    target_attr=target_attr))
+        c_box.setChecked(self.get_attr_from_piece(target_attr))
         c_box.stateChanged.connect(
             lambda _: self.update_checkBox(
-                state=-1,
                 c_box=c_box,
                 target_attr=target_attr))
 
-    def update_slider(self, slider, target_attr, factor, state, *args):
-        if state == 0:  # show
-            slider.setValue(int(self.get_attr_from_piece(target_attr) / factor))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_slider(self, slider, target_attr, factor, *args):
+        orig_value = self.get_attr_from_piece(target_attr)
+        new_value = slider.value() * factor
+        if orig_value != new_value:
             with pm.UndoChunk():
-                self.set_attr_to_piece(target_attr, slider.value() * factor)
+                self.set_attr_to_piece(target_attr, new_value)
 
     def install_slider(self, slider, target_attr, factor=1):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_slider,
-                    slider,
-                    target_attr,
-                    factor))
+        slider.setValue(int(self.get_attr_from_piece(target_attr) / factor))
         slider.valueChanged.connect(
             partial(self.update_slider,
                     slider,
                     target_attr,
-                    factor,
-                    -1))
+                    factor))
 
-    def update_textEdit(self, t_edit, target_attr, state):
-        if state == 0:  # show
-            t_edit.setPlainText(self.get_attr_from_piece(target_attr))
-        elif state in [-1, 1, 2]:  # default, hide, close
+    def update_textEdit(self, t_edit, target_attr):
+        orig_value = self.get_attr_from_piece(target_attr)
+        new_value = t_edit.toPlainText()
+        if orig_value != new_value:
             with pm.UndoChunk():
-                self.set_attr_to_piece(target_attr, t_edit.toPlainText())
+                self.set_attr_to_piece(target_attr, new_value)
                 s = t_edit.document().size()
                 t_edit.setFixedHeight(s.height() + 4)
 
     def install_textEdit(self, t_edit, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_textEdit,
-                    t_edit,
-                    target_attr))
+        txt = self.get_attr_from_piece(target_attr)
+        t_edit.setPlainText(txt)
+        font = t_edit.document().defaultFont()
+        font_metrices = QtGui.QFontMetrics(font)
+        txt_size = font_metrices.size(0, t_edit.toPlainText())
+        t_edit.setFixedHeight(txt_size.height() + 12)
         t_edit.textChanged.connect(
             partial(self.update_textEdit,
                     t_edit,
-                    target_attr,
-                    -1))
+                    target_attr))
 
     def use_rgb_color_checkBox(self,
                                use_rgb_c_box,
@@ -354,58 +296,56 @@ class UiFunctionSet:
                                s_box,
                                rgb_attr,
                                index_attr,
-                               state,
                                *args):
         is_rgb = use_rgb_c_box.isChecked()
         if not is_rgb:
             slider.setVisible(False)
             s_box.setVisible(True)
+            index = self.get_attr_from_piece(index_attr)
+            rgb = [float(x / 255) for x in MAYA_OVERRIDE_COLOR[index]]
+            color = pm.colorManagementConvert(toDisplaySpace=rgb)
+            self.update_rgb_color_btn(btn, color)
+            s_box.setValue(index)
         else:
             slider.setVisible(True)
             s_box.setVisible(False)
-        if state == 0:  # show
-            if is_rgb:
-                rgb = self.get_attr_from_piece(rgb_attr)
-                color = pm.colorManagementConvert(
-                    toDisplaySpace=rgb)
-                h_value = sorted(rgb)[2]
-                if not h_value:
-                    color = (0, 0, 0)
-                color = ", ".join([str(c * 255) for c in color])
-                btn.setStyleSheet("* {background-color: rgb(" + color + ")}")
-                slider.setValue(h_value * 100)
-            else:
-                index = self.get_attr_from_piece(index_attr)
-                rgb = [float(x / 255)
-                       for x in MAYA_OVERRIDE_COLOR[index]]
-                color = pm.colorManagementConvert(
-                    toDisplaySpace=rgb)
-                color = ",".join([str(c * 255) for c in color])
-                btn.setStyleSheet("* {background-color: rgb(" + color + ")}")
-                value = self.get_attr_from_piece(index_attr)
-                s_box.setValue(value)
+            rgb = self.get_attr_from_piece(rgb_attr)
+            color = pm.colorManagementConvert(toDisplaySpace=rgb)
+            h_value = sorted(rgb)[2]
+            if not h_value:
+                color = (0, 0, 0)
+            self.update_rgb_color_btn(btn, color)
+            slider.setValue(h_value * 100)
 
-    def rgb_color_btn(self, use_rgb_c_box, target_attr):
+    def rgb_color_btn(self, use_rgb_c_box, btn, target_attr):
         if not use_rgb_c_box.isChecked():
             return 0
         pm.colorEditor(rgb=self.get_attr_from_piece(target_attr))
         if pm.colorEditor(query=True, result=True):
             rgb = pm.colorEditor(query=True, rgb=True)
             self.set_attr_to_piece(target_attr, rgb)
-            self.ui.visibilitySignal.emit(0)
+            color = pm.colorManagementConvert(toDisplaySpace=rgb)
+            self.update_rgb_color_btn(btn, color)
 
-    def rgb_color_slider(self, target_attr, value):
+    def rgb_color_slider(self, btn, target_attr, value):
         rgb = self.get_attr_from_piece(target_attr)
         hsv_value = sorted(rgb)[2]
         if hsv_value:
-            new_rgb = tuple(i / (hsv_value / 1.0) * (value / 100)
-                            for i in rgb)
+            new_rgb = tuple(i / (hsv_value / 1.0) * (value / 100) for i in rgb)
         else:
-            new_rgb = tuple((1.0 * (value / 100),
-                             1.0 * (value / 100),
-                             1.0 * (value / 100)))
+            new_rgb = tuple((1.0 * (value / 100), 1.0 * (value / 100), 1.0 * (value / 100)))
+        self.update_rgb_color_btn(btn, new_rgb)
         self.set_attr_to_piece(target_attr, new_rgb)
-        self.ui.visibilitySignal.emit(0)
+
+    def rgb_color_spinBox(self, s_box, btn, target_attr, value):
+        self.update_spinBox(s_box, target_attr, 1)
+        rgb = [float(x / 255) for x in MAYA_OVERRIDE_COLOR[value]]
+        color = pm.colorManagementConvert(toDisplaySpace=rgb)
+        self.update_rgb_color_btn(btn, color)
+
+    def update_rgb_color_btn(self, btn, color):
+        color = ", ".join([str(c * 255) for c in color])
+        btn.setStyleSheet("* {background-color: rgb(" + color + ")}")
 
     def install_color_widgets(self,
                               use_rgb_c_box,
@@ -414,15 +354,7 @@ class UiFunctionSet:
                               s_box,
                               rgb_attr,
                               index_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.use_rgb_color_checkBox,
-                    use_rgb_c_box,
-                    btn,
-                    slider,
-                    s_box,
-                    rgb_attr,
-                    index_attr))
-
+        self.use_rgb_color_checkBox(use_rgb_c_box, btn, slider, s_box, rgb_attr, index_attr)
         use_rgb_c_box.clicked.connect(
             partial(self.use_rgb_color_checkBox,
                     use_rgb_c_box,
@@ -430,28 +362,31 @@ class UiFunctionSet:
                     slider,
                     s_box,
                     rgb_attr,
-                    index_attr,
-                    0))
-
+                    index_attr))
         btn.clicked.connect(
             partial(self.rgb_color_btn,
                     use_rgb_c_box,
+                    btn,
                     rgb_attr))
-
         s_box.valueChanged.connect(
-            partial(self.update_spinBox,
+            partial(self.rgb_color_spinBox,
                     s_box,
-                    index_attr,
-                    -1))
-
+                    btn,
+                    index_attr))
         slider.valueChanged.connect(
             partial(self.rgb_color_slider,
+                    btn,
                     rgb_attr))
 
-    def reset_values(self, target_attrs, values):
-        for index, attr in enumerate(target_attrs):
-            self.set_attr_to_piece(attr, values[index])
-        self.ui.visibilitySignal.emit(0)
+    def reset_values(self, widgets, values):
+        for index, widget in enumerate(widgets):
+            if isinstance(widget, QtWidgets.QLineEdit):
+                widget.setText(values[index])
+                widget.editingFinished.emit()
+            elif isinstance(widget, QtWidgets.QComboBox):
+                widget.setCurrentText(values[index])
+            elif isinstance(widget, QtWidgets.QSpinBox):
+                widget.setValue(values[index])
 
     def add_space_switch_listWidget(self, list_widget, target_attr):
         items = pm.ls(selection=True, long=True)
@@ -470,14 +405,12 @@ class UiFunctionSet:
                                           plugs=True)[0]
             root = ctl_attr.node()
             if root.attr("piece").get() == "assembly_01":
-                identifier = \
-                    Identifier.to_str(root.attr("name").get(), None, None)
+                identifier = Identifier.to_str(root.attr("name").get(), None, None)
             else:
                 name = root.attr("name").get()
                 side = root.attr("side").get(asString=True)
                 index = root.attr("index").get()
-                identifier = \
-                    Identifier.to_str(name, side, index)
+                identifier = Identifier.to_str(name, side, index)
             index = ctl_attr.index()
             data = f"{index} | {identifier}"
             if data in registered_items:
@@ -488,7 +421,6 @@ class UiFunctionSet:
                 value += f",{data}" if value else data
                 with pm.UndoChunk():
                     self.set_attr_to_piece(target_attr, value)
-        self.ui.visibilitySignal.emit(-1)
 
     def remove_space_switch_listWidget(self, list_widget, target_attr):
         for item in list_widget.selectedItems():
@@ -496,14 +428,12 @@ class UiFunctionSet:
             value.remove(item.text())
             with pm.UndoChunk():
                 self.set_attr_to_piece(target_attr, ",".join(value))
-        self.ui.visibilitySignal.emit(-1)
 
     def update_space_switch_listWidget(self, list_widget, target_attr, state):
         """Update the string attribute with values separated by commas"""
         data = self.get_attr_from_piece(target_attr)
         list_widget.clear()
-        registered_items = [i.text() for i in
-                            list_widget.findItems("", QtCore.Qt.MatchContains)]
+        registered_items = [i.text() for i in list_widget.findItems("", QtCore.Qt.MatchContains)]
         if registered_items and not registered_items[0]:
             list_widget.takeItem(0)
         for d in data.split(","):
@@ -516,16 +446,10 @@ class UiFunctionSet:
                                         add_btn,
                                         remove_btn,
                                         target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_space_switch_listWidget,
-                    list_widget,
-                    target_attr))
-
         add_btn.clicked.connect(
             partial(self.add_space_switch_listWidget,
                     list_widget,
                     target_attr))
-
         remove_btn.clicked.connect(
             partial(self.remove_space_switch_listWidget,
                     list_widget,
@@ -548,7 +472,7 @@ class UiFunctionSet:
         self.set_attr_to_piece(target_attr, Identifier.to_str(name, side, index))
         self.update_host_lineEdit(line_edit, target_attr, 0)
 
-    def update_host_lineEdit(self, line_edit, target_attr, state):
+    def update_host_lineEdit(self, line_edit, target_attr):
         line_edit.setText("")
         top_node = self.root.getParent(generations=-1)
 
@@ -558,11 +482,7 @@ class UiFunctionSet:
             line_edit.setText(guide.strip())
 
     def install_host_lineEdit(self, line_edit, btn, target_attr):
-        self.ui.visibilitySignal.connect(
-            partial(self.update_host_lineEdit,
-                    line_edit,
-                    target_attr))
-
+        self.update_host_lineEdit(line_edit, target_attr)
         btn.clicked.connect(
             partial(self.add_host_lineEdit,
                     line_edit,
