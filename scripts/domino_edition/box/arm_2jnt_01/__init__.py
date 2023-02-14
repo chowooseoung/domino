@@ -923,6 +923,76 @@ class Arm2jnt01Rig(piece.Rig):
             shoulder_root = auto_clavicle_data[1]
             shoulder_ctl = auto_clavicle_data[0]
             shoulder_host = auto_clavicle_data[2]
+            auto_clavicle_attr = attribute.add(shoulder_host,
+                                               "auto_clavicle",
+                                               typ="double",
+                                               value=1,
+                                               minValue=0,
+                                               maxValue=1,
+                                               keyable=True)
+            neutral_factor_attr = attribute.add(shoulder_host,
+                                                "neutral_factor",
+                                                typ="double",
+                                                value=0,
+                                                minValue=0,
+                                                maxValue=10,
+                                                keyable=True)
+            t_factor_attr = attribute.add(shoulder_host,
+                                          "t_factor",
+                                          typ="double",
+                                          value=0,
+                                          minValue=0,
+                                          maxValue=10,
+                                          keyable=True)
+            up_factor_attr = attribute.add(shoulder_host,
+                                           "up_factor",
+                                           typ="double",
+                                           value=2.7,
+                                           minValue=0,
+                                           maxValue=10,
+                                           keyable=True)
+            down_factor_attr = attribute.add(shoulder_host,
+                                             "down_factor",
+                                             typ="double",
+                                             value=0.7,
+                                             minValue=0,
+                                             maxValue=10,
+                                             keyable=True)
+            front_90_factor_attr = attribute.add(shoulder_host,
+                                                 "front_90_factor",
+                                                 typ="double",
+                                                 value=1.5,
+                                                 minValue=0,
+                                                 maxValue=10,
+                                                 keyable=True)
+            back_90_factor_attr = attribute.add(shoulder_host,
+                                                "back_90_factor",
+                                                typ="double",
+                                                value=1.5,
+                                                minValue=0,
+                                                maxValue=10,
+                                                keyable=True)
+            back_140_factor_attr = attribute.add(shoulder_host,
+                                                 "front_140_factor",
+                                                 typ="double",
+                                                 value=1.8,
+                                                 minValue=0,
+                                                 maxValue=10,
+                                                 keyable=True)
+            front_140_factor_attr = attribute.add(shoulder_host,
+                                                  "back_140_factor",
+                                                  typ="double",
+                                                  value=1.8,
+                                                  minValue=0,
+                                                  maxValue=10,
+                                                  keyable=True)
+            ik_factor_attr = attribute.add(shoulder_host,
+                                           "ik_factor",
+                                           typ="double",
+                                           value=0.35,
+                                           minValue=0,
+                                           maxValue=10,
+                                           keyable=True)
 
             ik_npo = self.ik_ctl.getParent()
             if pm.controller(ik_npo, query=True):
@@ -1035,19 +1105,22 @@ class Arm2jnt01Rig(piece.Rig):
             pm.poseInterpolator(interpolator, edit=True, addPose="BACK140_pose")
             self.auto_clavicle_jnts[0].attr("rotate").set((0, 0, 0))
             mds = []
-            values = [0,  # neutral
-                      0,  # t
-                      2.7,  # up
-                      0.7,  # down
-                      1.5,  # front90
-                      1.5,  # back90
-                      1.8,  # front140
-                      1.8]  # back140
+            factor_attrs = [
+                neutral_factor_attr,
+                t_factor_attr,
+                up_factor_attr,
+                down_factor_attr,
+                front_90_factor_attr,
+                back_90_factor_attr,
+                front_140_factor_attr,
+                back_140_factor_attr
+            ]
             for i in pm.poseInterpolator(interpolator, query=True, index=True):
                 interpolator.attr(f"pose[{i}].poseType").set(1)
                 md = pm.createNode("multiplyDivide")
                 pm.connectAttr(interpolator.attr("output")[i], md.attr("input1X"))
-                md.attr("input2X").set(values[i])
+                pm.connectAttr(factor_attrs[i], md.attr("input2X"))
+                # md.attr("input2X").set(factor_attrs[i])
                 mds.append(md)
             pma = pm.createNode("plusMinusAverage")
             for i, md in enumerate(mds):
@@ -1068,18 +1141,11 @@ class Arm2jnt01Rig(piece.Rig):
             offset_transform = controller.npo(shoulder_ctl, name=name)
             pm.parent(offset_transform, target_transform)
 
-            auto_clavicle_attr = attribute.add(shoulder_host,
-                                               "auto_clavicle",
-                                               typ="double",
-                                               value=1,
-                                               minValue=0,
-                                               maxValue=1,
-                                               keyable=True)
             rm = pm.createNode("remapValue")
             rm.attr("inputMin").set(1)
             rm.attr("inputMax").set(0)
             pm.connectAttr(self.fk_ik_attr, rm.attr("inputValue"))
-            rm.attr("outputMin").set(0.3)
+            pm.connectAttr(ik_factor_attr, rm.attr("outputMin"))
             rm.attr("outputMax").set(1)
 
             md = pm.createNode("multiplyDivide")
