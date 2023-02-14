@@ -1457,13 +1457,8 @@ class Rig:
         hosts = [root.attr("host").inputs() for root in roots]
         hosts = list(set([host[0] for host in hosts if host]))
         for host in hosts:
-            publish_attrs = pm.listAttr(host,
-                                        keyable=True,
-                                        userDefined=True,
-                                        shortNames=True) or []
-            publish_attrs += pm.listAttr(host,
-                                         channelBox=True,
-                                         shortNames=True) or []
+            publish_attrs = pm.listAttr(host, userDefined=True, shortNames=True) or []
+            publish_attrs = [x for x in publish_attrs if host.attr(x).isInChannelBox() or host.attr(x).isKeyable()]
             container = pm.container(query=True, findContainer=host)
             for attr in publish_attrs:
                 publish_name = "hostI_" + attr
