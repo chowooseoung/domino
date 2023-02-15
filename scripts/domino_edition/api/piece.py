@@ -267,9 +267,15 @@ class DData:
 
     def sync(self, reverse=False):
         if reverse:
-            for key, value in self.data(DData.SELF).items():
-                if key not in self.preset:
+            _data = self.data(DData.SELF)
+            for key in self.preset:
+                if key not in _data:
+                    argument = self.preset[key]
+                    attribute.add(self.node,
+                                  longName=key,
+                                  **argument)
                     continue
+                value = _data[key]
                 if not pm.objExists(f"{self.node}.{key}"):
                     argument = self.preset[key].copy()
                     if "fcurve" in argument:
