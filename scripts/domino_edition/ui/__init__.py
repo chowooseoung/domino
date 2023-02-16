@@ -734,6 +734,8 @@ class Manager(ManagerUI):
         self.proxy_model = QtCore.QSortFilterProxyModel(self)
         self.piece_listView.setModel(self.proxy_model)
         self.piece_listView.setDragEnabled(False)
+        indent = QtGui.QFontMetricsF(self.description_textEdit.font()).horizontalAdvance("    ")
+        self.description_textEdit.document().setIndentWidth(indent)
 
         self.create_connections()
         self.refresh_listView()
