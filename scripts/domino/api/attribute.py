@@ -203,3 +203,24 @@ def reset_all(objs):
 def reset_SRT(objs, attributes=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"]):
     for obj in objs:
         reset(obj, attributes)
+
+
+def get_data(ctls):
+    d = {}
+    for ctl in ctls:
+        name = ctl.nodeName()
+        user_define_attrs = pm.listAttr(ctl, unlocked=True) or []
+        user_define_attrs = [x for x in user_define_attrs if ctl.attr(x).isKeyable() or ctl.attr(x).isInChannelBox()]
+        _d = {}
+        for attr in user_define_attrs:
+            _d[attr] = ctl.attr(attr).get()
+        if _d:
+            d[name] = _d
+    return d
+
+
+def set_data(data, namespace=":"):
+    for ctl in data:
+        name = namespace + ctl
+        for attr in data[ctl]:
+            pm.setAttr(name + "." + attr, data[ctl][attr])

@@ -1484,19 +1484,21 @@ class Rig:
                 continue
             pub_name = ctl.nodeName()
             container = pm.container(query=True, findContainer=ctl)
-            pm.containerPublish(container,
-                                publishNode=(pub_name, ""))
-            pm.containerPublish(container,
-                                bindNode=(pub_name, ctl))
+            pm.containerPublish(container, publishNode=(pub_name, ""))
+            pm.containerPublish(container, bindNode=(pub_name, ctl))
 
             shapes = ctl.getShapes()
             for shape in shapes:
-                pm.connectAttr(context["asset"][1].attr("ctl_x_ray"),
-                               shape.attr("alwaysDrawOnTop"))
-        pm.connectAttr(context["asset"][1].attr("ctl_on_playback"),
-                       context["roots"].attr("hideOnPlayback"))
-        pm.connectAttr(context["asset"][1].attr("ctl_vis"),
-                       context["roots"].attr("v"))
+                pm.connectAttr(context["asset"][1].attr("ctl_x_ray"), shape.attr("alwaysDrawOnTop"))
+        pm.connectAttr(context["asset"][1].attr("ctl_on_playback"), context["roots"].attr("hideOnPlayback"))
+        pm.connectAttr(context["asset"][1].attr("ctl_vis"), context["roots"].attr("v"))
+        assembly_root = context["asset"][1].attr("assembly_piece").get()
+        pose_data = json.loads(assembly_root.attr("pose_json").get().replace("'", "\""))
+        if pose_data["neutral"]:
+            return
+        neutral_pose_data = attribute.get_data(context["ctls"])
+        pose_data["neutral"] = neutral_pose_data
+        assembly_root.attr("pose_json").set(json.dumps(pose_data))
 
     @staticmethod
     def setup_jnt(context):
@@ -1529,8 +1531,12 @@ class Rig:
         pm.sets(controller_sets, edit=True, addElement=context["ctls"])
         s = [model_sets, geometry_sets, skeleton_sets, controller_sets]
         pm.sets(rig_sets, edit=True, addElement=s)
-        sets_attr = attribute.add(context["asset"][1], longName="sets", typ="message")
-        pm.connectAttr(rig_sets.attr("message"), sets_attr)
+        geo_sets_attr = attribute.add(context["asset"][1], longName="geo_sets", typ="message")
+        ctl_sets_attr = attribute.add(context["asset"][1], longName="ctl_sets", typ="message")
+        jnt_sets_attr = attribute.add(context["asset"][1], longName="jnt_sets", typ="message")
+        pm.connectAttr(geometry_sets.attr("message"), geo_sets_attr)
+        pm.connectAttr(controller_sets.attr("message"), ctl_sets_attr)
+        pm.connectAttr(skeleton_sets.attr("message"), jnt_sets_attr)
 
     @staticmethod
     def callback(context):

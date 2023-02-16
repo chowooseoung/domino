@@ -1,6 +1,7 @@
 # built-ins
 import os
 import uuid
+import json
 
 # maya
 from pymel import core as pm
@@ -169,6 +170,12 @@ class Assembly01Data(piece.DData):
                                    "value": {}},
             "icon_name": {"typ": "string",
                           "value": "human"},
+            "pose_json": {"typ": "string",
+                          "value": json.dumps({
+                              "neutral": {},
+                              "t": {},
+                              "simulation": {}
+                          })},
             "publish_notes": {"typ": "string",
                               "value": ""}
         }
@@ -199,6 +206,8 @@ class Assembly01Rig(piece.Rig):
         skeleton = context["skeleton"]
 
         origin_rig = self.create_root(context, (0, 0, 0))
+        assembly_piece_attr = attribute.add(asset_root, "assembly_piece", typ="message")
+        pm.connectAttr(origin_rig.attr("message"), assembly_piece_attr)
 
         attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx", "sy", "sz"]
         for obj in [asset_root, skeleton]:

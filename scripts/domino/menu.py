@@ -35,11 +35,16 @@ domino_edition.api.lib.add_blended_jnt()"""
 cb_add_support_jnt = """import domino_edition.api.lib
 domino_edition.api.lib.add_support_jnt()"""
 
+cb_pose_manager_ui = """import domino_edition.ui
+domino_edition.ui.open_pose_manager()"""
+
 
 def rigging_menu():
     command = (
         ("Add Blended Joint", cb_add_blended_jnt, ""),
-        ("Add Support Joint", cb_add_support_jnt, "")
+        ("Add Support Joint", cb_add_support_jnt, ""),
+        ("---", None),
+        ("Pose Manager", cb_pose_manager_ui, "")
     )
     menu.add("Rigging Tools", command)
 

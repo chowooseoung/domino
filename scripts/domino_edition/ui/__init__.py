@@ -4,11 +4,13 @@ from PySide2 import (QtWidgets,
                      QtGui)
 from . import (common_piece_settings_ui,
                jnt_name_setting_ui,
-               manager_ui)
+               manager_ui,
+               pose_manager_ui)
 
 # built-ins
 from functools import partial
 import os
+import json
 
 # maya
 from pymel import core as pm
@@ -19,7 +21,7 @@ from domino_edition.api import (utils,
 from domino_edition.api.piece import (Identifier,
                                       find_guide_from_identifier)
 from domino.api.color import MAYA_OVERRIDE_COLOR
-from domino.api import log
+from domino.api import log, attribute
 
 
 class DominoDialog(QtWidgets.QDialog):
@@ -390,8 +392,7 @@ class UiFunctionSet:
 
     def add_space_switch_listWidget(self, list_widget, target_attr):
         items = pm.ls(selection=True, long=True)
-        registered_items = [i.text() for i in
-                            list_widget.findItems("", QtCore.Qt.MatchContains)]
+        registered_items = [i.text() for i in list_widget.findItems("", QtCore.Qt.MatchContains)]
         if registered_items and not registered_items[0]:
             list_widget.takeItem(0)
 
@@ -852,6 +853,78 @@ class Manager(ManagerUI):
                 lib.create_guide(name)
 
 
+class PoseManagerUI(QtWidgets.QDialog, pose_manager_ui.Ui_Dialog):
+    ui_name = "PoseManagerUI"
+
+    def __init__(self, parent=None):
+        super(PoseManagerUI, self).__init__(parent=parent)
+        self.setupUi(self)
+        self.setWindowTitle("Pose Manager")
+        self.setObjectName(self.ui_name)
+
+
+class PoseManager(PoseManagerUI):
+    POSE_ROLE = QtCore.Qt.UserRole + 33
+
+    def __init__(self, parent=None, root=None):
+        super(PoseManager, self).__init__(parent=parent)
+        self._root = root
+        self.create_connections()
+        self.refresh_listWidget()
+
+    @property
+    def root(self):
+        if not self._root.exists():
+            self.close()
+        return self._root
+
+    def get_pose_data(self):
+        return json.loads(self.root.attr("pose_json").get().replace("'", "\""))
+
+    def add_pose_data(self, new_pose):
+        original_data = self.get_pose_data()
+        original_data[new_pose[0]] = new_pose[1]
+        self.root.attr("pose_json").set(json.dumps(original_data))
+
+    def create_connections(self):
+        self.add_pushButton.clicked.connect(self.add_pose)
+        self.delete_pushButton.clicked.connect(self.delete_pose)
+        self.listWidget.doubleClicked.connect(self.go_to_pose)
+
+    def add_pose(self):
+        pose_name = self.lineEdit.text()
+        if pose_name:
+            self.add_pose_data([pose_name, attribute.get_data(pm.ls(selection=True))])
+            self.go_to_pose("neutral")
+            self.refresh_listWidget()
+
+    def delete_pose(self):
+        pose_data = self.get_pose_data()
+        items = self.listWidget.selectedItems()
+        for item in items:
+            pose = item.data(QtCore.Qt.DisplayRole)
+            del pose_data[pose]
+        self.root.attr("pose_json").set(json.dumps(pose_data))
+        self.refresh_listWidget()
+
+    def go_to_pose(self, pose):
+        if isinstance(pose, QtCore.QModelIndex):
+            pose_data = pose.data(self.POSE_ROLE)
+        else:
+            pose_data = self.get_pose_data()[pose]
+        attribute.set_data(pose_data)
+
+    def refresh_listWidget(self):
+        pose_data = self.get_pose_data()
+
+        self.listWidget.clear()
+
+        for pose, data in pose_data.items():
+            item = QtWidgets.QListWidgetItem(pose)
+            item.setData(self.POSE_ROLE, data)
+            self.listWidget.addItem(item)
+
+
 def open_manager():
     utils.show_dialog(Manager, parent=None)
 
@@ -865,3 +938,17 @@ def open_settings():
     ui = utils.import_piece_settings(selected[0].attr("piece").get())
     if ui is not None:
         utils.show_dialog(ui, parent=None)
+
+
+def open_pose_manager():
+    selected = pm.ls(selection=True, type="transform")
+    if not selected:
+        return 0
+    top = selected[0].getParent(generations=-1)
+    if not top.hasAttr("ctl_sets"):
+        return 0
+    sets = top.attr("ctl_sets").inputs()
+    if not sets:
+        return 0
+    assembly_root = top.attr("assembly_piece").inputs()[0]
+    utils.show_dialog(PoseManager, parent=None, root=assembly_root)

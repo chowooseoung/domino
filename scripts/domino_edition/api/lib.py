@@ -302,10 +302,10 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
 
             # cleanup
             log.Logger.info(f"Clean up...")
+            Rig.create_sets(context)
             Rig.setup_host(context)
             Rig.setup_ctl(context)
             Rig.setup_jnt(context)
-            Rig.create_sets(context)
             Rig.callback(context)
 
             assert assembly_data["end_point"] != "cleanup", AssertionError("End Point : cleanup")
