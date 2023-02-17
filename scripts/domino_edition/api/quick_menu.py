@@ -9,6 +9,9 @@ from functools import partial
 from domino.api import (attribute,
                         controller)
 
+# gui
+from PySide2 import (QtWidgets, QtGui)
+
 
 def _null(*args, **kwargs):
     pass
@@ -49,10 +52,9 @@ def install(menu_id):
 
 def __quick_menu(parent_menu, current_control):
     asset_root = mc.ls(current_control, long=True)[0].split("|")[1]
-    asset_container = mc.container(query=True,
-                                   findContainer=asset_root)
+    asset_container = mc.container(query=True, findContainer=asset_root)
 
-    selected = mc.ls(sl=1)
+    selected = mc.ls(selection=True)
     selected_controller = [x for x in selected if mc.objExists(f"{x}.is_domino_ctl")]
 
     child_controller = controller.get_child_controller(current_control)
@@ -64,21 +66,20 @@ def __quick_menu(parent_menu, current_control):
         controller_sets = controller_sets[0]
     all_controller = mc.sets(controller_sets, query=True)
 
-    selected_container = mc.container(query=True,
-                                      findContainer=current_control)
-    if selected_container:
-        if selected_container != asset_container:
-            mc.menuItem(parent=parent_menu, divider=True)
-            selected_root = mc.container(selected_container,
-                                         query=True,
-                                         publishAsRoot=True)
-            host = mc.listConnections(f"{selected_root}.host",
-                                      destination=False,
-                                      source=True)
-            mc.menuItem(parent=parent_menu,
-                        label="Select Host",
-                        command=f"import maya.cmds as mc;mc.select({host})")
-            mc.menuItem(parent=parent_menu, divider=True)
+    # selected_container = mc.container(query=True, findContainer=current_control)
+    mc.menuItem(parent=parent_menu, divider=True)
+    roots = [mc.listConnections(f"{x}.message",
+                                destination=True,
+                                source=False,
+                                type="transform") for x in mc.ls(sl=1)]
+    roots = [list(set(x)) for x in roots if x]
+    roots = [y for x in roots for y in x if mc.attributeQuery("d_id", node=y, exists=True)]
+    hosts = [mc.listConnections(f"{x}.host", destination=False, source=True) for x in roots]
+    hosts = [y for x in hosts for y in x]
+    mc.menuItem(parent=parent_menu,
+                label="Select Host",
+                command=f"import maya.cmds as mc;mc.select({hosts})")
+    mc.menuItem(parent=parent_menu, divider=True)
 
     if mc.objExists(f"{current_control}.is_domino_ctl"):
         mc.menuItem(parent=parent_menu,
@@ -141,8 +142,7 @@ def __quick_menu(parent_menu, current_control):
                                subMenu=True)
             mc.radioMenuItemCollection()
             on_value = True if mc.getAttr(f"{asset_root}.{attr}") else False
-            off_value = True if not mc.getAttr(
-                f"{asset_root}.{attr}") else False
+            off_value = True if not mc.getAttr(f"{asset_root}.{attr}") else False
             mc.menuItem(parent=menu,
                         label="on",
                         command=partial(__attribute_trigger,
