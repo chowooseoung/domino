@@ -20,7 +20,7 @@ from pymel import core as pm
 dt = pm.datatypes
 
 
-class Leg2Jnt01Identifier(piece.Identifier):
+class Leg2jnt01Identifier(piece.Identifier):
     madeBy = "chowooseung"
     contact = "main.wooseung@gmail.com"
     piece = os.path.split(os.path.dirname(__file__))[-1]
@@ -31,15 +31,15 @@ class Leg2Jnt01Identifier(piece.Identifier):
     description = "사람의 다리입니다. foot_01과 연결 될 수 있습니다."
 
 
-class Leg2Jnt01Data(piece.DData):
+class Leg2jnt01Data(piece.DData):
     _m1 = matrix.get_matrix_from_pos((0, 0, 0))
     _m2 = matrix.get_matrix_from_pos((0, -2, 0.01))
     _m3 = matrix.get_matrix_from_pos((0, -4, 0))
     _m4 = matrix.get_matrix_from_pos((0, -4, 1))
 
     def __init__(self, node=None, data=None):
-        self._identifier = Leg2Jnt01Identifier(self)
-        super(Leg2Jnt01Data, self).__init__(node=node, data=data)
+        self._identifier = Leg2jnt01Identifier(self)
+        super(Leg2jnt01Data, self).__init__(node=node, data=data)
 
     @property
     def identifier(self):
@@ -47,7 +47,7 @@ class Leg2Jnt01Data(piece.DData):
 
     @property
     def preset(self):
-        preset = super(Leg2Jnt01Data, self).preset
+        preset = super(Leg2jnt01Data, self).preset
         preset.update({
             "anchors": {"typ": "matrix",
                         "value": [self._m1, self._m2, self._m3, self._m4],
@@ -115,11 +115,11 @@ class Leg2Jnt01Data(piece.DData):
         return preset
 
 
-class Leg2Jnt01Guide(piece.Guide):
+class Leg2jnt01Guide(piece.Guide):
 
     def guide(self):
-        data = self.data(Leg2Jnt01Data.SELF)
-        root = super(Leg2Jnt01Guide, self).guide()
+        data = self.data(Leg2jnt01Data.SELF)
+        root = super(Leg2jnt01Guide, self).guide()
         pos = self.create_position(root, data["anchors"][1])
         pos1 = self.create_position(pos, data["anchors"][2])
         pos2 = self.create_position(pos1, data["anchors"][3])
@@ -128,13 +128,13 @@ class Leg2Jnt01Guide(piece.Guide):
         self.create_display_crv(root, [pos, pv], thickness=1)
 
 
-class Leg2Jnt01Rig(piece.Rig):
+class Leg2jnt01Rig(piece.Rig):
 
     def objects(self, context):
-        super(Leg2Jnt01Rig, self).objects(context)
+        super(Leg2jnt01Rig, self).objects(context)
 
-        data = self.data(Leg2Jnt01Data.SELF)
-        assembly_data = self.data(Leg2Jnt01Data.ASSEMBLY)
+        data = self.data(Leg2jnt01Data.SELF)
+        assembly_data = self.data(Leg2jnt01Data.ASSEMBLY)
 
         m0 = dt.Matrix(data["anchors"][0])
         m1 = dt.Matrix(data["anchors"][1])
@@ -573,10 +573,10 @@ class Leg2Jnt01Rig(piece.Rig):
             twist_index += 1
 
     def attributes(self, context):
-        super(Leg2Jnt01Rig, self).attributes(context)
+        super(Leg2jnt01Rig, self).attributes(context)
         host = self.create_host(context)
 
-        data = self.data(Leg2Jnt01Data.SELF)
+        data = self.data(Leg2jnt01Data.SELF)
         self.fk0_length_attr = attribute.add(self.fk0_ctl,
                                              "length",
                                              "double",
@@ -684,8 +684,8 @@ class Leg2Jnt01Rig(piece.Rig):
                                                     keyable=True)
 
     def operators(self, context):
-        super(Leg2Jnt01Rig, self).operators(context)
-        data = self.data(Leg2Jnt01Data.SELF)
+        super(Leg2jnt01Rig, self).operators(context)
+        data = self.data(Leg2jnt01Data.SELF)
         host = self.host()
 
         # fk ik blend
@@ -849,7 +849,7 @@ class Leg2Jnt01Rig(piece.Rig):
                 context["callbacks"].append(script_node)
 
     def connections(self, context):
-        super(Leg2Jnt01Rig, self).connections(context)
+        super(Leg2jnt01Rig, self).connections(context)
 
         if "leg_2jnt_01" not in context:
             context["leg_2jnt_01"] = {}
@@ -859,9 +859,9 @@ class Leg2Jnt01Rig(piece.Rig):
                                                               self.fk_ik_attr]
 
 
-class Leg2Jnt01Piece(piece.AbstractPiece):
+class Leg2jnt01Piece(piece.AbstractPiece):
 
     def __init__(self, node=None, data=None):
-        self._ddata = Leg2Jnt01Data(node=node, data=data)
-        self._guide = Leg2Jnt01Guide(self._ddata)
-        self._rig = Leg2Jnt01Rig(self._ddata)
+        self._ddata = Leg2jnt01Data(node=node, data=data)
+        self._guide = Leg2jnt01Guide(self._ddata)
+        self._rig = Leg2jnt01Rig(self._ddata)
