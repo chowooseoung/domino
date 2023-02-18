@@ -143,7 +143,7 @@ class Foot01Rig(piece.Rig):
         toe_pos = toe_m.translate
 
         fk_positions = [dt.Matrix(x).translate for x in data["anchors"][1:-5]]
-        fk_normal = vector.getPlaneNormal(root_pos, fk_positions[0], fk_positions[1])
+        fk_normal = vector.getPlaneNormal(root_pos, fk_positions[0], fk_positions[1]) * -1
         fk_matrices = matrix.get_chain_matrix(fk_positions, fk_normal, self.ddata.negate)
         fk_matrices.append(matrix.set_matrix_position(fk_matrices[-1], fk_positions[-1]))
 
