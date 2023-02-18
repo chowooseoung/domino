@@ -16,10 +16,10 @@ class Leg3jnt01Identifier(piece.Identifier):
     contact = "main.wooseung@gmail.com"
     piece = os.path.split(os.path.dirname(__file__))[-1]
     version = (1, 0, 0)
-    name = ""
+    name = "leg"
     side = "C"
     index = 0
-    description = ""
+    description = "quadruped 다리 입니다."
 
 
 class Leg3jnt01Data(piece.DData):

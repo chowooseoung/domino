@@ -4,6 +4,7 @@ from maya import mel
 
 # built-ins
 from functools import partial
+import json
 
 # domino
 from domino.api import (attribute,
@@ -64,6 +65,9 @@ def install(menu_id):
 
 
 def __quick_menu(parent_menu, current_control):
+    namespace = mc.ls(current_control, showNamespace=True)[1]
+    if namespace != ":":
+        namespace += ":"
     asset_root = mc.ls(current_control, long=True)[0].split("|")[1]
     asset_container = mc.container(query=True, findContainer=asset_root)
 
@@ -79,7 +83,6 @@ def __quick_menu(parent_menu, current_control):
         controller_sets = controller_sets[0]
     all_controller = mc.sets(controller_sets, query=True)
 
-    # selected_container = mc.container(query=True, findContainer=current_control)
     mc.menuItem(parent=parent_menu, divider=True)
     roots = [mc.listConnections(f"{x}.message",
                                 destination=True,
@@ -94,105 +97,115 @@ def __quick_menu(parent_menu, current_control):
                 command=f"import maya.cmds as mc;mc.select({hosts})")
     mc.menuItem(parent=parent_menu, divider=True)
 
-    if mc.objExists(f"{current_control}.is_domino_ctl"):
-        mc.menuItem(parent=parent_menu,
-                    label="Switch IK / FK (DEV)",
-                    command=_null)
-        mc.menuItem(parent=parent_menu,
-                    label="Switch IK / FK + key (DEV)",
-                    command=_null)
-        mc.menuItem(parent=parent_menu, divider=True)
+    current_control_root = mc.listConnections(f"{current_control}.message",
+                                              destination=True,
+                                              source=False,
+                                              type="transform")[0]
+    mc.menuItem(parent=parent_menu,
+                label="Switch IK / FK (DEV)",
+                command=_null)
+    mc.menuItem(parent=parent_menu,
+                label="Switch IK / FK + key (DEV)",
+                command=_null)
+    mc.menuItem(parent=parent_menu, divider=True)
 
-        mc.menuItem(parent=parent_menu,
-                    label="Reset",
-                    command=partial(__reset_all, selected_controller))
-        mc.menuItem(parent=parent_menu,
-                    label="Reset all below",
-                    command=partial(__reset_all, child_controller))
-        mc.menuItem(parent=parent_menu,
-                    label="Reset translate",
-                    command=partial(__reset_SRT, selected_controller, ["tx", "ty", "tz"]))
-        mc.menuItem(parent=parent_menu,
-                    label="Reset rotate",
-                    command=partial(__reset_SRT, selected_controller, ["rx", "ry", "rz"]))
-        mc.menuItem(parent=parent_menu,
-                    label="Reset scale",
-                    command=partial(__reset_SRT, selected_controller, ["sx", "sy", "sz"]))
-        mc.menuItem(parent=parent_menu, divider=True)
+    mc.menuItem(parent=parent_menu,
+                label="Reset",
+                command=partial(__reset_all, selected_controller))
+    mc.menuItem(parent=parent_menu,
+                label="Reset all below",
+                command=partial(__reset_all, child_controller))
+    mc.menuItem(parent=parent_menu,
+                label="Reset translate",
+                command=partial(__reset_SRT, selected_controller, ["tx", "ty", "tz"]))
+    mc.menuItem(parent=parent_menu,
+                label="Reset rotate",
+                command=partial(__reset_SRT, selected_controller, ["rx", "ry", "rz"]))
+    mc.menuItem(parent=parent_menu,
+                label="Reset scale",
+                command=partial(__reset_SRT, selected_controller, ["sx", "sy", "sz"]))
+    mc.menuItem(parent=parent_menu, divider=True)
 
-        mc.menuItem(parent=parent_menu,
-                    label="Mirror (DEV)",
-                    command=_null)
-        mc.menuItem(parent=parent_menu,
-                    label="Mirror below (DEV)",
-                    command=_null)
-        mc.menuItem(parent=parent_menu,
-                    label="Flip (DEV)",
-                    command=_null)
-        mc.menuItem(parent=parent_menu,
-                    label="Flip below (DEV)",
-                    command=_null)
-        mc.menuItem(parent=parent_menu, divider=True)
+    mc.menuItem(parent=parent_menu,
+                label="Mirror (DEV)",
+                command=_null)
+    mc.menuItem(parent=parent_menu,
+                label="Mirror below (DEV)",
+                command=_null)
+    mc.menuItem(parent=parent_menu,
+                label="Flip (DEV)",
+                command=_null)
+    mc.menuItem(parent=parent_menu,
+                label="Flip below (DEV)",
+                command=_null)
+    mc.menuItem(parent=parent_menu, divider=True)
 
-        mc.menuItem(parent=parent_menu,
-                    label="Select all controller",
-                    command=f"import maya.cmds as mc;mc.select({all_controller})")
-        mc.menuItem(parent=parent_menu,
-                    label="Select child controller",
-                    command=f"import maya.cmds as mc;mc.select({child_controller})")
-        mc.menuItem(parent=parent_menu, divider=True)
+    mc.menuItem(parent=parent_menu,
+                label="Select all controller",
+                command=f"import maya.cmds as mc;mc.select({all_controller})")
+    mc.menuItem(parent=parent_menu,
+                label="Select child controller",
+                command=f"import maya.cmds as mc;mc.select({child_controller})")
+    mc.menuItem(parent=parent_menu, divider=True)
 
-        mc.menuItem(parent=parent_menu,
-                    label="Keyframe child controller",
-                    command=f"import maya.cmds as mc;mc.setKeyframe({child_controller})")
-        mc.menuItem(parent=parent_menu, divider=True)
+    mc.menuItem(parent=parent_menu,
+                label="Keyframe child controller",
+                command=f"import maya.cmds as mc;mc.setKeyframe({child_controller})")
+    mc.menuItem(parent=parent_menu, divider=True)
 
-    for attr in mc.listAttr(asset_root, userDefined=True, channelBox=True) or []:
-        at = mc.attributeQuery(attr, node=asset_root, attributeType=True)
-        if at == "bool":
-            menu = mc.menuItem(parent=parent_menu,
-                               label=attr,
-                               subMenu=True)
-            mc.radioMenuItemCollection()
-            on_value = True if mc.getAttr(f"{asset_root}.{attr}") else False
-            off_value = True if not mc.getAttr(f"{asset_root}.{attr}") else False
-            mc.menuItem(parent=menu,
-                        label="on",
-                        command=partial(__attribute_trigger,
-                                        asset_root,
-                                        attr,
-                                        True),
-                        radioButton=on_value,
-                        sourceType="python")
-            mc.menuItem(parent=menu,
-                        label="off",
-                        command=partial(__attribute_trigger,
-                                        asset_root,
-                                        attr,
-                                        False),
-                        radioButton=off_value,
-                        sourceType="python")
-        elif at == "enum":
-            enum_names = mc.attributeQuery(attr,
-                                           node=asset_root,
-                                           listEnum=True)
-            if not enum_names:
-                continue
-            menu = mc.menuItem(parent=parent_menu,
-                               label=attr,
-                               subMenu=True)
-            mc.radioMenuItemCollection()
-            current_value = mc.getAttr(f"{asset_root}.{attr}",
-                                       asString=True)
-            for index, name in enumerate(enum_names[0].split(":")):
-                value = True if name == current_value else False
+    if mc.getAttr(current_control_root + ".piece") == "assembly_01":
+        for attr in mc.listAttr(asset_root, userDefined=True, channelBox=True) or []:
+            at = mc.attributeQuery(attr, node=asset_root, attributeType=True)
+            if at == "bool":
+                menu = mc.menuItem(parent=parent_menu,
+                                   label=attr,
+                                   subMenu=True)
+                mc.radioMenuItemCollection()
+                on_value = True if mc.getAttr(f"{asset_root}.{attr}") else False
+                off_value = True if not mc.getAttr(f"{asset_root}.{attr}") else False
                 mc.menuItem(parent=menu,
-                            label=name,
+                            label="on",
                             command=partial(__attribute_trigger,
                                             asset_root,
                                             attr,
-                                            index),
-                            radioButton=value)
+                                            True),
+                            radioButton=on_value,
+                            sourceType="python")
+                mc.menuItem(parent=menu,
+                            label="off",
+                            command=partial(__attribute_trigger,
+                                            asset_root,
+                                            attr,
+                                            False),
+                            radioButton=off_value,
+                            sourceType="python")
+            elif at == "enum":
+                enum_names = mc.attributeQuery(attr,
+                                               node=asset_root,
+                                               listEnum=True)
+                if not enum_names:
+                    continue
+                menu = mc.menuItem(parent=parent_menu,
+                                   label=attr,
+                                   subMenu=True)
+                mc.radioMenuItemCollection()
+                current_value = mc.getAttr(f"{asset_root}.{attr}", asString=True)
+                for index, name in enumerate(enum_names[0].split(":")):
+                    value = True if name == current_value else False
+                    mc.menuItem(parent=menu,
+                                label=name,
+                                command=partial(__attribute_trigger,
+                                                asset_root,
+                                                attr,
+                                                index),
+                                radioButton=value)
+        mc.menuItem(parent=parent_menu, divider=True)
+        pose_data = json.loads(mc.getAttr(f"{current_control_root}.pose_json").replace("'", "\""))
+        pose_menu = mc.menuItem(parent=parent_menu, label="pose", subMenu=True)
+        for pose, data in pose_data.items():
+
+            mc.menuItem(parent=pose_menu, label=pose, command=partial(attribute.set_data, data, namespace))
+
     roots_grp_index = mc.containerPublish(asset_container,
                                           query=True,
                                           bindNode=True).index("roots")
@@ -204,9 +217,7 @@ def __quick_menu(parent_menu, current_control):
             break
     notes = mc.getAttr(i + ".publish_notes")
     mc.menuItem(parent=parent_menu, divider=True)
-    menu = mc.menuItem(parent=parent_menu,
-                       label="rig notes",
-                       command=partial(__message_dialog, notes))
+    menu = mc.menuItem(parent=parent_menu, label="rig notes", command=partial(__message_dialog, notes))
 
 
 def domino_quick_menu(*args, **kwargs):

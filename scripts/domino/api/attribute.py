@@ -219,7 +219,7 @@ def get_data(ctls):
     return d
 
 
-def set_data(data, namespace=":"):
+def set_data(data, namespace=":", *args, **kwargs):
     for ctl in data:
         name = namespace + ctl
         for attr in data[ctl]:
