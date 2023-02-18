@@ -554,7 +554,7 @@ class Arm2jnt01Rig(piece.Rig):
                 index = len(upper_jnt_v_values) - 1
                 aim_m = self.arm_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
                 aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-                pm.connectAttr(self.arm_output_objs[index + 1].attr("matrix"),
+                pm.connectAttr(self.arm_output_objs[index + 1].attr("dagLocalMatrix"),
                                aim_m.attr("primaryTargetMatrix"),
                                force=True)
         else:
