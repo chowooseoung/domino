@@ -9,9 +9,6 @@ from functools import partial
 from domino.api import (attribute,
                         controller)
 
-# gui
-from PySide2 import (QtWidgets, QtGui)
-
 
 def _null(*args, **kwargs):
     pass
@@ -30,10 +27,26 @@ def __attribute_trigger(n, attr, value, *args, **kwargs):
 
 
 def __message_dialog(message, *args, **kwargs):
-    mc.confirmDialog(title="Notes",
-                     message=message,
-                     button=["Ok"],
-                     defaultButton="Ok")
+    try:
+        from domino_edition.ui.markdown_view import MarkdownView
+        from PySide2 import QtWidgets
+
+        dialog = QtWidgets.QDialog()
+        dialog.setWindowTitle("Notes")
+        view = MarkdownView(message)
+        btn = QtWidgets.QPushButton("Ok")
+        layout = QtWidgets.QVBoxLayout(dialog)
+
+        layout.addWidget(view)
+        layout.addWidget(btn)
+
+        btn.clicked.connect(dialog.accept)
+        dialog.exec_()
+    except ModuleNotFoundError:
+        mc.confirmDialog(title="Notes",
+                         message=message,
+                         button=["Ok"],
+                         defaultButton="Ok")
 
 
 def install(menu_id):
