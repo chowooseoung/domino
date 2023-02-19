@@ -5,7 +5,6 @@ from pymel import util
 
 # domino
 from . import vector
-from .joint import dt
 
 dt = pm.datatypes
 
@@ -187,78 +186,3 @@ class OrientXYZ:
         self.x = dt.Vector(x.x, x.y, x.z)
         self.y = dt.Vector(y.x, y.y, y.z)
         self.z = dt.Vector(z.x, z.y, z.z)
-
-
-def connect_space(source, target):
-    mult_m = pm.createNode("multMatrix")
-    pm.connectAttr(source.attr("worldMatrix")[0], mult_m.attr("matrixIn")[0])
-    pm.connectAttr(target.attr("parentInverseMatrix"), mult_m.attr("matrixIn")[1])
-
-    decom_m = pm.createNode("decomposeMatrix")
-    pm.connectAttr(mult_m.attr("matrixSum"), decom_m.attr("inputMatrix"))
-    pm.connectAttr(decom_m.attr("outputTranslate"), target.attr("t"))
-    if decom_m.attr("outputScaleZ").get() < 0:
-        md = pm.createNode("multiplyDivide")
-        pm.connectAttr(decom_m.attr("outputScale"), md.attr("input1"))
-        md.attr("input2").set(1, 1, -1)
-        pm.connectAttr(md.attr("output"), target.attr("s"))
-    else:
-        pm.connectAttr(decom_m.attr("outputScale"), target.attr("s"))
-    pm.connectAttr(decom_m.attr("outputShear"), target.attr("shear"))
-
-    if pm.nodeType(target) == "transform":
-        pm.connectAttr(decom_m.attr("outputRotate"), target.attr("r"))
-        return 0
-
-    m = mult_m.attr("matrixSum").get()
-    i_m = m.inverse()
-
-    tm = dt.TransformationMatrix(m)
-    j_orient = dt.degrees(tm.getRotation())
-
-    target.attr("jointOrient").set(j_orient)
-
-    mult_m2 = pm.createNode("multMatrix")
-    pm.connectAttr(mult_m.attr("matrixSum"), mult_m2.attr("matrixIn")[0])
-    mult_m2.attr("matrixIn")[1].set(i_m)
-    decom_m2 = pm.createNode("decomposeMatrix")
-    pm.connectAttr(mult_m2.attr("matrixSum"), decom_m2.attr("inputMatrix"))
-    pm.connectAttr(decom_m2.attr("outputRotate"), target.attr("r"))
-
-
-def set_fk_ik_blend_matrix(blend, fk, ik, switch):
-    for i in range(len(blend)):
-        blend_m = pm.createNode("blendMatrix")
-        blend_m.attr("envelope").set(1)
-
-        if i == 0:
-            mult_m = pm.createNode("multMatrix")
-            pm.connectAttr(fk[i].attr("worldMatrix"), mult_m.attr("matrixIn")[0])
-            pm.connectAttr(blend[i].attr("parentInverseMatrix"), mult_m.attr("matrixIn")[1])
-            pm.connectAttr(mult_m.attr("matrixSum"), blend_m.attr("inputMatrix"))
-        else:
-            pm.connectAttr(fk[i].attr("matrix"), blend_m.attr("inputMatrix"))
-
-        comp_m = pm.createNode("composeMatrix")
-        comp_m.attr("inputTranslate").set(ik[i].attr("t").get())
-        comp_m.attr("inputRotate").set(ik[i].attr("jointOrient").get())
-
-        inv_m = pm.createNode("inverseMatrix")
-        inv_m.attr("inputMatrix").set(comp_m.attr("outputMatrix").get())
-        pm.delete(comp_m)
-
-        mult_m = pm.createNode("multMatrix")
-        pm.connectAttr(ik[i].attr("matrix"), mult_m.attr("matrixIn")[0])
-        pm.connectAttr(inv_m.attr("outputMatrix"), mult_m.attr("matrixIn")[1])
-
-        pm.connectAttr(mult_m.attr("matrixSum"), blend_m.attr("target.target[0].targetMatrix"))
-
-        decom_m = pm.createNode("decomposeMatrix")
-        pm.connectAttr(blend_m.attr("outputMatrix"), decom_m.attr("inputMatrix"))
-
-        pm.connectAttr(decom_m.attr("outputTranslate"), blend[i].attr("t"))
-        pm.connectAttr(decom_m.attr("outputRotate"), blend[i].attr("r"))
-        pm.connectAttr(decom_m.attr("outputScale"), blend[i].attr("s"))
-        pm.connectAttr(decom_m.attr("outputShear"), blend[i].attr("shear"))
-
-        pm.connectAttr(switch, blend_m.attr("envelope"))

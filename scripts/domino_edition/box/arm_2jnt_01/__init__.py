@@ -753,10 +753,10 @@ class Arm2jnt01Rig(piece.Rig):
         host = self.host()
 
         # fk ik blend
-        matrix.set_fk_ik_blend_matrix(self.blend_objs,
-                                      [self.fk0_ctl, self.fk1_ctl, self.fk2_ctl],
-                                      self.ik_jnts,
-                                      self.fk_ik_attr)
+        operators.set_fk_ik_blend_matrix(self.blend_objs,
+                                         [self.fk0_ctl, self.fk1_ctl, self.fk2_ctl],
+                                         self.ik_jnts,
+                                         self.fk_ik_attr)
         rev = pm.createNode("reverse")
         pm.connectAttr(self.fk_ik_attr, rev.attr("inputX"))
 

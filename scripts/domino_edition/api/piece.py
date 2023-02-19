@@ -1298,7 +1298,7 @@ class Rig:
 
         # connect ref to jnt
         if ref:
-            matrix.connect_space(ref, obj)
+            joint.connect_space(ref, obj)
 
         # joint label setup
         if "side" not in data:

@@ -198,3 +198,40 @@ def pole_vec_position(parent, positions, multiple):
     pm.connectAttr(m_m.attr("matrixSum"),
                    d_m.attr("inputMatrix"))
     return d_m.attr("outputTranslate")
+
+
+def connect_space(source, target):
+    mult_m = pm.createNode("multMatrix")
+    pm.connectAttr(source.attr("worldMatrix")[0], mult_m.attr("matrixIn")[0])
+    pm.connectAttr(target.attr("parentInverseMatrix"), mult_m.attr("matrixIn")[1])
+
+    decom_m = pm.createNode("decomposeMatrix")
+    pm.connectAttr(mult_m.attr("matrixSum"), decom_m.attr("inputMatrix"))
+    pm.connectAttr(decom_m.attr("outputTranslate"), target.attr("t"))
+    if decom_m.attr("outputScaleZ").get() < 0:
+        md = pm.createNode("multiplyDivide")
+        pm.connectAttr(decom_m.attr("outputScale"), md.attr("input1"))
+        md.attr("input2").set(1, 1, -1)
+        pm.connectAttr(md.attr("output"), target.attr("s"))
+    else:
+        pm.connectAttr(decom_m.attr("outputScale"), target.attr("s"))
+    pm.connectAttr(decom_m.attr("outputShear"), target.attr("shear"))
+
+    if pm.nodeType(target) == "transform":
+        pm.connectAttr(decom_m.attr("outputRotate"), target.attr("r"))
+        return 0
+
+    m = mult_m.attr("matrixSum").get()
+    i_m = m.inverse()
+
+    tm = dt.TransformationMatrix(m)
+    j_orient = dt.degrees(tm.getRotation())
+
+    target.attr("jointOrient").set(j_orient)
+
+    mult_m2 = pm.createNode("multMatrix")
+    pm.connectAttr(mult_m.attr("matrixSum"), mult_m2.attr("matrixIn")[0])
+    mult_m2.attr("matrixIn")[1].set(i_m)
+    decom_m2 = pm.createNode("decomposeMatrix")
+    pm.connectAttr(mult_m2.attr("matrixSum"), decom_m2.attr("inputMatrix"))
+    pm.connectAttr(decom_m2.attr("outputRotate"), target.attr("r"))

@@ -88,18 +88,6 @@ def getTransposedVector(v, position0, position1, inverse=False):
     return vector
 
 
-def get_pole_vec_position(positions, multiple=1):
-    vec1 = positions[1] - positions[0]
-    vec2 = positions[2] - positions[0]
-    vec1_normal = vec1.normal()
-    vec2_normal = vec2.normal()
-
-    prod_factor = vec1.length() * vec1_normal.dot(vec2_normal)
-    dot_pos = (vec2_normal * prod_factor) + positions[0]
-    projection_vec = positions[1] - dot_pos
-    return (projection_vec.normal() * multiple) + positions[1]
-
-
 def rotateAlongAxis(v, axis, a):
     """Rotate a vector around a given axis defined by other vector.
     Arguments:
