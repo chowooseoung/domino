@@ -2,7 +2,8 @@
 from domino_edition.ui import CommonPieceSettings
 
 # gui
-from PySide2 import QtWidgets
+from PySide2 import (QtWidgets,
+                     QtCore)
 from . import settings_ui
 
 
@@ -23,3 +24,18 @@ class Settings(CommonPieceSettings):
         self.common_settings.toolBox.addItem(ui,
                                              "Individual Settings")
         self.resize_window()
+
+        self.ui_funcs.install_spinBox(
+            ui.sliding_doubleSpinBox,
+            "sliding")
+
+        self.ui_funcs.install_spinBox(
+            ui.sliding_angle_doubleSpinBox,
+            "sliding_angle")
+
+    def resize_window(self):
+        super(Settings, self).resize_window()
+        index = self.common_settings.toolBox.currentIndex()
+        if index == 1:
+            size = QtCore.QSize(370, 190)
+            self.resize(size)
