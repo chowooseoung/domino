@@ -101,13 +101,15 @@ def __quick_menu(parent_menu, current_control):
                                               destination=True,
                                               source=False,
                                               type="transform")[0]
-    mc.menuItem(parent=parent_menu,
-                label="Switch IK / FK (DEV)",
-                command=_null)
-    mc.menuItem(parent=parent_menu,
-                label="Switch IK / FK + key (DEV)",
-                command=_null)
-    mc.menuItem(parent=parent_menu, divider=True)
+    current_control_host = mc.listConnections(f"{current_control_root}.host", destination=False, source=True)[0]
+    if mc.attributeQuery("fk_ik", node=current_control_host, exists=True):
+        mc.menuItem(parent=parent_menu,
+                    label="Switch IK / FK (DEV)",
+                    command=_null)
+        mc.menuItem(parent=parent_menu,
+                    label="Switch IK / FK + key (DEV)",
+                    command=_null)
+        mc.menuItem(parent=parent_menu, divider=True)
 
     mc.menuItem(parent=parent_menu,
                 label="Reset",
@@ -157,9 +159,7 @@ def __quick_menu(parent_menu, current_control):
         for attr in mc.listAttr(asset_root, userDefined=True, channelBox=True) or []:
             at = mc.attributeQuery(attr, node=asset_root, attributeType=True)
             if at == "bool":
-                menu = mc.menuItem(parent=parent_menu,
-                                   label=attr,
-                                   subMenu=True)
+                menu = mc.menuItem(parent=parent_menu, label=attr, subMenu=True)
                 mc.radioMenuItemCollection()
                 on_value = True if mc.getAttr(f"{asset_root}.{attr}") else False
                 off_value = True if not mc.getAttr(f"{asset_root}.{attr}") else False
@@ -180,14 +180,10 @@ def __quick_menu(parent_menu, current_control):
                             radioButton=off_value,
                             sourceType="python")
             elif at == "enum":
-                enum_names = mc.attributeQuery(attr,
-                                               node=asset_root,
-                                               listEnum=True)
+                enum_names = mc.attributeQuery(attr, node=asset_root, listEnum=True)
                 if not enum_names:
                     continue
-                menu = mc.menuItem(parent=parent_menu,
-                                   label=attr,
-                                   subMenu=True)
+                menu = mc.menuItem(parent=parent_menu, label=attr, subMenu=True)
                 mc.radioMenuItemCollection()
                 current_value = mc.getAttr(f"{asset_root}.{attr}", asString=True)
                 for index, name in enumerate(enum_names[0].split(":")):
@@ -203,21 +199,18 @@ def __quick_menu(parent_menu, current_control):
         pose_data = json.loads(mc.getAttr(f"{current_control_root}.pose_json").replace("'", "\""))
         pose_menu = mc.menuItem(parent=parent_menu, label="pose", subMenu=True)
         for pose, data in pose_data.items():
-
             mc.menuItem(parent=pose_menu, label=pose, command=partial(attribute.set_data, data, namespace))
 
-    roots_grp_index = mc.containerPublish(asset_container,
-                                          query=True,
-                                          bindNode=True).index("roots")
-    roots_grp = mc.containerPublish(asset_container,
-                                    query=True,
-                                    bindNode=True)[roots_grp_index + 1]
+    roots_grp_index = mc.containerPublish(asset_container, query=True, bindNode=True).index("roots")
+    roots_grp = mc.containerPublish(asset_container, query=True, bindNode=True)[roots_grp_index + 1]
+    assembly_root = None
     for i in mc.listRelatives(roots_grp, children=True, fullPath=True):
         if mc.getAttr(f"{i}.piece") == "assembly_01":
+            assembly_root = i
             break
-    notes = mc.getAttr(i + ".publish_notes")
+    notes = mc.getAttr(assembly_root + ".publish_notes")
     mc.menuItem(parent=parent_menu, divider=True)
-    menu = mc.menuItem(parent=parent_menu, label="rig notes", command=partial(__message_dialog, notes))
+    mc.menuItem(parent=parent_menu, label="rig notes", command=partial(__message_dialog, notes))
 
 
 def domino_quick_menu(*args, **kwargs):
@@ -243,8 +236,7 @@ def quick_menu_toggle_cb(state):
         if state and isinstance(menu_cmd, str):
             if "buildObjectMenuItemsNow" in menu_cmd:
                 parent_menu = menu_cmd.split(" ")[-1]
-                mc.menu(m_menu, edit=True, postMenuCommand=partial(
-                    domino_quick_menu, parent_menu))
+                mc.menu(m_menu, edit=True, postMenuCommand=partial(domino_quick_menu, parent_menu))
         elif not state and type(menu_cmd) == partial:
             if "domino_quick_menu" in menu_cmd.func.__name__:
                 parent_menu = menu_cmd(state)
