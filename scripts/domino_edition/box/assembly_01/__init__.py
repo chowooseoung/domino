@@ -171,11 +171,7 @@ class Assembly01Data(piece.DData):
             "icon_name": {"typ": "string",
                           "value": "human"},
             "pose_json": {"typ": "string",
-                          "value": json.dumps({
-                              "neutral": {},
-                              "t": {},
-                              "simulation": {}
-                          })},
+                          "value": json.dumps({"neutral": {}, })},
             "publish_notes": {"typ": "string",
                               "value": ""}
         }
