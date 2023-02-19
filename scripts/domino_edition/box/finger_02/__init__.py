@@ -214,6 +214,7 @@ class Finger02Rig(piece.Rig):
 
     def attributes(self, context):
         super(Finger02Rig, self).attributes(context)
+        self.create_host(context)
 
         self.roll_attr = attribute.add(self.ik_ctl,
                                        "roll",

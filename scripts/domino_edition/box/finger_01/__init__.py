@@ -233,6 +233,7 @@ class Finger01Rig(piece.Rig):
 
     def attributes(self, context):
         super(Finger01Rig, self).attributes(context)
+        self.create_host(context)
 
         self.auto_rot_attr = attribute.add(self.ik_ctl,
                                            "auto_rot",

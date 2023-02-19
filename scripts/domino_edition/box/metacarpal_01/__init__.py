@@ -175,6 +175,7 @@ class Metacarpal01Rig(piece.Rig):
 
     def attributes(self, context):
         super(Metacarpal01Rig, self).attributes(context)
+        self.create_host(context)
 
     def operators(self, context):
         super(Metacarpal01Rig, self).operators(context)
