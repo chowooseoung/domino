@@ -1,7 +1,7 @@
 # domino
-from .api import menu
-from domino_edition.api import quick_menu
-from domino_edition.api import menu as edition_menu
+from domino.core.api import menu
+from domino.edition.api import quick_menu
+from domino.edition.api import menu as edition_menu
 
 
 def install():

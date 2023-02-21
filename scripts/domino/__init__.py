@@ -1,7 +1,7 @@
 # domino
-from .api import log
+from .core.api import log
 from domino import menu
-from domino_edition.api import utils as edition_utils
+from domino.edition.api import utils as edition_utils
 
 __version__ = [1, 0, 0]
 __version_str__ = ". ".join([str(x) for x in __version__])
