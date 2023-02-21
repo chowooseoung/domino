@@ -28,7 +28,7 @@ def __attribute_trigger(n, attr, value, *args, **kwargs):
 
 def __message_dialog(message, *args, **kwargs):
     try:
-        from domino_edition.ui.markdown_view import MarkdownView
+        from domino.edition.ui.markdown_view import MarkdownView
         from PySide2 import QtWidgets
 
         dialog = QtWidgets.QDialog()

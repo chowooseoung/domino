@@ -5,5 +5,5 @@ from . import main
 from domino.edition.api import utils
 
 
-def show():
+def open_ui():
     utils.show_dialog(main.Mocap, parent=None)

@@ -29,14 +29,14 @@ def install():
     menu.install_utils()
 
 
-cb_add_blended_jnt = """import domino_edition.api.lib
-domino_edition.api.lib.add_blended_jnt()"""
+cb_add_blended_jnt = """import domino.edition.api.lib
+domino.edition.api.lib.add_blended_jnt()"""
 
-cb_add_support_jnt = """import domino_edition.api.lib
-domino_edition.api.lib.add_support_jnt()"""
+cb_add_support_jnt = """import domino.edition.api.lib
+domino.edition.api.lib.add_support_jnt()"""
 
-cb_pose_manager_ui = """import domino_edition.ui
-domino_edition.ui.open_pose_manager()"""
+cb_pose_manager_ui = """import domino.edition.ui
+domino.edition.ui.open_pose_manager()"""
 
 
 def rigging_menu():
@@ -49,8 +49,12 @@ def rigging_menu():
     menu.add("Rigging Tools", command)
 
 
+cb_motion_capture_ui = """import domino.motion_capture.ui
+domino.motion_capture.ui.open_ui()"""
+
+
 def motion_capture_menu():
     commands = (
-        ("MotionCaptureCmd", "print('TODO')", ""),
+        ("MotionCapture UI", cb_motion_capture_ui, ""),
     )
     menu.add("Motion Capture Tools", commands)
