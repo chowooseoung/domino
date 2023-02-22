@@ -1,5 +1,5 @@
 # domino
-from domino.core.api import matrix, vector
+from domino.core import matrix, vector
 from domino.edition.api import piece
 
 # built-ins

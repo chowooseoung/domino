@@ -2,7 +2,7 @@
 from pymel import core as pm
 
 # domino
-from . import attribute
+from domino.core import attribute
 
 # built-ins
 import uuid

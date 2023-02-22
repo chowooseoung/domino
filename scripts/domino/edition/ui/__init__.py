@@ -20,9 +20,8 @@ from domino.edition.api import (utils,
                                 lib)
 from domino.edition.api.piece import (Identifier,
                                       find_guide_from_identifier)
-from domino.core.api.color import MAYA_OVERRIDE_COLOR
-from domino.core.api import attribute
-from domino.core.api import log
+from domino.core.color import MAYA_OVERRIDE_COLOR
+from ...core import attribute, log
 
 
 class DominoDialog(QtWidgets.QDialog):

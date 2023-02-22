@@ -7,7 +7,7 @@ from functools import partial
 import json
 
 # domino
-from domino.core.api import (attribute, controller)
+from domino.core import attribute, controller
 
 
 def _null(*args, **kwargs):

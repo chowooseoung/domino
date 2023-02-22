@@ -1,6 +1,5 @@
 # domino
-from domino.core.api import (operators)
-from domino.core.api import matrix, callback
+from domino.core import matrix, operators, callback
 from domino.edition.api import piece
 
 # built-ins

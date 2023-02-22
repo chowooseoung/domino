@@ -2,7 +2,7 @@
 import sys
 
 # domino
-from . import log
+from domino.core import log
 
 
 def reload_domino():

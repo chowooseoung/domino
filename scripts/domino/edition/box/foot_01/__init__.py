@@ -1,6 +1,5 @@
 # domino
-from domino.core.api import (attribute)
-from domino.core.api import controller, icon, matrix, vector
+from domino.core import attribute, controller, icon, matrix, vector
 from domino.edition.api import piece
 
 # built-ins

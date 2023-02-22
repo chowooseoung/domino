@@ -4,7 +4,7 @@ from pymel import core as pm
 from pymel import util
 
 # domino
-from . import vector
+from domino.core import vector
 
 dt = pm.datatypes
 

@@ -1,5 +1,5 @@
 # domino
-from .core.api import log
+from .core import log
 from domino import menu
 from domino.edition.api import utils as edition_utils
 

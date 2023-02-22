@@ -8,10 +8,7 @@ import json
 from typing import Type
 
 # domino
-from domino.core.api import (joint,
-                             nurbs,
-                             attribute)
-from domino.core.api import controller, icon, matrix, log, fcurve
+from ...core import nurbs, attribute, controller, log, fcurve, icon, joint, matrix
 from . import naming
 
 dt = pm.datatypes

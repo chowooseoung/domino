@@ -43,8 +43,8 @@ def divide(parent=menu_id):
     pm.menuItem(divider=True, parent=parent)
 
 
-cb_reload_domino = """import domino.core.api.utils
-domino.core.api.utils.reload_domino()"""
+cb_reload_domino = """import domino.core.utils
+domino.core.utils.reload_domino()"""
 
 cb_reinstall_menu = """import domino.menu
 domino.menu.install()"""

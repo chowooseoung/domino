@@ -15,7 +15,7 @@ from importlib.machinery import SourceFileLoader
 from . import utils
 from .piece import (AbstractSubPiece,
                     Rig)
-from domino.core.api import (matrix, log)
+from ...core import log, matrix
 from .utils import DOMINO_SUB_PIECE_DIR
 
 dt = pm.datatypes

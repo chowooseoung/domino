@@ -5,11 +5,7 @@ import os
 from pymel import core as pm
 
 # domino
-from domino.core.api import (nurbs,
-                             joint,
-                             attribute,
-                             operators)
-from domino.core.api import controller, icon, matrix, callback, fcurve, vector
+from domino.core import nurbs, attribute, controller, fcurve, icon, joint, matrix, operators, callback, vector
 from domino.edition.api import piece
 
 dt = pm.datatypes

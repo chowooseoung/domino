@@ -2,7 +2,7 @@
 from pymel import core as pm
 
 # domino
-from . import matrix
+from domino.core import matrix
 
 dt = pm.datatypes
 

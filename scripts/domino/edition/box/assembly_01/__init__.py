@@ -9,8 +9,7 @@ from pymel import core as pm
 # domino
 from domino.edition.api import (piece,
                                 naming)
-from domino.core.api import (attribute)
-from domino.core.api import matrix
+from domino.core import attribute, matrix
 import domino
 
 dt = pm.datatypes

@@ -1,7 +1,5 @@
 # domino
-from domino.core.api import (joint,
-                             attribute)
-from domino.core.api import matrix, vector
+from domino.core import attribute, joint, matrix, vector
 from domino.edition.api import piece
 
 # built-ins

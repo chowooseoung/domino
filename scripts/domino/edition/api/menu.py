@@ -1,5 +1,5 @@
 # domino
-from domino.core.api import menu
+from domino.core import menu
 from domino.edition.api import utils
 
 # built-ins

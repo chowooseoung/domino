@@ -2,8 +2,7 @@
 from pymel import core as pm
 
 # domino
-from . import icon
-
+from domino.core import icon
 
 dt = pm.datatypes
 

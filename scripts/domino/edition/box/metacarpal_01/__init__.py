@@ -8,7 +8,7 @@ from pymel import core as pm
 from domino.edition.ui import division_ui
 
 # domino
-from domino.core.api import matrix, vector
+from domino.core import matrix, vector
 from domino.edition.api import piece
 
 dt = pm.datatypes

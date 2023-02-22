@@ -2,9 +2,7 @@
 from pymel import core as pm
 
 # domino
-from . import (log,
-               fcurve)
-
+from domino.core import log, fcurve
 
 dt = pm.datatypes
 

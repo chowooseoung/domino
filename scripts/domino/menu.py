@@ -1,5 +1,5 @@
 # domino
-from domino.core.api import menu
+from domino.core import menu
 from domino.edition.api import quick_menu
 from domino.edition.api import menu as edition_menu
 

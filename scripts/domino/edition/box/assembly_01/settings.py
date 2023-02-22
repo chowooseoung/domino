@@ -1,7 +1,7 @@
 # domino
 import sys
 
-from domino.core.api import log
+from domino.core import log
 from domino.edition.api import naming
 from domino.edition.api.utils import DOMINO_SUB_PIECE_DIR
 from ...api import lib

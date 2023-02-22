@@ -2,7 +2,7 @@
 from pymel import core as pm
 
 # domino
-from . import attribute
+from domino.core import attribute
 
 
 def space_switch(source_ctls, target_ctl, host, attr_name="space_switch", constraint="parent"):

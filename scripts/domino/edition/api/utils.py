@@ -5,7 +5,7 @@ import json
 import importlib.util
 
 # domino
-from domino.core.api import log
+from ...core import log
 from . import piece
 
 # maya

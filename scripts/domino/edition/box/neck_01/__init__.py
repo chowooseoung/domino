@@ -1,8 +1,5 @@
 # domino
-from domino.core.api import (attribute,
-                             joint,
-                             nurbs)
-from domino.core.api import matrix, fcurve
+from domino.core import nurbs, attribute, fcurve, joint, matrix
 from domino.edition.api import piece
 
 # built-ins
