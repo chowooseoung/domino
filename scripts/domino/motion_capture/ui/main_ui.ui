@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>457</width>
-    <height>273</height>
+    <height>247</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,17 +28,20 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="target_rig_file_lineEdit"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Rig - Interface Map</string>
+         <string>Interface File</string>
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="interface_comboBox"/>
+      </item>
       <item row="0" column="2" rowspan="3">
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="load_rig_pushButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
@@ -50,19 +53,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="comboBox"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Definition</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="comboBox_2"/>
-      </item>
      </layout>
     </widget>
    </item>
@@ -73,10 +63,10 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="motion_directory_lineEdit"/>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="comboBox_4"/>
+       <widget class="QComboBox" name="motion_definition_comboBox"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_4">
@@ -109,10 +99,10 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit_3"/>
+       <widget class="QLineEdit" name="export_directory_lineEdit"/>
       </item>
       <item row="0" column="2">
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="export_pushButton">
         <property name="text">
          <string>Export</string>
         </property>
