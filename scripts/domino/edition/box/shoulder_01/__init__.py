@@ -123,7 +123,7 @@ class Shoulder01Rig(piece.Rig):
         self.orbit_ctl, self.orbit_loc = self.create_ctl(context=context,
                                                          parent=self.shoulder_loc,
                                                          name=name,
-                                                         parent_ctl=None,
+                                                         parent_ctl=self.shoulder_ctl,
                                                          color=fk_color,
                                                          keyable_attrs=["tx", "ty", "tz",
                                                                         "rx", "ry", "rz"],
