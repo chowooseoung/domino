@@ -186,3 +186,99 @@ class OrientXYZ:
         self.x = dt.Vector(x.x, x.y, x.z)
         self.y = dt.Vector(y.x, y.y, y.z)
         self.z = dt.Vector(z.x, z.y, z.z)
+
+
+def pole_vec_position(parent, positions, multiple):
+    decom0 = pm.createNode("decomposeMatrix")
+    decom1 = pm.createNode("decomposeMatrix")
+    decom2 = pm.createNode("decomposeMatrix")
+
+    pm.connectAttr(positions[0].attr("worldMatrix")[0], decom0.attr("inputMatrix"))
+    pm.connectAttr(positions[1].attr("worldMatrix")[0], decom1.attr("inputMatrix"))
+    pm.connectAttr(positions[2].attr("worldMatrix")[0], decom2.attr("inputMatrix"))
+
+    vec0_node = pm.createNode("plusMinusAverage")
+    vec1_node = pm.createNode("plusMinusAverage")
+    vec0_node.attr("operation").set(2)
+    vec1_node.attr("operation").set(2)
+
+    pm.connectAttr(decom1.attr("outputTranslate"), vec0_node.attr("input3D")[0])
+    pm.connectAttr(decom0.attr("outputTranslate"), vec0_node.attr("input3D")[1])
+
+    pm.connectAttr(decom2.attr("outputTranslate"), vec1_node.attr("input3D")[0])
+    pm.connectAttr(decom0.attr("outputTranslate"), vec1_node.attr("input3D")[1])
+
+    dot = pm.createNode("vectorProduct")
+    dot.attr("operation").set(1)
+    pm.connectAttr(vec1_node.attr("output3D"), dot.attr("input1"))
+    pm.connectAttr(vec0_node.attr("output3D"), dot.attr("input2"))
+
+    vec1_length = pm.createNode("distanceBetween")
+    pm.connectAttr(vec1_node.attr("output3D"), vec1_length.attr("point1"))
+    vec1_normalize = pm.createNode("vectorProduct")
+    vec1_normalize.attr("operation").set(0)
+    vec1_normalize.attr("normalizeOutput").set(1)
+    pm.connectAttr(vec1_node.attr("output3D"), vec1_normalize.attr("input1"))
+
+    divided_dot = pm.createNode("multiplyDivide")
+    divided_dot.attr("operation").set(2)
+    pm.connectAttr(dot.attr("output"), divided_dot.attr("input1"))
+    pm.connectAttr(vec1_length.attr("distance"), divided_dot.attr("input2X"))
+    pm.connectAttr(vec1_length.attr("distance"), divided_dot.attr("input2Y"))
+    pm.connectAttr(vec1_length.attr("distance"), divided_dot.attr("input2Z"))
+
+    projection_point = pm.createNode("multiplyDivide")
+    projection_point.attr("operation").set(1)
+    pm.connectAttr(divided_dot.attr("output"), projection_point.attr("input1"))
+    pm.connectAttr(vec1_normalize.attr("output"), projection_point.attr("input2"))
+
+    move_projection_point = pm.createNode("plusMinusAverage")
+    pm.connectAttr(decom0.attr("outputTranslate"), move_projection_point.attr("input3D")[0])
+    pm.connectAttr(projection_point.attr("output"), move_projection_point.attr("input3D")[1])
+
+    projection_vec = pm.createNode("plusMinusAverage")
+    projection_vec.attr("operation").set(2)
+    pm.connectAttr(decom1.attr("outputTranslate"), projection_vec.attr("input3D")[0])
+    pm.connectAttr(move_projection_point.attr("output3D"), projection_vec.attr("input3D")[1])
+
+    projection_vec_normalize = pm.createNode("vectorProduct")
+    projection_vec_normalize.attr("operation").set(0)
+    projection_vec_normalize.attr("normalizeOutput").set(1)
+    pm.connectAttr(projection_vec.attr("output3D"), projection_vec_normalize.attr("input1"))
+
+    output_vec = pm.createNode("multiplyDivide")
+    pm.connectAttr(projection_vec_normalize.attr("output"), output_vec.attr("input1"))
+    pm.connectAttr(multiple, output_vec.attr("input2X"))
+    pm.connectAttr(multiple, output_vec.attr("input2Y"))
+    pm.connectAttr(multiple, output_vec.attr("input2Z"))
+
+    move = pm.createNode("plusMinusAverage")
+    pm.connectAttr(output_vec.attr("output"), move.attr("input3D")[0])
+    pm.connectAttr(decom1.attr("outputTranslate"), move.attr("input3D")[1])
+
+    f_b_f_matrix = pm.createNode("fourByFourMatrix")
+    pm.connectAttr(move.attr("output3Dx"), f_b_f_matrix.attr("in30"))
+    pm.connectAttr(move.attr("output3Dy"), f_b_f_matrix.attr("in31"))
+    pm.connectAttr(move.attr("output3Dz"), f_b_f_matrix.attr("in32"))
+
+    m_m = pm.createNode("multMatrix")
+    pm.connectAttr(f_b_f_matrix.attr("output"), m_m.attr("matrixIn")[0])
+    pm.connectAttr(parent.attr("worldInverseMatrix")[0], m_m.attr("matrixIn")[1])
+
+    d_m = pm.createNode("decomposeMatrix")
+    pm.connectAttr(m_m.attr("matrixSum"), d_m.attr("inputMatrix"))
+    return d_m.attr("outputTranslate")
+
+
+def get_pole_vec_position(positions, multiple=1):
+    vec1 = positions[1] - positions[0]
+    vec2 = positions[2] - positions[0]
+    vec1_normal = vec1.normal()
+    vec2_normal = vec2.normal()
+
+    if vec1_normal.dot(vec2_normal) == 1.0:
+        return positions[1]
+    prod_factor = vec1.length() * vec1_normal.dot(vec2_normal)
+    dot_pos = (vec2_normal * prod_factor) + positions[0]
+    projection_vec = positions[1] - dot_pos
+    return (projection_vec.normal() * multiple) + positions[1]

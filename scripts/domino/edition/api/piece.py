@@ -644,9 +644,9 @@ class Guide:
 
     def create_pv_locator(self, parent, positions):
         multiple_attr = parent.attr("offset_pole_vec")
-        position_attr = joint.pole_vec_position(parent=parent,
-                                                positions=positions,
-                                                multiple=multiple_attr)
+        position_attr = matrix.pole_vec_position(parent=parent,
+                                                 positions=positions,
+                                                 multiple=multiple_attr)
         loc = self.create_locator(parent=parent)
         loc.attr("localScale").set(0.5, 0.5, 0.5)
         pm.connectAttr(position_attr, loc.attr("t"))
