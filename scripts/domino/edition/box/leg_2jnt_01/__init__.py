@@ -147,10 +147,17 @@ class Leg2jnt01Rig(piece.Rig):
         name = self.naming("fk0", "", _s="ctl")
         offset = ((positions[1] - positions[0]) / 2.0).length()
         po = offset * -1 if self.ddata.negate else offset
-        self.fk0_ctl, self.fk0_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=None,
+        self.fk0_ctl, self.fk0_loc = self.create_ctl(context=context,
+                                                     parent=None,
+                                                     name=name,
+                                                     parent_ctl=None,
                                                      color=fk_color,
-                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"], m=fk0_m,
-                                                     shape="cube", cns=False, width=offset * 2, po=(po, 0, 0))
+                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"],
+                                                     m=fk0_m,
+                                                     shape="cube",
+                                                     cns=False,
+                                                     width=offset * 2,
+                                                     po=(po, 0, 0))
         m = matrix.set_matrix_position(fk0_m, positions[1])
         name = self.naming("fk0", "length", _s="ctl")
         self.fk0_length_obj = matrix.transform(self.fk0_loc, name, m)
@@ -159,10 +166,17 @@ class Leg2jnt01Rig(piece.Rig):
         name = self.naming("fk1", "", _s="ctl")
         offset = ((positions[2] - positions[1]) / 2.0).length()
         po = offset * -1 if self.ddata.negate else offset
-        self.fk1_ctl, self.fk1_loc = self.create_ctl(context=context, parent=self.fk0_length_obj, name=name,
-                                                     parent_ctl=self.fk0_ctl, color=fk_color,
-                                                     keyable_attrs=["tx", "ty", "tz", "rz"], m=fk1_m, shape="cube",
-                                                     cns=False, width=offset * 2, po=(po, 0, 0))
+        self.fk1_ctl, self.fk1_loc = self.create_ctl(context=context,
+                                                     parent=self.fk0_length_obj,
+                                                     name=name,
+                                                     parent_ctl=self.fk0_ctl,
+                                                     color=fk_color,
+                                                     keyable_attrs=["tx", "ty", "tz", "rz"],
+                                                     m=fk1_m,
+                                                     shape="cube",
+                                                     cns=False,
+                                                     width=offset * 2,
+                                                     po=(po, 0, 0))
         m = matrix.set_matrix_position(fk1_m, positions[2])
         name = self.naming("fk1", "length", _s="ctl")
         self.fk1_length_obj = matrix.transform(self.fk1_loc, name, m)
@@ -174,40 +188,77 @@ class Leg2jnt01Rig(piece.Rig):
         name = self.naming("fk2", "", _s="ctl")
         offset = ((positions[3] - positions[2]) / 2.0).length()
         po = offset * -1 if self.ddata.negate and not data["guide_orient_ankle"] else offset
-        self.fk2_ctl, self.fk2_loc = self.create_ctl(context=context, parent=self.fk1_length_obj, name=name,
-                                                     parent_ctl=self.fk1_ctl, color=fk_color,
-                                                     keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx",
-                                                                    "sy", "sz"], m=fk2_m, shape="cube", cns=False,
-                                                     width=offset * 2, po=(po, 0, 0))
+        self.fk2_ctl, self.fk2_loc = self.create_ctl(context=context,
+                                                     parent=self.fk1_length_obj,
+                                                     name=name,
+                                                     parent_ctl=self.fk1_ctl,
+                                                     color=fk_color,
+                                                     keyable_attrs=["tx", "ty", "tz",
+                                                                    "rx", "ry", "rz", "ro",
+                                                                    "sx", "sy", "sz"],
+                                                     m=fk2_m,
+                                                     shape="cube",
+                                                     cns=False,
+                                                     width=offset * 2,
+                                                     po=(po, 0, 0))
         # ik ctls
         m = matrix.get_matrix_from_pos(positions[2])
         if self.ddata.negate:
             m = matrix.get_mirror_matrix(m)
             m = matrix.set_matrix_position(m, positions[2])
         name = self.naming("ik", "", _s="ctl")
-        self.ik_ctl, self.ik_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=None,
+        self.ik_ctl, self.ik_loc = self.create_ctl(context=context,
+                                                   parent=None,
+                                                   name=name,
+                                                   parent_ctl=None,
                                                    color=ik_color,
-                                                   keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx", "sy",
-                                                                  "sz"], m=m, shape="cube", cns=True)
+                                                   keyable_attrs=["tx", "ty", "tz",
+                                                                  "rx", "ry", "rz", "ro",
+                                                                  "sx", "sy", "sz"],
+                                                   m=m,
+                                                   shape="cube",
+                                                   cns=True)
+        name = self.naming("ankle", "match", _s="ctl")
+        self.ik_match_source = [self.fk0_ctl, self.fk1_ctl]
+        self.ik_match_source.append(matrix.transform(self.fk2_loc, name, m))
 
         name = self.naming("ikLocal", "", _s="ctl")
-        self.ik_local_ctl, self.ik_local_loc = self.create_ctl(context=context, parent=self.ik_loc, name=name,
-                                                               parent_ctl=self.ik_ctl, color=ik_color,
-                                                               keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro",
-                                                                              "sx", "sy", "sz"], m=fk2_m, shape="cube",
-                                                               cns=False, width=0.8, height=0.8, depth=0.8)
+        self.ik_local_ctl, self.ik_local_loc = self.create_ctl(context=context,
+                                                               parent=self.ik_loc,
+                                                               name=name,
+                                                               parent_ctl=self.ik_ctl,
+                                                               color=ik_color,
+                                                               keyable_attrs=["tx", "ty", "tz",
+                                                                              "rx", "ry", "rz", "ro",
+                                                                              "sx", "sy", "sz"],
+                                                               m=fk2_m,
+                                                               shape="cube",
+                                                               cns=False,
+                                                               width=0.8,
+                                                               height=0.8,
+                                                               depth=0.8)
 
         pole_vec_pos = dt.Matrix(data["offset_pole_vec_matrix"]).translate
         pole_vec_m = matrix.set_matrix_position(fk1_m, pole_vec_pos)
         name = self.naming("pv", "", _s="ctl")
-        self.pole_vec_ctl, self.pole_vec_loc = self.create_ctl(context=context, parent=None, name=name,
-                                                               parent_ctl=self.ik_local_ctl, color=ik_color,
+        self.pole_vec_ctl, self.pole_vec_loc = self.create_ctl(context=context,
+                                                               parent=None,
+                                                               name=name,
+                                                               parent_ctl=self.ik_local_ctl,
+                                                               color=ik_color,
                                                                keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro"],
-                                                               m=pole_vec_m, shape="x", cns=True)
+                                                               m=pole_vec_m,
+                                                               shape="x",
+                                                               cns=True)
 
         # ik jnts
         name = self.naming("ik%s", _s="jnt")
-        self.ik_jnts = joint.add_chain(root, name, positions[:-1], normal, last_orient=fk2_m, negate=self.ddata.negate)
+        self.fk_match_source = self.ik_jnts = joint.add_chain(root,
+                                                              name,
+                                                              positions[:-1],
+                                                              normal,
+                                                              last_orient=fk2_m,
+                                                              negate=self.ddata.negate)
 
         name = self.naming("RP", "ikh", _s="jnt")
         self.ik_ikh = joint.ikh(self.ik_local_loc, name, self.ik_jnts, pole_vector=self.pole_vec_loc)
@@ -285,10 +336,15 @@ class Leg2jnt01Rig(piece.Rig):
         name = self.naming("pin", _s="ctl")
         pin_m = matrix.get_matrix_look_at(positions[0], positions[2], normal, "xz", self.ddata.negate)
         pin_m = matrix.set_matrix_position(pin_m, positions[1])
-        self.pin_ctl, self.pin_loc = self.create_ctl(context=context, parent=None, name=name, parent_ctl=self.ik_ctl,
+        self.pin_ctl, self.pin_loc = self.create_ctl(context=context,
+                                                     parent=None,
+                                                     name=name,
+                                                     parent_ctl=self.ik_ctl,
                                                      color=ik_color,
                                                      keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx"],
-                                                     m=pin_m, shape="angle", cns=True,
+                                                     m=pin_m,
+                                                     shape="angle",
+                                                     cns=True,
                                                      ro=(90, 0, 225) if self.ddata.negate else (90, 0, 45))
         # support knee ctl
         self.knee_loc = self.pin_loc
@@ -298,10 +354,15 @@ class Leg2jnt01Rig(piece.Rig):
             knee_m = matrix.get_matrix_look_at(positions[0], positions[2], normal, "xz", False)
             knee_m = matrix.set_matrix_position(knee_m, positions[1])
             name = self.naming("kneeThickness", _s="ctl")
-            self.thickness_knee_ctl, self.thickness_knee_loc = self.create_ctl(context=context, parent=self.pin_loc,
-                                                                               name=name, parent_ctl=self.pin_ctl,
-                                                                               color=ik_color, keyable_attrs=["tx"],
-                                                                               m=knee_m, shape="arrow", cns=False)
+            self.thickness_knee_ctl, self.thickness_knee_loc = self.create_ctl(context=context,
+                                                                               parent=self.pin_loc,
+                                                                               name=name,
+                                                                               parent_ctl=self.pin_ctl,
+                                                                               color=ik_color,
+                                                                               keyable_attrs=["tx"],
+                                                                               m=knee_m,
+                                                                               shape="arrow",
+                                                                               cns=False)
             self.knee_loc = self.thickness_knee_loc
 
         # lookAt jnts
@@ -405,11 +466,16 @@ class Leg2jnt01Rig(piece.Rig):
 
             name = self.naming("mid0", _s="ctl")
             m = self.upper_fix_sc_jnts[0].getMatrix(worldSpace=True)
-            self.mid0_ctl, self.mid0_loc = self.create_ctl(context=context, parent=self.upper_sc_offset, name=name,
-                                                           parent_ctl=self.pin_ctl, color=ik_color,
+            self.mid0_ctl, self.mid0_loc = self.create_ctl(context=context,
+                                                           parent=self.upper_sc_offset,
+                                                           name=name,
+                                                           parent_ctl=self.pin_ctl,
+                                                           color=ik_color,
                                                            keyable_attrs=["tx", "ty", "tz",
                                                                           "rx", "ry", "rz",
-                                                                          "sx", "sy", "sz"], m=m, shape="circle3",
+                                                                          "sx", "sy", "sz"],
+                                                           m=m,
+                                                           shape="circle3",
                                                            cns=False)
             name = self.naming("upperMid", "bind", _s="jnt")
             self.upper_mid_bind = joint.add(self.mid0_loc,
@@ -430,11 +496,16 @@ class Leg2jnt01Rig(piece.Rig):
 
             name = self.naming("mid1", _s="ctl")
             m = self.lower_fix_sc_jnts[0].getMatrix(worldSpace=True)
-            self.mid1_ctl, self.mid1_loc = self.create_ctl(context=context, parent=root, name=name,
-                                                           parent_ctl=self.pin_ctl, color=ik_color,
+            self.mid1_ctl, self.mid1_loc = self.create_ctl(context=context,
+                                                           parent=root,
+                                                           name=name,
+                                                           parent_ctl=self.pin_ctl,
+                                                           color=ik_color,
                                                            keyable_attrs=["tx", "ty", "tz",
                                                                           "rx", "ry", "rz",
-                                                                          "sx", "sy", "sz"], m=m, shape="circle3",
+                                                                          "sx", "sy", "sz"],
+                                                           m=m,
+                                                           shape="circle3",
                                                            cns=False)
             name = self.naming("lowerMid", "bind", _s="jnt")
             self.lower_mid_bind = joint.add(self.mid1_loc,
@@ -673,6 +744,31 @@ class Leg2jnt01Rig(piece.Rig):
                                                     minValue=0,
                                                     maxValue=1,
                                                     keyable=True)
+        self.ik_match_source_attr = attribute.add(host,
+                                                  longName="ik_match_source",
+                                                  typ="message",
+                                                  multi=True)
+        for i, obj in enumerate(self.ik_match_source):
+            pm.connectAttr(obj.attr("message"), self.ik_match_source_attr[i])
+        self.fk_match_source_attr = attribute.add(host,
+                                                  longName="fk_match_source",
+                                                  typ="message",
+                                                  multi=True)
+        for i, obj in enumerate(self.fk_match_source):
+            pm.connectAttr(obj.attr("message"), self.fk_match_source_attr[i])
+        self.ik_match_target_attr = attribute.add(host,
+                                                  longName="ik_match_target",
+                                                  typ="message",
+                                                  multi=True)
+        pm.connectAttr(self.ik_ctl.attr("message"), self.ik_match_target_attr[0])
+        pm.connectAttr(self.pole_vec_ctl.attr("message"), self.ik_match_target_attr[1])
+        self.fk_match_target_attr = attribute.add(host,
+                                                  longName="fk_match_target",
+                                                  typ="message",
+                                                  multi=True)
+        pm.connectAttr(self.fk0_ctl.attr("message"), self.fk_match_target_attr[0])
+        pm.connectAttr(self.fk1_ctl.attr("message"), self.fk_match_target_attr[1])
+        pm.connectAttr(self.fk2_ctl.attr("message"), self.fk_match_target_attr[2])
 
     def operators(self, context):
         super(Leg2jnt01Rig, self).operators(context)

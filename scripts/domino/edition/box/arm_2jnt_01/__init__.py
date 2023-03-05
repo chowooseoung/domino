@@ -220,6 +220,9 @@ class Arm2jnt01Rig(piece.Rig):
                                                    m=m,
                                                    shape="cube",
                                                    cns=True)
+        name = self.naming("wrist", "match", _s="ctl")
+        self.ik_match_source = [self.fk0_ctl, self.fk1_ctl]
+        self.ik_match_source.append(matrix.transform(self.fk2_loc, name, m))
 
         name = self.naming("ikLocal", "", _s="ctl")
         self.ik_local_ctl, self.ik_local_loc = self.create_ctl(context=context,
@@ -251,7 +254,12 @@ class Arm2jnt01Rig(piece.Rig):
 
         # ik jnts
         name = self.naming("ik%s", _s="jnt")
-        self.ik_jnts = joint.add_chain(root, name, positions[:-1], normal, last_orient=fk2_m, negate=self.ddata.negate)
+        self.fk_match_source = self.ik_jnts = joint.add_chain(root,
+                                                              name,
+                                                              positions[:-1],
+                                                              normal,
+                                                              last_orient=fk2_m,
+                                                              negate=self.ddata.negate)
 
         name = self.naming("RP", "ikh", _s="jnt")
         self.ik_ikh = joint.ikh(self.ik_local_loc, name, self.ik_jnts, pole_vector=self.pole_vec_loc)
@@ -737,6 +745,31 @@ class Arm2jnt01Rig(piece.Rig):
                                                     minValue=0,
                                                     maxValue=1,
                                                     keyable=True)
+        self.ik_match_source_attr = attribute.add(host,
+                                                  longName="ik_match_source",
+                                                  typ="message",
+                                                  multi=True)
+        for i, obj in enumerate(self.ik_match_source):
+            pm.connectAttr(obj.attr("message"), self.ik_match_source_attr[i])
+        self.fk_match_source_attr = attribute.add(host,
+                                                  longName="fk_match_source",
+                                                  typ="message",
+                                                  multi=True)
+        for i, obj in enumerate(self.fk_match_source):
+            pm.connectAttr(obj.attr("message"), self.fk_match_source_attr[i])
+        self.ik_match_target_attr = attribute.add(host,
+                                                  longName="ik_match_target",
+                                                  typ="message",
+                                                  multi=True)
+        pm.connectAttr(self.ik_ctl.attr("message"), self.ik_match_target_attr[0])
+        pm.connectAttr(self.pole_vec_ctl.attr("message"), self.ik_match_target_attr[1])
+        self.fk_match_target_attr = attribute.add(host,
+                                                  longName="fk_match_target",
+                                                  typ="message",
+                                                  multi=True)
+        pm.connectAttr(self.fk0_ctl.attr("message"), self.fk_match_target_attr[0])
+        pm.connectAttr(self.fk1_ctl.attr("message"), self.fk_match_target_attr[1])
+        pm.connectAttr(self.fk2_ctl.attr("message"), self.fk_match_target_attr[2])
 
     def operators(self, context):
         super(Arm2jnt01Rig, self).operators(context)
@@ -914,6 +947,10 @@ class Arm2jnt01Rig(piece.Rig):
             shoulder_root = auto_clavicle_data[1]
             shoulder_ctl = auto_clavicle_data[0]
             shoulder_host = auto_clavicle_data[2]
+            shoulder_host_attr = attribute.add(host, "shoulder_host", typ="message")
+            shoulder_ctl_attr = attribute.add(host, "shoulder_ctl", typ="message")
+            pm.connectAttr(shoulder_host.attr("message"), shoulder_host_attr)
+            pm.connectAttr(shoulder_ctl.attr("message"), shoulder_ctl_attr)
             auto_clavicle_attr = attribute.add(shoulder_host,
                                                "auto_clavicle",
                                                typ="double",
