@@ -138,38 +138,3 @@ def run_space_switch_callback():
 run_space_switch_callback()"""
     pm.scriptNode(script_node, edit=True, beforeScript=script_code)
     return script_node
-
-
-def fk_to_ik(_switch, source, target):
-    pole_vec_pos = matrix.get_pole_vec_position([x.getTranslation(worldSpace=True) for x in source], 2)
-    pole_match_obj = pm.createNode("transform", name="MATCHFKTOIKPOLEVECTEMP")
-    pole_match_obj.attr("t").set(pole_vec_pos)
-    ik_ctl_m = source[-1].getMatrix(worldSpace=True)
-
-    pm.setAttr(_switch.attr("fk_ik"), 1)
-    ik_ctl, pole_vec_ctl = target
-    pm.matchTransform(pole_vec_ctl, pole_match_obj, position=True)
-    ik_ctl.setMatrix(ik_ctl_m, worldSpace=True)
-    pm.delete(pole_match_obj)
-
-
-def ik_to_fk(_switch, source, target):
-    pm.setAttr(_switch.attr("fk_ik"), 0)
-    [pm.matchTransform(t, source[i], rotation=True) for i, t in enumerate(target)]
-
-
-def match_fk_ik(switch, fk_source, ik_source, fk_target, ik_target):
-    switch = pm.PyNode(switch)
-    if fk_source is not None:
-        fk_source = [pm.PyNode(x) for x in fk_source]
-    if ik_source is not None:
-        ik_source = [pm.PyNode(x) for x in ik_source]
-    if fk_target is not None:
-        fk_target = [pm.PyNode(x) for x in fk_target]
-    if ik_target is not None:
-        ik_target = [pm.PyNode(x) for x in ik_target]
-
-    if round(switch.attr("fk_ik").get(), 0):
-        ik_to_fk(switch, fk_source, fk_target)
-    else:
-        fk_to_ik(switch, ik_source, ik_target)

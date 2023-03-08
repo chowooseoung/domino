@@ -174,35 +174,6 @@ def add_color(node, longName, typ, **kws):
     return node.attr(longName)
 
 
-def reset(obj, attrs):
-    for attr in attrs:
-        default_value = pm.attributeQuery(attr, node=obj, listDefault=True)[0]
-        try:
-            pm.setAttr(f"{obj}.{attr}", default_value)
-        except:
-            pass
-
-
-def reset_published_attr(containers):
-    for container in containers:
-        publish_attrs = [x[0] for x in pm.container(container, query=True, bindAttr=True)]
-        for attr in publish_attrs:
-            reset(attr.node(), [attr.attrName()])
-
-
-def reset_all(objs):
-    for obj in objs:
-        keyable_attrs = pm.listAttr(obj, keyable=True) or []
-        nonkeyable_attrs = pm.listAttr(obj, channelBox=True) or []
-        attrs = keyable_attrs + nonkeyable_attrs
-        reset(obj, list(set(attrs)))
-
-
-def reset_SRT(objs, attributes=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"]):
-    for obj in objs:
-        reset(obj, attributes)
-
-
 def get_data(ctls):
     d = {}
     for ctl in ctls:

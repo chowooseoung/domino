@@ -7,49 +7,26 @@ from functools import partial
 import json
 
 # domino
-from domino.core import attribute, controller, callback
+from domino.core import attribute, controller, anime
 
 
 def _null(*args, **kwargs):
     pass
 
 
-def __switch_fk_ik(*args, **kwargs):
-    argument = {}
-    argument["switch"] = kwargs["switch"]
-    source_t = mc.xform(kwargs["source"][0], query=True, worldSpace=True, translation=True)
-    aim_obj = cons = orig_value = None
-    if kwargs["shoulder_ctl"]:  # auto clavicle 때문에 shoulder_ctl 을 고정시킨 후 match 합니다.
-        orig_value = mc.getAttr(kwargs["shoulder_host"] + ".auto_clavicle")
-        aim_obj = mc.createNode("transform", name="MATCHCLAVICLETEMP")
-        mc.setAttr(aim_obj + ".t", *source_t)
-
-        _shoulder_grp = mc.listRelatives(kwargs["shoulder_ctl"], parent=True, fullPath=True)[0]
-        cons = mc.aimConstraint(aim_obj, kwargs["shoulder_ctl"], maintainOffset=True)
-        mc.setAttr(kwargs["shoulder_host"] + ".auto_clavicle", 0)
-    if round(mc.getAttr(kwargs["switch"] + ".fk_ik"), 0):
-        argument["ik_source"] = None
-        argument["ik_target"] = None
-        argument["fk_source"] = kwargs["source"]
-        argument["fk_target"] = kwargs["target"]
-    else:
-        argument["ik_source"] = kwargs["source"]
-        argument["ik_target"] = kwargs["target"]
-        argument["fk_source"] = None
-        argument["fk_target"] = None
-    callback.match_fk_ik(**argument)
-    if aim_obj:  # 고정시킨 shoulder_ctl aim 삭제.
-        mc.setAttr(kwargs["shoulder_host"] + ".auto_clavicle", orig_value)
-        mc.delete(cons)
-        mc.delete(aim_obj)
+def __switch_fk_ik(hosts, set_key, *args, **kwargs):
+    time_slider = mel.eval("$tmpVar=$gPlayBackSlider")
+    frame_range = mc.timeControl(time_slider, query=True, rangeArray=True)
+    for host in hosts:
+        anime.switch_fk_ik(host, frame_range=frame_range, set_key=set_key)
 
 
 def __reset_SRT(*args):
-    attribute.reset_SRT(args[0], args[1])
+    anime.reset_SRT(args[0], args[1])
 
 
 def __reset_all(*args):
-    attribute.reset_all(args[0])
+    anime.reset_all(args[0])
 
 
 def __attribute_trigger(n, attr, value, *args, **kwargs):
@@ -116,7 +93,7 @@ def __quick_menu(parent_menu, current_control):
     roots = [mc.listConnections(f"{x}.message",
                                 destination=True,
                                 source=False,
-                                type="transform") for x in mc.ls(sl=1)]
+                                type="transform") for x in mc.ls(selection=True)]
     roots = [list(set(x)) for x in roots if x]
     roots = [y for x in roots for y in x if mc.attributeQuery("d_id", node=y, exists=True)]
     hosts = [mc.listConnections(f"{x}.host", destination=False, source=True) for x in roots]
@@ -133,38 +110,20 @@ def __quick_menu(parent_menu, current_control):
     current_control_host = mc.listConnections(f"{current_control_root}.host", destination=False, source=True)[0]
     if mc.attributeQuery("fk_ik", node=current_control_host, exists=True):
         if round(mc.getAttr(current_control_host + ".fk_ik"), 0):
-            argument = {}
-            if mc.attributeQuery("shoulder_ctl", node=current_control_host, exists=True):
-                argument["shoulder_host"] = mc.listConnections(current_control_host + ".shoulder_host")[0]
-                argument["shoulder_ctl"] = mc.listConnections(current_control_host + ".shoulder_ctl")[0]
-            else:
-                argument["shoulder_ctl"] = None
-            argument["switch"] = current_control_host
-            argument["source"] = mc.listConnections(current_control_host + ".fk_match_source")
-            argument["target"] = mc.listConnections(current_control_host + ".fk_match_target")
             mc.menuItem(parent=parent_menu,
                         label="Go to Fk",
-                        command=partial(__switch_fk_ik, **argument))
+                        command=partial(__switch_fk_ik, hosts, False))
             mc.menuItem(parent=parent_menu,
                         label="Go to Fk (Set Key)",
-                        command=_null)
+                        command=partial(__switch_fk_ik, hosts, True))
             mc.menuItem(parent=parent_menu, divider=True)
         else:
-            argument = {}
-            if mc.attributeQuery("shoulder_ctl", node=current_control_host, exists=True):
-                argument["shoulder_host"] = mc.listConnections(current_control_host + ".shoulder_host")[0]
-                argument["shoulder_ctl"] = mc.listConnections(current_control_host + ".shoulder_ctl")[0]
-            else:
-                argument["shoulder_ctl"] = None
-            argument["switch"] = current_control_host
-            argument["source"] = mc.listConnections(current_control_host + ".ik_match_source")
-            argument["target"] = mc.listConnections(current_control_host + ".ik_match_target")
             mc.menuItem(parent=parent_menu,
                         label="Go to Ik",
-                        command=partial(__switch_fk_ik, **argument))
+                        command=partial(__switch_fk_ik, hosts, False))
             mc.menuItem(parent=parent_menu,
                         label="Go to Ik (Set Key)",
-                        command=_null)
+                        command=partial(__switch_fk_ik, hosts, True))
             mc.menuItem(parent=parent_menu, divider=True)
 
     mc.menuItem(parent=parent_menu,
