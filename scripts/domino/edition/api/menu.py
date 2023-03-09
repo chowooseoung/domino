@@ -11,13 +11,13 @@ domino.edition.ui.open_manager()"""
 cb_settings = """import domino.edition.ui
 domino.edition.ui.open_settings()"""
 
-cb_build_from_selection = """import domino.edition.api.lib
+cb_build_from_selection_guide = """import domino.edition.api.lib
 import pymel.core as pm
 selected = pm.ls(selection=True)
 if selected:
     domino.edition.api.lib.create_rig(guide=selected[0])"""
 
-cb_build_from_dot_domino = """import domino.edition.api.lib
+cb_build_from_selection_rig = """import domino.edition.api.lib
 import pymel.core as pm
 selected = pm.ls(selection=True)
 if selected:
@@ -48,8 +48,8 @@ def install():
         ("Settings", cb_settings, ""),
         ("Extract Ctl Shape", cb_extract_ctl_shape, ""),
         ("---", None),
-        ("Build From Selection", cb_build_from_selection, ""),
-        ("Build From .domino", cb_build_from_dot_domino, ""),
+        ("Build From Selection(Guide)", cb_build_from_selection_guide, ""),
+        ("Build From Selection(Rig)", cb_build_from_selection_rig, ""),
         ("---", None),
         ("Save Guide", cb_save_guide, ""),
         ("Load Guide", cb_load_guide, ""),

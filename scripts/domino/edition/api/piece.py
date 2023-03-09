@@ -1497,10 +1497,7 @@ class Rig:
     def setup_jnt(context):
         for jnt in context["jnts"]:
             jnt.attr("segmentScaleCompensate").set(False)
-            target = pm.listConnections(jnt.attr("inverseScale"),
-                                        source=True,
-                                        destination=False,
-                                        plugs=True)
+            target = pm.listConnections(jnt.attr("inverseScale"), source=True, destination=False, plugs=True)
             if target:
                 pm.disconnectAttr(target[0], jnt.attr("inverseScale"))
 
@@ -1514,9 +1511,7 @@ class Rig:
         controller_sets = pm.sets(name=f"{name}_controller_{naming.SETS_EXT}", empty=True)
 
         pm.sets(model_sets, addElement=context["model"])
-        geometries = list(set([x.getParent() for x in pm.ls(context["model"],
-                                                            dagObjects=True,
-                                                            type="mesh")]))
+        geometries = list(set([x.getParent() for x in pm.ls(context["model"], dagObjects=True, type="mesh")]))
         if geometries:
             pm.sets(geometry_sets, edit=True, addElement=geometries)
         if "jnts" in context:

@@ -295,9 +295,9 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                 p.rig.connections(context)
             assert assembly_data["end_point"] != "connections", AssertionError("End Point : connections")
 
-            run_sub_pieces(context, subs)
-
             pm.mel.eval("ClearCurrentContainer;")
+
+            run_sub_pieces(context, subs)
 
             # cleanup
             log.Logger.info(f"Clean up...")
