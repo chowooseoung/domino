@@ -75,6 +75,9 @@ def create(parent, name, degree, positions, m=dt.Matrix(), bezier=False, vis=Tru
     if not vis:
         crv.attr("v").set(0)
     if not inherits:
+        crv.attr("t").set((0, 0, 0))
+        crv.attr("r").set((0, 0, 0))
+        crv.attr("s").set((1, 1, 1))
         crv.attr("inheritsTransform").set(0)
     if display_type != 0:
         crv.attr("overrideEnabled").set(1)
