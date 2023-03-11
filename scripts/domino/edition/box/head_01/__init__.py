@@ -113,6 +113,7 @@ class Head01Rig(piece.Rig):
 
     def attributes(self, context):
         super(Head01Rig, self).attributes(context)
+        self.create_host(context)
 
     def operators(self, context):
         super(Head01Rig, self).operators(context)

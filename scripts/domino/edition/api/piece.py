@@ -1043,8 +1043,7 @@ class Rig:
         else:
             index = len(attrs)
 
-        attrs = ["tx", "ty", "tz", "rx", "ry",
-                 "rz", "ro", "sx", "sy", "sz", "v"]
+        attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx", "sy", "sz", "v"]
         # name
         npo_name = name.replace(assembly_data["ctl_name_ext"], "npo")
         ctl_name = name
@@ -1072,8 +1071,7 @@ class Rig:
         pm.connectAttr(ctl.attr("message"), self.root.attr("ctls")[index])
         if str(index) in data["ncurve_ctls_shapes"]:
             nurbs.build(data["ncurve_ctls_shapes"][str(index)], replace=ctl)
-            pm.connectAttr(ctl.attr("message"),
-                           self.root.attr("ncurve_ctls_shapes")[index])
+            pm.connectAttr(ctl.attr("message"), self.root.attr("ncurve_ctls_shapes")[index])
             shapes = ctl.getShapes()
             for shape in shapes:
                 shape.attr("isHistoricallyInteresting").set(0)
@@ -1101,7 +1099,8 @@ class Rig:
             for s in cns_ctl.getShapes():
                 pm.connectAttr(visible, s.attr("v"))
             pm.connectAttr(visible, cns_ctl.attr("displayRotatePivot"))
-            ctl = pm.parent(ctl, cns_ctl)[0]
+            pm.parent(ctl, cns_ctl)
+            pm.connectAttr(cns_ctl.attr("message"), self.root.attr("ctls")[index + 1])
 
         attribute.keyable(ctl, attrs)
         attribute.lock(ctl, set(attrs) - set(keyable_attrs))
