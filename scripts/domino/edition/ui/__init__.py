@@ -422,6 +422,7 @@ class UiFunctionSet:
                 value += f",{data}" if value else data
                 with pm.UndoChunk():
                     self.set_attr_to_piece(target_attr, value)
+        self.update_space_switch_listWidget(list_widget, target_attr)
 
     def remove_space_switch_listWidget(self, list_widget, target_attr):
         for item in list_widget.selectedItems():
@@ -429,8 +430,9 @@ class UiFunctionSet:
             value.remove(item.text())
             with pm.UndoChunk():
                 self.set_attr_to_piece(target_attr, ",".join(value))
+        self.update_space_switch_listWidget(list_widget, target_attr)
 
-    def update_space_switch_listWidget(self, list_widget, target_attr, state):
+    def update_space_switch_listWidget(self, list_widget, target_attr):
         """Update the string attribute with values separated by commas"""
         data = self.get_attr_from_piece(target_attr)
         list_widget.clear()
@@ -447,6 +449,7 @@ class UiFunctionSet:
                                         add_btn,
                                         remove_btn,
                                         target_attr):
+        self.update_space_switch_listWidget(list_widget, target_attr)
         add_btn.clicked.connect(
             partial(self.add_space_switch_listWidget,
                     list_widget,
