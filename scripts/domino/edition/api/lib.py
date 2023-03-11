@@ -246,6 +246,8 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
                                  rig=roots_grp,
                                  datas=datas,
                                  include_assembly=True)
+    context["pieces"] = pieces
+
     log.Logger.info("{: ^50}".format("- domino -"))
     try:
         with pm.UndoChunk():
