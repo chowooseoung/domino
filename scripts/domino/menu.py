@@ -55,6 +55,6 @@ domino.motion_capture.ui.open_ui()"""
 
 def motion_capture_menu():
     commands = (
-        ("Imitator UI", cb_motion_capture_ui, ""),
+        ("CopyCat UI", cb_motion_capture_ui, ""),
     )
     menu.add("Motion Capture Tools", commands)

@@ -16,20 +16,20 @@ from pymel import core as pm
 from domino.core import log
 
 
-class ImitatorUI(QtWidgets.QDialog, main_ui.Ui_Dialog):
-    ui_name = "DominoMotionCaptureImitatorUI"
+class CopyCatUI(QtWidgets.QDialog, main_ui.Ui_Dialog):
+    ui_name = "DominoMotionCaptureCopyCatUI"
 
     def __init__(self, parent=None):
-        super(ImitatorUI, self).__init__(parent=parent)
+        super(CopyCatUI, self).__init__(parent=parent)
         self.setupUi(self)
-        self.setWindowTitle("Motion Capture Imitator")
+        self.setWindowTitle("Motion Capture CopyCat")
         self.setObjectName(self.ui_name)
 
 
-class Imitator(ImitatorUI):
+class CopyCat(CopyCatUI):
 
     def __init__(self, parent=None):
-        super(Imitator, self).__init__(parent=parent)
+        super(CopyCat, self).__init__(parent=parent)
         self.populate()
         self.create_connections()
 
