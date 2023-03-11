@@ -140,7 +140,7 @@ class Eye01Rig(piece.Rig):
         if assembly_data["force_uni_scale"]:
             uni_scale = True
 
-        name = self.naming("", _s="ctl")
+        name = self.naming("", _s="jnt")
         jnt = self.create_jnt(context=context,
                               parent=None,
                               name=name,
