@@ -43,11 +43,11 @@ class Jaw01Data(piece.DData):
                         "value": [self._m1, self._m2, self._m3],
                         "multi": True},
             "sliding_angle": {"typ": "double",
-                              "value": -10},
+                              "value": -3},
             "sliding": {"typ": "double",
-                        "value": 1,
+                        "value": 0.1,
                         "minValue": 0,
-                        "maxValue": 10}
+                        "maxValue": 2}
         })
         return preset
 
