@@ -299,7 +299,7 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
             self.sub_pieces_listWidget.takeItem(0)
 
         content = """# domino 
-import domino_edition.api.piece as p
+import domino.edition.api.piece as p
 
         
 class SubPiece(p.AbstractSubPiece):
