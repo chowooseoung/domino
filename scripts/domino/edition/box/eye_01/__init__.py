@@ -165,7 +165,6 @@ class Eye01Rig(piece.Rig):
                          aimVector=(1, 0, 0),
                          upVector=(0, 1, 0),
                          worldUpType="objectrotation",
-                         worldUpVector=(0, 0, 1),
                          worldUpObject=self.aim_orient)
 
         if data["aim_space_switch_array"]:
