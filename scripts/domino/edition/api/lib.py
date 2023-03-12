@@ -7,14 +7,12 @@ import uuid
 import json
 import inspect
 import traceback
-from importlib.util import (spec_from_loader,
-                            module_from_spec)
+from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
 
 # domino
 from . import utils
-from .piece import (AbstractSubPiece,
-                    Rig)
+from .piece import AbstractSubPiece, Rig
 from ...core import log, matrix
 from .utils import DOMINO_SUB_PIECE_DIR
 
