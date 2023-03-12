@@ -357,14 +357,15 @@ class Neck01Rig(piece.Rig):
         self.squash_attrs = []
         stretch_volume_fcurve = self.root.attr("stretch_volume_fcurve").inputs()[0]
         squash_volume_fcurve = self.root.attr("squash_volume_fcurve").inputs()[0]
-        stretch_values = fcurve.get_fcurve_values(stretch_volume_fcurve, data["division"])
+        volume_inputs = [x / float(data["division"]) for x in range(data["division"] + 1)]
+        stretch_values = fcurve.get_fcurve_values(stretch_volume_fcurve, division=0, inputs=volume_inputs)
         for i, value in enumerate(stretch_values):
             self.stretch_attrs.append(attribute.add(self.root,
                                                     f"stretch_volume_value{i}",
                                                     "double",
                                                     keyable=False,
                                                     defaultValue=value))
-        squash_values = fcurve.get_fcurve_values(squash_volume_fcurve, data["division"])
+        squash_values = fcurve.get_fcurve_values(squash_volume_fcurve, division=0, inputs=volume_inputs)
         for i, value in enumerate(squash_values):
             self.squash_attrs.append(attribute.add(self.root,
                                                    f"squash_volume_value{i}",
@@ -482,7 +483,7 @@ class Neck01Rig(piece.Rig):
         md.attr("input2X").set(0.5)
         abs_value = md.attr("outputX")
 
-        for i in range(data["division"]):
+        for i in range(data["division"] + 1):
             condition = pm.createNode("condition")
             condition.attr("operation").set(3)
             pm.connectAttr(stretch_squash_switch, condition.attr("firstTerm"))
