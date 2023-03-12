@@ -54,7 +54,7 @@ class Foot01Data(piece.DData):
                         "value": [],
                         "multi": True},
             "roll_angle": {"typ": "double",
-                           "value": 20},
+                           "value": -20},
             "connector": {"typ": "string",
                           "value": "default"}
         })
@@ -354,7 +354,7 @@ class Foot01Rig(piece.Rig):
         input_value = self.roll_ctl.attr("rz")
         for i, attr in enumerate(self.roll_angle_attrs):
             cmp = pm.createNode("clamp")
-            pm.connectAttr(attr, cmp.attr("maxR"))
+            pm.connectAttr(attr, cmp.attr("minR"))
             pm.connectAttr(input_value, cmp.attr("inputR"))
 
             npo = reversed_rev_fk_ctls[i].getParent()
@@ -384,7 +384,7 @@ class Foot01Rig(piece.Rig):
         input_value = adl.attr("output")
 
         cmp = pm.createNode("clamp")
-        cmp.attr("maxR").set(360)
+        cmp.attr("minR").set(-360)
         pm.connectAttr(input_value, cmp.attr("inputR"))
 
         npo = reversed_rev_fk_ctls[-1].getParent()
@@ -392,30 +392,33 @@ class Foot01Rig(piece.Rig):
 
         # roll - heel
         cmp = pm.createNode("clamp")
-        cmp.attr("minR").set(-360)
+        cmp.attr("maxR").set(360)
         pm.connectAttr(self.roll_ctl.attr("rz"), cmp.attr("inputR"))
 
-        md = pm.createNode("multiplyDivide")
-        pm.connectAttr(cmp.attr("outputR"), md.attr("input1X"))
-        md.attr("input2X").set(-1)
-
         npo = self.heel_ctl.getParent()
-        pm.connectAttr(md.attr("outputX"), npo.attr("ry"))
+        pm.connectAttr(cmp.attr("outputR"), npo.attr("ry"))
 
         # roll - in, out
         cmp = pm.createNode("clamp")
         cmp.attr("maxR").set(360)
         pm.connectAttr(self.roll_ctl.attr("ry"), cmp.attr("inputR"))
 
-        npo = self.in_ctl.getParent()
-        pm.connectAttr(cmp.attr("outputR"), npo.attr("rx"))
+        md = pm.createNode("multiplyDivide")
+        md.attr("input1X").set(-1)
+        md.attr("input1Y").set(-1)
+        pm.connectAttr(cmp.attr("outputR"), md.attr("input2X"))
+
+        npo = self.out_ctl.getParent()
+        pm.connectAttr(md.attr("outputX"), npo.attr("rx"))
 
         cmp = pm.createNode("clamp")
         cmp.attr("minR").set(-360)
         pm.connectAttr(self.roll_ctl.attr("ry"), cmp.attr("inputR"))
 
-        npo = self.out_ctl.getParent()
-        pm.connectAttr(cmp.attr("outputR"), npo.attr("rx"))
+        pm.connectAttr(cmp.attr("outputR"), md.attr("input2Y"))
+
+        npo = self.in_ctl.getParent()
+        pm.connectAttr(md.attr("outputY"), npo.attr("rx"))
 
         # fk ctl
         fk_ctls_reverse = list(reversed(self.fk_ctls))
