@@ -75,7 +75,6 @@ def __quick_menu(parent_menu, current_control):
     if namespace != ":":
         namespace += ":"
     asset_root = mc.ls(current_control, long=True)[0].split("|")[1]
-    asset_container = mc.container(query=True, findContainer=asset_root)
 
     selected = mc.ls(selection=True)
     selected_controller = [x for x in selected if mc.objExists(f"{x}.is_domino_ctl")]
@@ -103,10 +102,10 @@ def __quick_menu(parent_menu, current_control):
                 command=f"import maya.cmds as mc;mc.select({hosts})")
     mc.menuItem(parent=parent_menu, divider=True)
 
-    current_control_root = mc.listConnections(f"{current_control}.message",
-                                              destination=True,
-                                              source=False,
-                                              type="transform")[0]
+    current_control_root = [x for x in mc.listConnections(f"{current_control}.message",
+                                                          destination=True,
+                                                          source=False,
+                                                          type="transform") if mc.objExists(x + ".d_id")][0]
     current_control_host = mc.listConnections(f"{current_control_root}.host", destination=False, source=True)[0]
     if mc.attributeQuery("fk_ik", node=current_control_host, exists=True):
         if round(mc.getAttr(current_control_host + ".fk_ik"), 0):
@@ -216,8 +215,7 @@ def __quick_menu(parent_menu, current_control):
         for pose, data in pose_data.items():
             mc.menuItem(parent=pose_menu, label=pose, command=partial(attribute.set_data, data, namespace))
 
-    roots_grp_index = mc.containerPublish(asset_container, query=True, bindNode=True).index("roots")
-    roots_grp = mc.containerPublish(asset_container, query=True, bindNode=True)[roots_grp_index + 1]
+    roots_grp = [x for x in mc.listRelatives(asset_root, children=True, fullPath=True) if "roots" in x][0]
     assembly_root = None
     for i in mc.listRelatives(roots_grp, children=True, fullPath=True):
         if mc.getAttr(f"{i}.piece") == "assembly_01":

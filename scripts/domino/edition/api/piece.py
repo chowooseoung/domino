@@ -1367,10 +1367,11 @@ class Rig:
                        description)
 
         container = pm.container(query=True, findContainer=self.root)
-        pm.container(container, edit=True, removeNode=[jnt, pair_b])
-        parent_container = pm.container(query=True,
-                                        findContainer=container)
-        pm.container(parent_container, edit=True, removeNode=[jnt, pair_b])
+        if container:
+            pm.container(container, edit=True, removeNode=[jnt, pair_b])
+            parent_container = pm.container(query=True,
+                                            findContainer=container)
+            pm.container(parent_container, edit=True, removeNode=[jnt, pair_b])
         return jnt
 
     def create_support_jnt(self, name, description, blended_index, count, m):
@@ -1408,10 +1409,11 @@ class Rig:
                       value=description)
 
         container = pm.container(query=True, findContainer=self.root)
-        pm.container(container, edit=True, removeNode=jnt)
-        parent_container = pm.container(query=True,
-                                        findContainer=container)
-        pm.container(parent_container, edit=True, removeNode=jnt)
+        if container:
+            pm.container(container, edit=True, removeNode=jnt)
+            parent_container = pm.container(query=True,
+                                            findContainer=container)
+            pm.container(parent_container, edit=True, removeNode=jnt)
         return jnt
 
     def sub_jnt(self, context):

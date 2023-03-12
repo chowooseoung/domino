@@ -29,12 +29,9 @@ def collect_piece(guide, rig, datas, include_assembly=False):
         if guide:
             if include_assembly and guide not in pm.ls(assemblies=True):
                 containers.append(pm.PyNode(guide).getParent(generations=-1))
-            containers.extend(
-                pm.ls(guide, dagObjects=True, type="dagContainer"))
+            containers.extend(pm.ls(guide, dagObjects=True, type="dagContainer"))
         elif rig:
-            containers = pm.listRelatives(rig,
-                                          children=True,
-                                          type="transform")
+            containers = pm.listRelatives(rig, children=True, type="transform")
             containers = [x for x in containers if x.hasAttr("d_id")]
         for container in containers:
             module_name = container.attr("piece").get()

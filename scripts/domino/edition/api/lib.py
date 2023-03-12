@@ -357,23 +357,26 @@ def add_blended_jnt():
     plug = [x for x in plugs if "jnts" in x.attrName()]
     if not plug:
         return None
+
     index = plug[0].index()
     selected_root = plug[0].node()
+
     asset = selected[0].getParent(generations=-1)
     container = pm.container(query=True, findContainer=asset)
-    roots_index = pm.containerPublish(container, query=True, bindNode=True).index("roots")
-    roots_grp = pm.containerPublish(container, query=True, bindNode=True)[roots_index + 1]
+    if container:
+        selected_container = pm.container(query=True, findContainer=selected_root)
+        pm.container(selected_container, edit=True, current=True)
+
+    roots_grp = [x for x in asset.getChildren() if "roots" in x.name()][0]
     pieces = utils.collect_piece(guide=None, rig=roots_grp, datas=None)
     d_id = selected_root.attr("d_id").get()
     piece = [p for p in pieces if p.ddata._data["d_id"] == d_id][0]
-    selected_container = pm.container(query=True, findContainer=selected_root)
-    pm.container(selected_container, edit=True, current=True)
     piece.rig.root = selected_root
     jnt = piece.rig.create_blended_jnt(name="", index=index)
 
     if jnt is not None:
         pm.select(jnt)
-        sets = pm.listConnections(asset.attr("sets"), type="objectSet", destination=False, source=True)
+        sets = pm.listConnections(asset.attr("jnt_sets"), type="objectSet", destination=False, source=True)
         if sets:
             child_sets = [x for x in pm.sets(sets[0], query=True) if x.type() == "objectSet"]
             sets.extend(child_sets)
@@ -384,7 +387,8 @@ def add_blended_jnt():
         jnt.attr("segmentScaleCompensate").set(ssc)
     else:
         pm.select(selected)
-    pm.mel.eval("ClearCurrentContainer;")
+    if container:
+        pm.mel.eval("ClearCurrentContainer;")
     return jnt
 
 
@@ -422,14 +426,15 @@ def add_support_jnt():
 
     asset = selected[0].getParent(generations=-1)
     container = pm.container(query=True, findContainer=asset)
-    roots_index = pm.containerPublish(container, query=True, bindNode=True).index("roots")
-    roots_grp = pm.containerPublish(container, query=True, bindNode=True)[roots_index + 1]
+    if container:
+        selected_container = pm.container(query=True, findContainer=selected_root)
+        pm.container(selected_container, edit=True, current=True)
+
+    roots_grp = [x for x in asset.getChildren() if "roots" in x.name()][0]
     pieces = utils.collect_piece(guide=None, rig=roots_grp, datas=None)
     d_id = selected_root.attr("d_id").get()
     piece = [p for p in pieces if p.ddata._data["d_id"] == d_id][0]
     m = selected[0].getMatrix(worldSpace=True)
-    selected_container = pm.container(query=True, findContainer=selected_root)
-    pm.container(selected_container, edit=True, current=True)
     piece.rig.root = selected_root
     jnt = piece.rig.create_support_jnt(name="",
                                        description=description,
@@ -438,7 +443,7 @@ def add_support_jnt():
                                        m=dt.Matrix(m))
     if jnt is not None:
         pm.select(jnt)
-        sets = pm.listConnections(asset.attr("sets"), type="objectSet", destination=False, source=True)
+        sets = pm.listConnections(asset.attr("jnt_sets"), type="objectSet", destination=False, source=True)
         if sets:
             child_sets = [x for x in pm.sets(sets[0], query=True) if x.type() == "objectSet"]
             sets.extend(child_sets)
@@ -449,7 +454,8 @@ def add_support_jnt():
         selected[0].attr("segmentScaleCompensate").set(ssc)
     else:
         pm.select(selected)
-    pm.mel.eval("ClearCurrentContainer;")
+    if container:
+        pm.mel.eval("ClearCurrentContainer;")
     return jnt
 
 
@@ -463,9 +469,7 @@ def extract_ctl_shapes(ctls):
         index = plugs.index()
         root = plugs.node()
         pm.disconnectAttr(root.attr("ncurve_ctls_shapes")[index])
-        pm.connectAttr(ctl.attr("message"),
-                       root.attr("ncurve_ctls_shapes")[index],
-                       force=True)
+        pm.connectAttr(ctl.attr("message"), root.attr("ncurve_ctls_shapes")[index], force=True)
 
 
 def save(dotfile):
@@ -483,9 +487,7 @@ def save(dotfile):
     if not is_guide and not is_rig:
         raise RuntimeError("select domino guide or rig")
     if is_rig:
-        asset_container = pm.container(query=True, findContainer=root)
-        roots_grp_index = pm.containerPublish(asset_container, query=True, bindNode=True).index("roots")
-        root = pm.containerPublish(asset_container, query=True, bindNode=True)[roots_grp_index + 1]
+        root = [x for x in root.getChildren() if "roots" in x.name()][0]
     argument = {"guide": root if is_guide else None,
                 "rig": root if is_rig else None,
                 "datas": None}
