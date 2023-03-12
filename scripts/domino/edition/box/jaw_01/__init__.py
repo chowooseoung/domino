@@ -107,7 +107,7 @@ class Jaw01Rig(piece.Rig):
                                                      shape="cube",
                                                      cns=False,
                                                      width=distance,
-                                                     depth=distance / 2,
+                                                     height=distance / 2,
                                                      po=(distance / 2, 0, 0))
         name = self.naming("rot", _s="ctl")
         self.rot_obj = matrix.transform(root, name, m, True)
