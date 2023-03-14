@@ -249,7 +249,8 @@ class Neck01Rig(piece.Rig):
                                              parent_ctl=parent_ctl,
                                              color=fk_color,
                                              keyable_attrs=["tx", "ty", "tz",
-                                                            "rx", "ry", "rz", "ro"],
+                                                            "rx", "ry", "rz", "ro",
+                                                            "sx", "sy", "sz"],
                                              m=m,
                                              shape="cube",
                                              width=0.1,
@@ -281,7 +282,15 @@ class Neck01Rig(piece.Rig):
                                               vis=False,
                                               inherits=False,
                                               display_type=1)
-        nurbs.constraint(self.deform_volume_crv, self.fk_ctls)
+        self.non_scale_fk_pos = []
+        parent = root
+        for i, ctl in enumerate(self.fk_ctls):
+            name = self.naming(f"fk{i}NonScale", "pos", _s="ctl")
+            parent = matrix.transform(parent, name, dt.Matrix())
+            self.non_scale_fk_pos.append(parent)
+            pm.connectAttr(ctl.attr("translate"), parent.attr("translate"))
+            pm.connectAttr(ctl.attr("rotate"), parent.attr("rotate"))
+        nurbs.constraint(self.deform_volume_crv, self.non_scale_fk_pos)
 
         refs = []
         for i in range(len(self.fk_ctls)):
@@ -530,6 +539,7 @@ class Neck01Rig(piece.Rig):
                 pm.connectAttr(lock_orient, pb.attr("inRotate2"))
                 pm.connectAttr(pb.attr("outRotate"), self.sp_chain[-1].attr("r"))
             pm.connectAttr(self.sp_chain[i].attr("dagLocalMatrix"), npo.attr("offsetParentMatrix"))
+            pm.connectAttr(self.sp_chain[i].attr("dagLocalMatrix"), self.non_scale_fk_pos[i].attr("offsetParentMatrix"))
 
         # tangent
         distance = pm.createNode("distanceBetween")
