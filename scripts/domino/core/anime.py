@@ -38,13 +38,14 @@ def fk_to_ik(source, target, host):
     pole_vec_pos = matrix.get_pole_vec_position([x.getTranslation(worldSpace=True) for x in source], 2)
     pole_match_obj = pm.createNode("transform", name="MATCHFKTOIKPOLEVECTEMP")
     pole_match_obj.attr("t").set(pole_vec_pos)
-    ik_ctl_m = source[-1].getMatrix(worldSpace=True)
+    ik_ctl_match_obj = pm.createNode("transform", name="MATCHTOIKCTLTEMP")
+    pm.matchTransform(ik_ctl_match_obj, source[-1], position=True, rotation=True)
 
     pm.setAttr(host.attr("fk_ik"), 1)
     ik_ctl, pole_vec_ctl = target
     pm.matchTransform(pole_vec_ctl, pole_match_obj, position=True)
-    ik_ctl.setMatrix(ik_ctl_m, worldSpace=True)
-    pm.delete(pole_match_obj)
+    pm.matchTransform(ik_ctl, ik_ctl_match_obj, position=True, rotation=True)
+    pm.delete([pole_match_obj, ik_ctl_match_obj])
 
 
 def ik_to_fk(source, target, host):
