@@ -1,5 +1,5 @@
 # domino
-from domino.core import attribute, joint, matrix, vector
+from domino.core import attribute, joint, matrix, vector, operators, callback
 from domino.edition.api import piece
 
 # built-ins
@@ -48,6 +48,8 @@ class Finger01Data(piece.DData):
                                 "channelBox": True},
             "offset_pole_vec_matrix": {"typ": "matrix",
                                        "value": dt.Matrix()},
+            "ik_space_switch_array": {"typ": "string",
+                                      "value": ""},
         })
         return preset
 
@@ -252,6 +254,8 @@ class Finger01Rig(piece.Rig):
 
     def operators(self, context):
         super(Finger01Rig, self).operators(context)
+        data = self.data(Finger01Data.SELF)
+        host = self.host()
 
         pm.connectAttr(self.ik_sc_jnts[0].attr("dagLocalMatrix"), self.sc_space_grp.attr("offsetParentMatrix"))
         pm.connectAttr(self.ik_sc_jnts[1].attr("dagLocalMatrix"), self.rp_auto_rot_loc.attr("offsetParentMatrix"))
@@ -321,6 +325,16 @@ class Finger01Rig(piece.Rig):
         pm.connectAttr(self.ik_jnts[0].attr("dagLocalMatrix"), fk0_npo.attr("offsetParentMatrix"))
         pm.connectAttr(self.ik_jnts[1].attr("dagLocalMatrix"), fk1_npo.attr("offsetParentMatrix"))
         pm.connectAttr(self.ik_jnts[2].attr("dagLocalMatrix"), fk2_npo.attr("offsetParentMatrix"))
+
+        # space switch
+        if data["ik_space_switch_array"]:
+            source_ctls = self.find_ctls(data["ik_space_switch_array"])
+            operators.space_switch(source_ctls, self.ik_ctl, host, attr_name="ik_space_switch")
+            script_node = callback.space_switch(source_ctls,
+                                                self.ik_ctl,
+                                                host,
+                                                switch_attr_name="ik_space_switch")
+            context["callbacks"].append(script_node)
 
     def connections(self, context):
         super(Finger01Rig, self).connections(context)
