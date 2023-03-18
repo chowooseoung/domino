@@ -621,9 +621,9 @@ class Arm2jnt01Rig(piece.Rig):
             elif i == len(self.refs) - 1:
                 name = self.naming("wrist", _s="jnt")
             elif i < len(upper_jnt_v_values):
-                name = self.naming(f"upperTwist{twist_index}", _s="jnt")
+                name = self.naming(f"upper{twist_index}", _s="jnt")
             else:
-                name = self.naming(f"lowerTwist{twist_index}", _s="jnt")
+                name = self.naming(f"lower{twist_index}", _s="jnt")
             m = ref.getMatrix(worldSpace=True)
             jnt = self.create_jnt(context=context,
                                   parent=jnt,
