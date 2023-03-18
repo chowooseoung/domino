@@ -70,6 +70,8 @@ class Foot01Guide(piece.Guide):
             ui.line_edit.setText("3")
             if ui.exec_():
                 div_value = int(ui.line_edit.text())
+                if div_value < 2:
+                    return False
                 d = []
                 for i, v in enumerate(range(div_value)):
                     d.append(matrix.get_matrix_from_pos((0, -1, i + 1)))
@@ -165,9 +167,9 @@ class Foot01Rig(piece.Rig):
                                                        m=m,
                                                        shape="dodecahedron",
                                                        cns=False,
-                                                       width=2,
-                                                       height=2,
-                                                       depth=2,
+                                                       width=0.6,
+                                                       height=0.6,
+                                                       depth=0.6,
                                                        ro=(0, 0, 90))
 
         name = self.naming("in", _s="ctl")
