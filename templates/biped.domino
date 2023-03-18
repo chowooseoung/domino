@@ -1443,9 +1443,9 @@
   },
   {
     "d_id": "6c863003-2a17-45de-b79c-6e61285f0577",
-    "piece": "shoulder_01",
+    "piece": "clavicle_01",
     "piece_version": "1. 0. 0",
-    "name": "shoulder",
+    "name": "clavicle",
     "side": "L",
     "index": 0,
     "parent_anchor": "b636638a-401c-4608-85fb-a9cba4aaca21,1",
@@ -1807,7 +1807,7 @@
         true
       ]
     },
-    "connector": "shoulder_01"
+    "connector": "clavicle_01"
   },
   {
     "d_id": "af6ffaf2-d041-4ac8-b082-2017e8538165",
@@ -2597,9 +2597,9 @@
   },
   {
     "d_id": "64cd5e57-81ae-49c9-8233-28e630a4cb29",
-    "piece": "shoulder_01",
+    "piece": "clavicle_01",
     "piece_version": "1. 0. 0",
-    "name": "shoulder",
+    "name": "clavicle",
     "side": "R",
     "index": 0,
     "parent_anchor": "b636638a-401c-4608-85fb-a9cba4aaca21,1",
@@ -2961,7 +2961,7 @@
         true
       ]
     },
-    "connector": "shoulder_01"
+    "connector": "clavicle_01"
   },
   {
     "d_id": "f8ff1a4b-3e87-41f2-986b-5cbd76ce0222",

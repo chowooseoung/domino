@@ -19,7 +19,7 @@ class Arm2jnt01Identifier(piece.Identifier):
     name = "arm"
     side = "C"
     index = 0
-    description = "사람의 팔 입니다. arm_2jnt_01은 shoulder_01과 연결될 수 있습니다."
+    description = "사람의 팔 입니다. arm_2jnt_01은 clavicle_01과 연결될 수 있습니다."
 
 
 class Arm2jnt01Data(piece.DData):
@@ -942,79 +942,79 @@ class Arm2jnt01Rig(piece.Rig):
         data = self.data(Arm2jnt01Data.SELF)
         parent_component = self.ddata.parent
         parent_data = parent_component.data(parent_component.SELF)
-        if data["connector"] == "shoulder_01" and parent_data["piece"] == "shoulder_01":
+        if data["connector"] == "clavicle_01" and parent_data["piece"] == "clavicle_01":
             auto_clavicle_data = context["auto_clavicle"][str(parent_component.identifier)]
-            shoulder_root = auto_clavicle_data[1]
-            shoulder_ctl = auto_clavicle_data[0]
-            shoulder_host = auto_clavicle_data[2]
-            shoulder_host_attr = attribute.add(host, "shoulder_host", typ="message")
-            shoulder_ctl_attr = attribute.add(host, "shoulder_ctl", typ="message")
-            pm.connectAttr(shoulder_host.attr("message"), shoulder_host_attr)
-            pm.connectAttr(shoulder_ctl.attr("message"), shoulder_ctl_attr)
-            auto_clavicle_attr = attribute.add(shoulder_host,
+            clavicle_root = auto_clavicle_data[1]
+            clavicle_ctl = auto_clavicle_data[0]
+            clavicle_host = auto_clavicle_data[2]
+            clavicle_host_attr = attribute.add(host, "clavicle_host", typ="message")
+            clavicle_ctl_attr = attribute.add(host, "clavicle_ctl", typ="message")
+            pm.connectAttr(clavicle_host.attr("message"), clavicle_host_attr)
+            pm.connectAttr(clavicle_ctl.attr("message"), clavicle_ctl_attr)
+            auto_clavicle_attr = attribute.add(clavicle_host,
                                                "auto_clavicle",
                                                typ="double",
                                                value=1,
                                                minValue=0,
                                                maxValue=1,
                                                keyable=True)
-            neutral_factor_attr = attribute.add(shoulder_host,
+            neutral_factor_attr = attribute.add(clavicle_host,
                                                 "neutral_factor",
                                                 typ="double",
                                                 value=0,
                                                 minValue=0,
                                                 maxValue=10,
                                                 keyable=True)
-            t_factor_attr = attribute.add(shoulder_host,
+            t_factor_attr = attribute.add(clavicle_host,
                                           "t_factor",
                                           typ="double",
                                           value=0,
                                           minValue=0,
                                           maxValue=10,
                                           keyable=True)
-            up_factor_attr = attribute.add(shoulder_host,
+            up_factor_attr = attribute.add(clavicle_host,
                                            "up_factor",
                                            typ="double",
                                            value=2.7,
                                            minValue=0,
                                            maxValue=10,
                                            keyable=True)
-            down_factor_attr = attribute.add(shoulder_host,
+            down_factor_attr = attribute.add(clavicle_host,
                                              "down_factor",
                                              typ="double",
                                              value=0.7,
                                              minValue=0,
                                              maxValue=10,
                                              keyable=True)
-            front_90_factor_attr = attribute.add(shoulder_host,
+            front_90_factor_attr = attribute.add(clavicle_host,
                                                  "front_90_factor",
                                                  typ="double",
                                                  value=1.5,
                                                  minValue=0,
                                                  maxValue=10,
                                                  keyable=True)
-            back_90_factor_attr = attribute.add(shoulder_host,
+            back_90_factor_attr = attribute.add(clavicle_host,
                                                 "back_90_factor",
                                                 typ="double",
                                                 value=1.5,
                                                 minValue=0,
                                                 maxValue=10,
                                                 keyable=True)
-            back_140_factor_attr = attribute.add(shoulder_host,
+            back_140_factor_attr = attribute.add(clavicle_host,
                                                  "front_140_factor",
                                                  typ="double",
                                                  value=1.8,
                                                  minValue=0,
                                                  maxValue=10,
                                                  keyable=True)
-            front_140_factor_attr = attribute.add(shoulder_host,
+            front_140_factor_attr = attribute.add(clavicle_host,
                                                   "back_140_factor",
                                                   typ="double",
                                                   value=1.8,
                                                   minValue=0,
                                                   maxValue=10,
                                                   keyable=True)
-            ik_factor_attr = attribute.add(shoulder_host,
+            ik_factor_attr = attribute.add(clavicle_host,
                                            "ik_factor",
                                            typ="double",
                                            value=0.35,
@@ -1028,16 +1028,16 @@ class Arm2jnt01Rig(piece.Rig):
             pv_npo = self.pole_vec_ctl.getParent()
             if pm.controller(pv_npo, query=True):
                 pv_npo = pv_npo.getParent()
-            pm.parent([ik_npo, pv_npo], shoulder_root)
+            pm.parent([ik_npo, pv_npo], clavicle_root)
 
-            parent = shoulder_root
+            parent = clavicle_root
             self.auto_clavicle_jnts = []
             for i, jnt in enumerate(self.ik_jnts):
                 name = self.naming(f"autoClavicle{i}", _s="jnt")
                 parent = joint.add(parent, name, jnt.getMatrix(worldSpace=True), vis=False)
                 self.auto_clavicle_jnts.append(parent)
             name = self.naming("autoClavicle", "ikh", _s="jnt")
-            self.auto_clavicle_ikh = joint.ikh(shoulder_root,
+            self.auto_clavicle_ikh = joint.ikh(clavicle_root,
                                                name,
                                                self.auto_clavicle_jnts,
                                                pole_vector=self.pole_vec_loc)
@@ -1045,7 +1045,7 @@ class Arm2jnt01Rig(piece.Rig):
             pm.connectAttr(self.fk_ik_attr, self.auto_clavicle_ikh.attr("ikBlend"))
 
             name = self.naming("autoClavicleAim", _s="jnt")
-            self.auto_clavicle_aim_jnt = joint.add(shoulder_root,
+            self.auto_clavicle_aim_jnt = joint.add(clavicle_root,
                                                    name,
                                                    self.ik_jnts[0].getMatrix(worldSpace=True),
                                                    vis=False)
@@ -1072,36 +1072,36 @@ class Arm2jnt01Rig(piece.Rig):
                                    attribute=attr,
                                    preInfinite="cycleRelative",
                                    postInfinite="cycleRelative")
-            root_m = shoulder_root.getMatrix(worldSpace=True)
+            root_m = clavicle_root.getMatrix(worldSpace=True)
             name = self.naming("t", "pose", _s="ctl")
-            t_target = matrix.transform(shoulder_root, name, root_m)
+            t_target = matrix.transform(clavicle_root, name, root_m)
             t_target.attr("rx").set(-90)
             if self.ddata.negate:
                 t_target.attr("rz").set(180)
             t_m = t_target.getMatrix(worldSpace=True) * root_m.inverse()
 
             name = self.naming("up", "pose", _s="ctl")
-            arm_up_90_target = matrix.transform(shoulder_root, name, root_m)
+            arm_up_90_target = matrix.transform(clavicle_root, name, root_m)
             arm_up_90_target.attr("offsetParentMatrix").set(t_m)
             arm_up_90_target.attr("ry").set(-90)
             name = self.naming("down", "pose", _s="ctl")
-            arm_down_90_target = matrix.transform(shoulder_root, name, root_m)
+            arm_down_90_target = matrix.transform(clavicle_root, name, root_m)
             arm_down_90_target.attr("offsetParentMatrix").set(t_m)
             arm_down_90_target.attr("ry").set(90)
             name = self.naming("front90", "pose", _s="ctl")
-            arm_front_90_target = matrix.transform(shoulder_root, name, root_m)
+            arm_front_90_target = matrix.transform(clavicle_root, name, root_m)
             arm_front_90_target.attr("offsetParentMatrix").set(t_m)
             arm_front_90_target.attr("rz").set(-90)
             name = self.naming("back90", "pose", _s="ctl")
-            arm_back_90_target = matrix.transform(shoulder_root, name, root_m)
+            arm_back_90_target = matrix.transform(clavicle_root, name, root_m)
             arm_back_90_target.attr("offsetParentMatrix").set(t_m)
             arm_back_90_target.attr("rz").set(90)
             name = self.naming("front140", "pose", _s="ctl")
-            arm_front_140_target = matrix.transform(shoulder_root, name, root_m)
+            arm_front_140_target = matrix.transform(clavicle_root, name, root_m)
             arm_front_140_target.attr("offsetParentMatrix").set(t_m)
             arm_front_140_target.attr("rz").set(-140)
             name = self.naming("back140", "pose", _s="ctl")
-            arm_back_140_target = matrix.transform(shoulder_root, name, root_m)
+            arm_back_140_target = matrix.transform(clavicle_root, name, root_m)
             arm_back_140_target.attr("offsetParentMatrix").set(t_m)
             arm_back_140_target.attr("rz").set(140)
 
@@ -1155,18 +1155,18 @@ class Arm2jnt01Rig(piece.Rig):
                 pm.connectAttr(md.attr("outputX"), pma.attr("input1D")[i])
             pm.poseInterpolator(interpolator, edit=True, goToPose="neutral")
 
-            shoulder_npo = shoulder_ctl.getParent()
-            if pm.controller(shoulder_npo, query=True):
-                shoulder_npo = shoulder_npo.getParent()
+            clavicle_npo = clavicle_ctl.getParent()
+            if pm.controller(clavicle_npo, query=True):
+                clavicle_npo = clavicle_npo.getParent()
             name = self.naming("autoClavicle", "target", _s="ctl")
             m = self.auto_clavicle_aim_jnt.getMatrix(worldSpace=True)
-            m = matrix.set_matrix_position(m, shoulder_ctl.getTranslation(worldSpace=True))
-            target_transform = matrix.transform(shoulder_npo,
+            m = matrix.set_matrix_position(m, clavicle_ctl.getTranslation(worldSpace=True))
+            target_transform = matrix.transform(clavicle_npo,
                                                 name,
                                                 m,
                                                 True)
             name = self.naming("autoClavicle", "offset", _s="ctl")
-            offset_transform = controller.npo(shoulder_ctl, name=name)
+            offset_transform = controller.npo(clavicle_ctl, name=name)
             pm.parent(offset_transform, target_transform)
 
             rm = pm.createNode("remapValue")

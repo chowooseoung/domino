@@ -226,7 +226,7 @@ class Ui_Form(object):
         self.groupBox.setTitle("")
         self.label_3.setText(QCoreApplication.translate("Form", u"Division", None))
         self.connector_comboBox.setItemText(0, QCoreApplication.translate("Form", u"default", None))
-        self.connector_comboBox.setItemText(1, QCoreApplication.translate("Form", u"shoulder_01", None))
+        self.connector_comboBox.setItemText(1, QCoreApplication.translate("Form", u"clavicle_01", None))
 
         self.label_2.setText(QCoreApplication.translate("Form", u"Max Stretch", None))
         self.label.setText(QCoreApplication.translate("Form", u"Fk / IK", None))

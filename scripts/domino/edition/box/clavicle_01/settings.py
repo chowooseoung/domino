@@ -6,7 +6,7 @@ from PySide2 import QtCore
 
 
 class Settings(CommonPieceSettings):
-    title_name = "Shoulder_01 Settings"
+    title_name = "Clavicle_01 Settings"
 
     def __init__(self, parent=None):
         super(Settings, self).__init__(parent=parent)
