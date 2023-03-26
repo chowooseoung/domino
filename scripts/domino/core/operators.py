@@ -25,8 +25,7 @@ def space_switch(source_ctls, target_ctl, host, attr_name="space_switch", constr
     weight_list = cons_func(cons, query=True, weightAliasList=True)
     for i, attr in enumerate(weight_list):
         condition = pm.createNode("condition")
-        pm.connectAttr(f"{host}.{attr_name}",
-                       f"{condition}.firstTerm")
+        pm.connectAttr(f"{host}.{attr_name}", f"{condition}.firstTerm")
         condition.attr("secondTerm").set(i + 1)
         condition.attr("colorIfTrueR").set(1)
         condition.attr("colorIfFalseR").set(0)
@@ -92,12 +91,13 @@ def ik_2jnt(jnt1, jnt2, scale_attr, slide_attr, stretch_value_attr, max_stretch_
     md.attr("operation").set(2)
     pm.connectAttr(stretch_value_attr, md.attr("input1X"))
     pm.connectAttr(scaled_total_distance_attr, md.attr("input2X"))
+    stretch_ratio_attr = md.attr("outputX")
 
     condition = pm.createNode("condition")
     condition.attr("operation").set(2)
     pm.connectAttr(stretch_value_attr, condition.attr("firstTerm"))
     pm.connectAttr(scaled_total_distance_attr, condition.attr("secondTerm"))
-    pm.connectAttr(md.attr("outputX"), condition.attr("colorIfTrueR"))
+    pm.connectAttr(stretch_ratio_attr, condition.attr("colorIfTrueR"))
     condition.attr("colorIfFalseR").set(1)
     stretch_condition_attr = condition.attr("outColorR")
 
@@ -126,6 +126,84 @@ def ik_2jnt(jnt1, jnt2, scale_attr, slide_attr, stretch_value_attr, max_stretch_
 
     pm.connectAttr(ik1_stretch_value_attr, jnt1.attr("tx"))
     pm.connectAttr(ik2_stretch_value_attr, jnt2.attr("tx"))
+
+
+def ik_3jnt(jnt1, jnt2, jnt3, multi1_attr, multi2_attr, multi3_attr, stretch_value_attr, max_stretch_attr, negate):
+    ik1_distance = jnt1.attr("tx").get()
+    ik2_distance = jnt2.attr("tx").get()
+    ik3_distance = jnt3.attr("tx").get()
+    if negate:
+        ik1_distance *= -1
+        ik2_distance *= -1
+        ik3_distance *= -1
+        md = pm.createNode("multiplyDivide")
+        md.attr("input1X").set(-1)
+        pm.connectAttr(stretch_value_attr, md.attr("input2X"))
+        stretch_value_attr = md.attr("outputX")
+
+    md = pm.createNode("multiplyDivide")
+    pm.connectAttr(multi1_attr, md.attr("input1X"))
+    pm.connectAttr(multi2_attr, md.attr("input1Y"))
+    pm.connectAttr(multi3_attr, md.attr("input1Z"))
+    md.attr("input2X").set(ik1_distance)
+    md.attr("input2Y").set(ik2_distance)
+    md.attr("input2Z").set(ik3_distance)
+    multiple_ik1_distance_attr = md.attr("outputX")
+    multiple_ik2_distance_attr = md.attr("outputY")
+    multiple_ik3_distance_attr = md.attr("outputZ")
+
+    pma = pm.createNode("plusMinusAverage")
+    pm.connectAttr(multiple_ik1_distance_attr, pma.attr("input1D")[0])
+    pm.connectAttr(multiple_ik2_distance_attr, pma.attr("input1D")[1])
+    pm.connectAttr(multiple_ik3_distance_attr, pma.attr("input1D")[2])
+    multiple_total_distance_attr = pma.attr("output1D")
+
+    md = pm.createNode("multiplyDivide")
+    md.attr("operation").set(2)
+    pm.connectAttr(stretch_value_attr, md.attr("input1X"))
+    pm.connectAttr(multiple_total_distance_attr, md.attr("input2X"))
+    stretch_ratio_attr = md.attr("outputX")
+
+    condition = pm.createNode("condition")
+    condition.attr("operation").set(2)
+    pm.connectAttr(stretch_value_attr, condition.attr("firstTerm"))
+    pm.connectAttr(multiple_total_distance_attr, condition.attr("secondTerm"))
+    pm.connectAttr(stretch_ratio_attr, condition.attr("colorIfTrueR"))
+    condition.attr("colorIfFalseR").set(1)
+    stretch_condition_attr = condition.attr("outColorR")
+
+    condition = pm.createNode("condition")
+    condition.attr("operation").set(4)
+    pm.connectAttr(stretch_condition_attr, condition.attr("firstTerm"))
+    pm.connectAttr(max_stretch_attr, condition.attr("secondTerm"))
+    pm.connectAttr(stretch_condition_attr, condition.attr("colorIfTrueR"))
+    pm.connectAttr(max_stretch_attr, condition.attr("colorIfFalseR"))
+
+    md = pm.createNode("multiplyDivide")
+    pm.connectAttr(multiple_ik1_distance_attr, md.attr("input1X"))
+    pm.connectAttr(multiple_ik2_distance_attr, md.attr("input1Y"))
+    pm.connectAttr(multiple_ik3_distance_attr, md.attr("input1Z"))
+    pm.connectAttr(condition.attr("outColorR"), md.attr("input2X"))
+    pm.connectAttr(condition.attr("outColorR"), md.attr("input2Y"))
+    pm.connectAttr(condition.attr("outColorR"), md.attr("input2Z"))
+    ik1_stretch_value_attr = md.attr("outputX")
+    ik2_stretch_value_attr = md.attr("outputY")
+    ik3_stretch_value_attr = md.attr("outputZ")
+    if negate:
+        md = pm.createNode("multiplyDivide")
+        pm.connectAttr(ik1_stretch_value_attr, md.attr("input1X"))
+        pm.connectAttr(ik2_stretch_value_attr, md.attr("input1Y"))
+        pm.connectAttr(ik3_stretch_value_attr, md.attr("input1Z"))
+        md.attr("input2X").set(-1)
+        md.attr("input2Y").set(-1)
+        md.attr("input2Z").set(-1)
+        ik1_stretch_value_attr = md.attr("outputX")
+        ik2_stretch_value_attr = md.attr("outputY")
+        ik3_stretch_value_attr = md.attr("outputZ")
+
+    pm.connectAttr(ik1_stretch_value_attr, jnt1.attr("tx"))
+    pm.connectAttr(ik2_stretch_value_attr, jnt2.attr("tx"))
+    pm.connectAttr(ik3_stretch_value_attr, jnt3.attr("tx"))
 
 
 def volume(original_distance_attr, delta_distance_attr, squash_attrs, stretch_attrs, switch_attr, objs):

@@ -27,6 +27,7 @@ class Ui_Form(object):
         self.connector_comboBox = QComboBox(self.groupBox)
         self.connector_comboBox.addItem("")
         self.connector_comboBox.addItem("")
+        self.connector_comboBox.addItem("")
         self.connector_comboBox.setObjectName(u"connector_comboBox")
 
         self.gridLayout.addWidget(self.connector_comboBox, 2, 1, 1, 2)
@@ -62,6 +63,7 @@ class Ui_Form(object):
         self.groupBox.setTitle("")
         self.connector_comboBox.setItemText(0, QCoreApplication.translate("Form", u"default", None))
         self.connector_comboBox.setItemText(1, QCoreApplication.translate("Form", u"leg_2jnt_01", None))
+        self.connector_comboBox.setItemText(2, QCoreApplication.translate("Form", u"leg_3jnt_01", None))
 
         self.label_4.setText(QCoreApplication.translate("Form", u"Connector", None))
         self.label.setText(QCoreApplication.translate("Form", u"Roll Angle", None))

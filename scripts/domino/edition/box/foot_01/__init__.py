@@ -456,8 +456,9 @@ class Foot01Rig(piece.Rig):
         data = self.data(Foot01Data.SELF)
         parent_component = self.ddata.parent
         parent_data = parent_component.data(parent_component.SELF)
-        if data["connector"] == "leg_2jnt_01" and parent_data["piece"] == "leg_2jnt_01":
-            connector_data = context["leg_2jnt_01"][str(parent_component.identifier)]
+        if (data["connector"] == "leg_2jnt_01" and parent_data["piece"] == "leg_2jnt_01") \
+                or (data["connector"] == "leg_3jnt_01" and parent_data["piece"] == "leg_3jnt_01"):
+            connector_data = context[data["connector"]][str(parent_component.identifier)]
             ik_local_loc, ikh, last_ref, fk_ik_attr = connector_data
 
             pm.disconnectAttr(self.root.attr("offsetParentMatrix"))
