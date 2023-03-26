@@ -1,4 +1,4 @@
-It's a project started for `mgear` personal study. Many parts were referred to in 'mgear'(e.g api.core and UX/UI).
+It's a project started for `mgear` personal study. Many parts were referred to in 'mgear'(e.g domino.core and UX/UI).
 'mgear' is a great open source maya rigging framework.(https://github.com/mgear-dev/mgear4)
 
 - Requirement `maya 2023.3`
@@ -16,4 +16,3 @@ DOMINO_CUSTOM_EDITION = ..
 DOMINO_TEMPLATE_DIR = templates
 DOMINO_SUB_PIECE_DIR = ..
 ```
-
