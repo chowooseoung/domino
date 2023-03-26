@@ -82,6 +82,8 @@ class Eye01Rig(piece.Rig):
 
         m = matrix.get_matrix_look_at(positions[0], positions[1], normal, "xy", False)
 
+        length = vector.get_distance(positions[0], positions[1])
+
         name = self.naming("aim", "", _s="ctl")
         aim_m = matrix.set_matrix_position(m, positions[1])
         self.aim_ctl, self.aim_loc = self.create_ctl(context=context,
@@ -93,7 +95,7 @@ class Eye01Rig(piece.Rig):
                                                      m=aim_m,
                                                      shape="circle3",
                                                      cns=True,
-                                                     width=0.5)
+                                                     width=length / 5)
 
         name = self.naming("aim", "target", _s="ctl")
         self.aim_target = matrix.transform(root, name, m, True)
@@ -117,7 +119,7 @@ class Eye01Rig(piece.Rig):
                                                      m=m,
                                                      shape="circle3",
                                                      cns=False,
-                                                     width=1)
+                                                     width=length / 3)
 
         m = matrix.get_matrix_look_at(positions[0], positions[1], normal, "xz", self.ddata.negate)
         name = self.naming("ref", "source", _s="ctl")

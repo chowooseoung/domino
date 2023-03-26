@@ -131,7 +131,7 @@ class Clavicle01Rig(piece.Rig):
                                                                         "sx", "sy", "sz"],
                                                          m=orbit_m,
                                                          shape="circle3",
-                                                         width=1.5)
+                                                         width=distance / 2)
         name = self.naming("orbit", "ref", _s="ctl")
         self.orbit_ref = self.create_ref(context=context, name=name, anchor=True, m=self.orbit_loc)
 

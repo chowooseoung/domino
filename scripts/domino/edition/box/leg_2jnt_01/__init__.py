@@ -142,6 +142,9 @@ class Leg2jnt01Rig(piece.Rig):
         fk_color = self.get_fk_ctl_color()
         ik_color = self.get_ik_ctl_color()
 
+        div_length = vector.get_distance(positions[0], positions[1])
+        total_length = div_length + vector.get_distance(positions[1], positions[2])
+
         # fk ctls
         fk0_m = matrix.get_matrix_look_at(positions[0], positions[1], normal, "xz", self.ddata.negate)
         name = self.naming("fk0", "", _s="ctl")
@@ -157,6 +160,8 @@ class Leg2jnt01Rig(piece.Rig):
                                                      shape="cube",
                                                      cns=False,
                                                      width=offset * 2,
+                                                     height=div_length / total_length,
+                                                     depth=div_length / total_length,
                                                      po=(po, 0, 0))
         m = matrix.set_matrix_position(fk0_m, positions[1])
         name = self.naming("fk0", "length", _s="ctl")
@@ -176,6 +181,8 @@ class Leg2jnt01Rig(piece.Rig):
                                                      shape="cube",
                                                      cns=False,
                                                      width=offset * 2,
+                                                     height=div_length / total_length,
+                                                     depth=div_length / total_length,
                                                      po=(po, 0, 0))
         m = matrix.set_matrix_position(fk1_m, positions[2])
         name = self.naming("fk1", "length", _s="ctl")
@@ -200,6 +207,8 @@ class Leg2jnt01Rig(piece.Rig):
                                                      shape="cube",
                                                      cns=False,
                                                      width=offset * 2,
+                                                     height=div_length / total_length,
+                                                     depth=div_length / total_length,
                                                      po=(po, 0, 0))
         # ik ctls
         m = matrix.get_matrix_from_pos(positions[2])
@@ -217,6 +226,9 @@ class Leg2jnt01Rig(piece.Rig):
                                                                   "sx", "sy", "sz"],
                                                    m=m,
                                                    shape="cube",
+                                                   width=div_length / total_length * 2,
+                                                   height=div_length / total_length * 2,
+                                                   depth=div_length / total_length * 2,
                                                    cns=True)
         name = self.naming("ankle", "match", _s="ctl")
         self.ik_match_source = [self.fk0_ctl, self.fk1_ctl]
@@ -234,9 +246,9 @@ class Leg2jnt01Rig(piece.Rig):
                                                                m=fk2_m,
                                                                shape="cube",
                                                                cns=False,
-                                                               width=0.8,
-                                                               height=0.8,
-                                                               depth=0.8)
+                                                               width=div_length / total_length * 1.6,
+                                                               height=div_length / total_length * 1.6,
+                                                               depth=div_length / total_length * 1.6)
 
         pole_vec_pos = dt.Matrix(data["offset_pole_vec_matrix"]).translate
         pole_vec_m = matrix.set_matrix_position(fk1_m, pole_vec_pos)
@@ -344,6 +356,9 @@ class Leg2jnt01Rig(piece.Rig):
                                                      keyable_attrs=["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx"],
                                                      m=pin_m,
                                                      shape="angle",
+                                                     width=div_length / total_length,
+                                                     height=div_length / total_length,
+                                                     depth=div_length / total_length,
                                                      cns=True,
                                                      ro=(90, 0, 225) if self.ddata.negate else (90, 0, 45))
         # support knee ctl
@@ -362,6 +377,9 @@ class Leg2jnt01Rig(piece.Rig):
                                                                                keyable_attrs=["tx"],
                                                                                m=knee_m,
                                                                                shape="arrow",
+                                                                               width=div_length / total_length,
+                                                                               height=div_length / total_length,
+                                                                               depth=div_length / total_length,
                                                                                cns=False)
             self.knee_loc = self.thickness_knee_loc
 
@@ -459,33 +477,36 @@ class Leg2jnt01Rig(piece.Rig):
         upper_bind_jnts = [self.upper_start_bind, self.upper_end_bind]
         lower_bind_jnts = [self.lower_start_bind, self.lower_end_bind]
 
-        # mid ctl
+        # flexible ctl
         if data["upper_division"] > 1:
             uniform_value = 1.0 / data["upper_division"]
             upper_jnt_v_values.extend([uniform_value * i for i in range(1, data["upper_division"])])
 
-            name = self.naming("mid0", _s="ctl")
+            name = self.naming("flexible0", _s="ctl")
             m = self.upper_fix_sc_jnts[0].getMatrix(worldSpace=True)
-            self.mid0_ctl, self.mid0_loc = self.create_ctl(context=context,
-                                                           parent=self.upper_sc_offset,
-                                                           name=name,
-                                                           parent_ctl=self.pin_ctl,
-                                                           color=ik_color,
-                                                           keyable_attrs=["tx", "ty", "tz",
-                                                                          "rx", "ry", "rz",
-                                                                          "sx", "sy", "sz"],
-                                                           m=m,
-                                                           shape="circle3",
-                                                           cns=False)
+            self.flexible0_ctl, self.flexible0_loc = self.create_ctl(context=context,
+                                                                     parent=self.upper_sc_offset,
+                                                                     name=name,
+                                                                     parent_ctl=self.pin_ctl,
+                                                                     color=ik_color,
+                                                                     keyable_attrs=["tx", "ty", "tz",
+                                                                                    "rx", "ry", "rz",
+                                                                                    "sx", "sy", "sz"],
+                                                                     m=m,
+                                                                     shape="circle3",
+                                                                     width=div_length / total_length,
+                                                                     height=div_length / total_length,
+                                                                     depth=div_length / total_length,
+                                                                     cns=False)
             name = self.naming("upperMid", "bind", _s="jnt")
-            self.upper_mid_bind = joint.add(self.mid0_loc,
-                                            name,
-                                            m,
-                                            vis=False)
-            upper_bind_jnts.append(self.upper_mid_bind)
-            mid0_npo = self.mid0_ctl.getParent()
-            pm.pointConstraint([self.upper_start_bind, self.upper_end_bind], mid0_npo)
-            cons = pm.orientConstraint([self.upper_start_bind, self.upper_end_bind], mid0_npo)
+            self.upper_flexible_bind = joint.add(self.flexible0_loc,
+                                                 name,
+                                                 m,
+                                                 vis=False)
+            upper_bind_jnts.append(self.upper_flexible_bind)
+            flexible0_npo = self.flexible0_ctl.getParent()
+            pm.pointConstraint([self.upper_start_bind, self.upper_end_bind], flexible0_npo)
+            cons = pm.orientConstraint([self.upper_start_bind, self.upper_end_bind], flexible0_npo)
             cons.attr("interpType").set(2)
         else:
             pm.parent(self.upper_start_bind, self.blend_objs[0])
@@ -494,28 +515,31 @@ class Leg2jnt01Rig(piece.Rig):
             uniform_value = 1.0 / data["lower_division"]
             lower_jnt_v_values.extend([uniform_value * i for i in range(1, data["lower_division"])])
 
-            name = self.naming("mid1", _s="ctl")
+            name = self.naming("flexible1", _s="ctl")
             m = self.lower_fix_sc_jnts[0].getMatrix(worldSpace=True)
-            self.mid1_ctl, self.mid1_loc = self.create_ctl(context=context,
-                                                           parent=root,
-                                                           name=name,
-                                                           parent_ctl=self.pin_ctl,
-                                                           color=ik_color,
-                                                           keyable_attrs=["tx", "ty", "tz",
-                                                                          "rx", "ry", "rz",
-                                                                          "sx", "sy", "sz"],
-                                                           m=m,
-                                                           shape="circle3",
-                                                           cns=False)
+            self.flexible1_ctl, self.flexible1_loc = self.create_ctl(context=context,
+                                                                     parent=root,
+                                                                     name=name,
+                                                                     parent_ctl=self.pin_ctl,
+                                                                     color=ik_color,
+                                                                     keyable_attrs=["tx", "ty", "tz",
+                                                                                    "rx", "ry", "rz",
+                                                                                    "sx", "sy", "sz"],
+                                                                     m=m,
+                                                                     shape="circle3",
+                                                                     width=div_length / total_length,
+                                                                     height=div_length / total_length,
+                                                                     depth=div_length / total_length,
+                                                                     cns=False)
             name = self.naming("lowerMid", "bind", _s="jnt")
-            self.lower_mid_bind = joint.add(self.mid1_loc,
-                                            name,
-                                            m,
-                                            vis=False)
-            lower_bind_jnts.append(self.lower_mid_bind)
-            mid1_npo = self.mid1_ctl.getParent()
-            pm.pointConstraint([self.lower_start_bind, self.lower_end_bind], mid1_npo)
-            cons = pm.orientConstraint([self.lower_start_bind, self.lower_end_bind], mid1_npo)
+            self.lower_flexible_bind = joint.add(self.flexible1_loc,
+                                                 name,
+                                                 m,
+                                                 vis=False)
+            lower_bind_jnts.append(self.lower_flexible_bind)
+            flexible1_npo = self.flexible1_ctl.getParent()
+            pm.pointConstraint([self.lower_start_bind, self.lower_end_bind], flexible1_npo)
+            cons = pm.orientConstraint([self.lower_start_bind, self.lower_end_bind], flexible1_npo)
             cons.attr("interpType").set(2)
 
         # ribbon
@@ -531,13 +555,13 @@ class Leg2jnt01Rig(piece.Rig):
         obj = matrix.transform(root, name, fk2_m)
         self.leg_output_objs.append(obj)
         if data["upper_division"] > 1:
-            mid0_uniform_attr = attribute.add(self.mid0_ctl,
-                                              longName="uniform",
-                                              typ="double",
-                                              defaultValue=1,
-                                              minValue=0,
-                                              maxValue=1,
-                                              keyable=True)
+            flexible0_uniform_attr = attribute.add(self.flexible0_ctl,
+                                                   longName="uniform",
+                                                   typ="double",
+                                                   defaultValue=1,
+                                                   minValue=0,
+                                                   maxValue=1,
+                                                   keyable=True)
             name = self.naming("upper", "{}", _s="ctl")
             uvpin1 = nurbs.ribbon(root,
                                   name,
@@ -545,7 +569,7 @@ class Leg2jnt01Rig(piece.Rig):
                                   normal,
                                   sorted(upper_jnt_v_values),
                                   upper_bind_jnts,
-                                  mid0_uniform_attr,
+                                  flexible0_uniform_attr,
                                   self.leg_output_objs[:len(lower_jnt_v_values) * -1],
                                   negate=self.ddata.negate)
             if not (data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1):
@@ -558,18 +582,19 @@ class Leg2jnt01Rig(piece.Rig):
         else:
             pm.parentConstraint(self.upper_start_bind, self.leg_output_objs[0])
         if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:
-            mid_index = len(upper_jnt_v_values)
-            cons = pm.orientConstraint([self.leg_output_objs[mid_index - 1], self.leg_output_objs[mid_index + 1]],
-                                       self.leg_output_objs[mid_index])
+            flexible_index = len(upper_jnt_v_values)
+            cons = pm.orientConstraint(
+                [self.leg_output_objs[flexible_index - 1], self.leg_output_objs[flexible_index + 1]],
+                self.leg_output_objs[flexible_index])
             cons.attr("interpType").set(2)
         if data["lower_division"] > 1:
-            mid1_uniform_attr = attribute.add(self.mid1_ctl,
-                                              longName="uniform",
-                                              typ="double",
-                                              defaultValue=1,
-                                              minValue=0,
-                                              maxValue=1,
-                                              keyable=True)
+            flexible1_uniform_attr = attribute.add(self.flexible1_ctl,
+                                                   longName="uniform",
+                                                   typ="double",
+                                                   defaultValue=1,
+                                                   minValue=0,
+                                                   maxValue=1,
+                                                   keyable=True)
             name = self.naming("lower", "{}", _s="ctl")
             uvpin2 = nurbs.ribbon(root,
                                   name,
@@ -577,7 +602,7 @@ class Leg2jnt01Rig(piece.Rig):
                                   normal,
                                   sorted(lower_jnt_v_values)[:-1],
                                   lower_bind_jnts,
-                                  mid1_uniform_attr,
+                                  flexible1_uniform_attr,
                                   self.leg_output_objs[len(upper_jnt_v_values):],
                                   negate=self.ddata.negate)
             aim_m = self.leg_output_objs[-2].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
@@ -729,7 +754,7 @@ class Leg2jnt01Rig(piece.Rig):
                                                           maxValue=2,
                                                           defaultValue=1)
         if data["upper_division"] > 1:
-            self.upper_uniform_attr = attribute.add(self.mid0_ctl,
+            self.upper_uniform_attr = attribute.add(self.flexible0_ctl,
                                                     longName="uniform",
                                                     typ="double",
                                                     defaultValue=1,
@@ -737,7 +762,7 @@ class Leg2jnt01Rig(piece.Rig):
                                                     maxValue=1,
                                                     keyable=True)
         if data["lower_division"] > 1:
-            self.lower_uniform_attr = attribute.add(self.mid1_ctl,
+            self.lower_uniform_attr = attribute.add(self.flexible1_ctl,
                                                     longName="uniform",
                                                     typ="double",
                                                     defaultValue=1,

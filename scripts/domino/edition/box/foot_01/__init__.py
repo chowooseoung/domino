@@ -53,6 +53,12 @@ class Foot01Data(piece.DData):
             "anchors": {"typ": "matrix",
                         "value": [],
                         "multi": True},
+            "offset": {"typ": "doubleAngle",
+                       "value": 0,
+                       "keyable": False,
+                       "channelBox": True},
+            "offset_matrix": {"typ": "matrix",
+                              "value": self._m1},
             "roll_angle": {"typ": "double",
                            "value": -20},
             "connector": {"typ": "string",
@@ -70,7 +76,7 @@ class Foot01Guide(piece.Guide):
             ui.line_edit.setText("3")
             if ui.exec_():
                 div_value = int(ui.line_edit.text())
-                if div_value < 2:
+                if div_value < 1:
                     return False
                 d = []
                 for i, v in enumerate(range(div_value)):
@@ -95,6 +101,7 @@ class Foot01Guide(piece.Guide):
             parent = self.create_position(parent, m)
             pos.append(parent)
         self.create_display_crv(pos[0], pos)
+        self.create_orientation(pos[0], pos[1])
 
         heel_pos = self.create_position(pos[0], data["anchors"][-5])
         in_pos = self.create_position(heel_pos, data["anchors"][-4])
@@ -130,22 +137,31 @@ class Foot01Rig(piece.Rig):
         root_m = dt.Matrix(data["anchors"][0])
         root_pos = root_m.translate
         heel_m = dt.Matrix(data["anchors"][-5])
+        heel_m.scale = (1, 1, 1)
         heel_pos = heel_m.translate
         in_m = dt.Matrix(data["anchors"][-4])
+        in_m.scale = (1, 1, 1)
         in_pos = in_m.translate
         out_m = dt.Matrix(data["anchors"][-3])
+        out_m.scale = (1, 1, 1)
         out_pos = out_m.translate
         tip_m = dt.Matrix(data["anchors"][-2])
+        tip_m.scale = (1, 1, 1)
         tip_pos = tip_m.translate
         toe_m = dt.Matrix(data["anchors"][-1])
+        toe_m.scale = (1, 1, 1)
         toe_pos = toe_m.translate
 
+        orient_xyz = matrix.OrientXYZ(dt.Matrix(data["offset_matrix"]))
+        normal = orient_xyz.y * (1 if self.ddata.negate else -1)
+        bi_normal = orient_xyz.z * (-1 if self.ddata.negate else 1)
+
         fk_positions = [dt.Matrix(x).translate for x in data["anchors"][1:-5]]
-        fk_normal = vector.getPlaneNormal(root_pos, fk_positions[0], fk_positions[1]) * -1
-        fk_matrices = matrix.get_chain_matrix(fk_positions, fk_normal, self.ddata.negate)
+        fk_matrices = matrix.get_chain_matrix(fk_positions, normal, self.ddata.negate)
         fk_matrices.append(matrix.set_matrix_position(fk_matrices[-1], fk_positions[-1]))
 
-        normal = vector.getPlaneNormal(in_pos, out_pos, toe_pos) * -1
+        total_length = vector.get_distance(heel_pos, tip_pos)
+        div_length = vector.get_distance(fk_positions[0], fk_positions[1])
 
         root = self.create_root(context, root_pos)
         fk_color = self.get_fk_ctl_color()
@@ -156,7 +172,7 @@ class Foot01Rig(piece.Rig):
         toe_m = matrix.set_matrix_position(heel_m, toe_pos)
 
         name = self.naming("roll", _s="ctl")
-        m = matrix.get_matrix_look_at(dt.Vector(0, 0, 0), normal, fk_normal, "xz", True)
+        m = matrix.get_matrix_look_at(dt.Vector(0, 0, 0), bi_normal, normal, "xz", self.ddata.negate)
         m = matrix.set_matrix_position(m, root_pos)
         self.roll_ctl, self.roll_loc = self.create_ctl(context=context,
                                                        parent=root,
@@ -167,10 +183,12 @@ class Foot01Rig(piece.Rig):
                                                        m=m,
                                                        shape="dodecahedron",
                                                        cns=False,
-                                                       width=0.6,
-                                                       height=0.6,
-                                                       depth=0.6,
+                                                       width=div_length / total_length,
+                                                       height=div_length / total_length,
+                                                       depth=div_length / total_length,
                                                        ro=(0, 0, 90))
+        attribute.unlock(self.roll_ctl, ["ro"])
+        self.roll_ctl.attr("rotateOrder").set(5)
 
         name = self.naming("in", _s="ctl")
         self.in_ctl, self.in_loc = self.create_ctl(context=context,
@@ -182,10 +200,8 @@ class Foot01Rig(piece.Rig):
                                                    m=in_m,
                                                    shape="halfmoon",
                                                    cns=False,
-                                                   width=1,
-                                                   height=0.2,
-                                                   depth=0.5,
-                                                   ro=(0, 90, 0))
+                                                   width=div_length / total_length,
+                                                   ro=(0, -90 if self.ddata.negate else 90, 0))
         name = self.naming("out", _s="ctl")
         self.out_ctl, self.out_loc = self.create_ctl(context=context,
                                                      parent=self.in_loc,
@@ -196,12 +212,9 @@ class Foot01Rig(piece.Rig):
                                                      m=out_m,
                                                      shape="halfmoon",
                                                      cns=False,
-                                                     width=1,
-                                                     height=0.2,
-                                                     depth=0.5,
-                                                     ro=(0, -90, 0))
+                                                     width=div_length / total_length,
+                                                     ro=(0, 90 if self.ddata.negate else -90, 0))
         name = self.naming("heel", _s="ctl")
-        offset = vector.get_distance(heel_pos, tip_pos)
         self.heel_ctl, self.heel_loc = self.create_ctl(context=context,
                                                        parent=self.out_loc,
                                                        name=name,
@@ -211,11 +224,9 @@ class Foot01Rig(piece.Rig):
                                                        m=heel_m,
                                                        shape="halfmoon",
                                                        cns=False,
-                                                       width=offset / 2,
-                                                       po=(0, 0, 0),
-                                                       ro=(90, 0, 180 if self.ddata.negate else 0))
+                                                       width=div_length / total_length,
+                                                       ro=(0, 0, 180 if self.ddata.negate else 0))
         name = self.naming("tip", _s="ctl")
-        offset = vector.get_distance(tip_pos, toe_pos)
         self.tip_ctl, self.tip_loc = self.create_ctl(context=context,
                                                      parent=self.heel_loc,
                                                      name=name,
@@ -225,10 +236,9 @@ class Foot01Rig(piece.Rig):
                                                      m=tip_m,
                                                      shape="square",
                                                      cns=False,
-                                                     width=offset,
-                                                     height=offset,
-                                                     po=(0, 0, 0),
-                                                     ro=(90, 0, 0))
+                                                     width=div_length / total_length,
+                                                     height=div_length / total_length,
+                                                     ro=(0, 0, 0))
         name = self.naming("toe", _s="ctl")
         self.toe_ctl, self.toe_loc = self.create_ctl(context=context,
                                                      parent=self.tip_loc,
@@ -239,9 +249,8 @@ class Foot01Rig(piece.Rig):
                                                      m=toe_m,
                                                      shape="halfmoon",
                                                      cns=False,
-                                                     width=offset,
-                                                     po=(0, 0, 0),
-                                                     ro=(90, 0, 0 if self.ddata.negate else 180))
+                                                     width=div_length / total_length,
+                                                     ro=(0, 0, 0 if self.ddata.negate else 180))
 
         self.rev_fk_ctls = []
         self.rev_fk_locs = []
@@ -258,16 +267,14 @@ class Foot01Rig(piece.Rig):
                                        m=m,
                                        shape="circle3",
                                        cns=False,
-                                       width=0.5)
+                                       width=div_length / total_length * 0.5)
+            if i == 0:
+                pm.delete(ctl.getShapes())
             self.rev_fk_ctls.append(ctl)
             self.rev_fk_locs.append(loc)
 
         name = self.naming("legRef", "space", _s="ctl")
         self.leg_space = matrix.transform(self.rev_fk_locs[-1], name, root.attr("offsetParentMatrix").get(), True)
-
-        name = self.naming("ref0", "space", _s="ctl")
-        ref0_obj = controller.child(self.leg_space, name=name, shape="")
-        ref0_obj.setMatrix(root_m, worldSpace=True)
 
         ctl = self.rev_fk_ctls[-1]
         loc = self.leg_space
@@ -287,8 +294,8 @@ class Foot01Rig(piece.Rig):
                                        shape="cube",
                                        cns=False,
                                        width=offset * 2,
-                                       height=offset,
-                                       depth=1,
+                                       height=div_length / total_length * 0.7,
+                                       depth=div_length / total_length * 0.7,
                                        po=(po, 0, 0))
             name = self.naming(f"rot{i}", "inv", _s="ctl")
             controller.npo(ctl, name)
@@ -300,7 +307,7 @@ class Foot01Rig(piece.Rig):
         ref = self.create_ref(context=context,
                               name=name,
                               anchor=True,
-                              m=ref0_obj)
+                              m=self.leg_space)
         self.refs.append(ref)
         for i, loc in enumerate(self.fk_locs):
             name = self.naming(i + 1, "ref", _s="ctl")
@@ -398,7 +405,7 @@ class Foot01Rig(piece.Rig):
         pm.connectAttr(self.roll_ctl.attr("rz"), cmp.attr("inputR"))
 
         npo = self.heel_ctl.getParent()
-        pm.connectAttr(cmp.attr("outputR"), npo.attr("ry"))
+        pm.connectAttr(cmp.attr("outputR"), npo.attr("rz"))
 
         # roll - in, out
         cmp = pm.createNode("clamp")
@@ -406,8 +413,8 @@ class Foot01Rig(piece.Rig):
         pm.connectAttr(self.roll_ctl.attr("ry"), cmp.attr("inputR"))
 
         md = pm.createNode("multiplyDivide")
-        md.attr("input1X").set(-1)
-        md.attr("input1Y").set(-1)
+        md.attr("input1X").set(1 if self.ddata.negate else -1)
+        md.attr("input1Y").set(1 if self.ddata.negate else -1)
         pm.connectAttr(cmp.attr("outputR"), md.attr("input2X"))
 
         npo = self.out_ctl.getParent()

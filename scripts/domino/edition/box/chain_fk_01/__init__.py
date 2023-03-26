@@ -102,6 +102,16 @@ class ChainFk01Rig(piece.Rig):
             matrices = matrix.get_chain_matrix(positions, normal, self.ddata.negate)
             matrices.append(matrix.set_matrix_position(matrices[-1], positions[-1]))
 
+        total_length = 0
+        div_length = 0
+        for i, p in enumerate(positions):
+            if i == len(positions) - 1:
+                break
+            l = vector.get_distance(p, positions[i + 1])
+            total_length += l
+            if i == 0:
+                div_length += l
+
         self.ctls = []
         self.locs = []
         loc = root
@@ -120,8 +130,8 @@ class ChainFk01Rig(piece.Rig):
                                        shape="cube",
                                        cns=False,
                                        width=distance,
-                                       height=1,
-                                       depth=1,
+                                       height=distance * div_length / total_length * 2,
+                                       depth=distance * div_length / total_length * 2,
                                        po=(distance / 2, 0, 0))
             self.ctls.append(ctl)
             self.locs.append(loc)
