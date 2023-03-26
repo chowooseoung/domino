@@ -831,14 +831,14 @@ class Leg3jnt01Rig(piece.Rig):
                                            defaultValue=1)
         if data["spring_solver"]:
             self.spring_bias0_attr = attribute.add(host,
-                                                   "angle_bias0",
+                                                   "spring_angle_bias0",
                                                    typ="double",
                                                    keyable=True,
                                                    minValue=0,
                                                    maxValue=1,
                                                    defaultValue=0.5)
             self.spring_bias1_attr = attribute.add(host,
-                                                   "angle_bias1",
+                                                   "spring_angle_bias1",
                                                    typ="double",
                                                    keyable=True,
                                                    minValue=0,
