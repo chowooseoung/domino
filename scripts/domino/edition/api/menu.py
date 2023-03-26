@@ -23,7 +23,10 @@ selected = pm.ls(selection=True)
 if selected:
     domino.edition.api.lib.create_rig(rig=selected[0])"""
 
-cb_extract_ctl_shape = """import domino.edition.api.lib
+cb_extract_guide_from_rig = """import domino.edition.api.lib
+domino.edition.api.lib.extract_guide_from_rig()"""
+
+cb_extract_ctl_shapes = """import domino.edition.api.lib
 import pymel.core as pm
 selected = pm.ls(selection=True)
 if selected:
@@ -46,10 +49,11 @@ def install():
     commands = (
         ("Manager", cb_manager, ""),
         ("Settings", cb_settings, ""),
-        ("Extract Ctl Shape", cb_extract_ctl_shape, ""),
+        ("Extract ctl shapes", cb_extract_ctl_shapes, ""),
         ("---", None),
-        ("Build From Selection(Guide)", cb_build_from_selection_guide, ""),
-        ("Build From Selection(Rig)", cb_build_from_selection_rig, ""),
+        ("Build from selection(Guide)", cb_build_from_selection_guide, ""),
+        ("Build from selection(Rig)", cb_build_from_selection_rig, ""),
+        ("Extract Guide from Rig", cb_extract_guide_from_rig, ""),
         ("---", None),
         ("Save Guide", cb_save_guide, ""),
         ("Load Guide", cb_load_guide, ""),

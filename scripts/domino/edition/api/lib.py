@@ -470,6 +470,22 @@ def extract_ctl_shapes(ctls):
         pm.connectAttr(ctl.attr("message"), root.attr("ncurve_ctls_shapes")[index], force=True)
 
 
+def extract_guide_from_rig(rig_node=None):
+    if rig_node is None:
+        rig_node = pm.selected(type="transform")
+    if rig_node is None:
+        return
+    if isinstance(rig_node, list):
+        rig_node = rig_node[0]
+
+    root = rig_node.getParent(generations=-1)
+    roots_grp = [x for x in root.getChildren() if "roots" in x.name()][0]
+    argument = {"guide": None, "rig": roots_grp, "datas": None}
+    pieces = utils.collect_piece(**argument)
+    datas = [p.ddata._data for p in pieces]
+    return create_guide(datas=datas)
+
+
 def save(dotfile):
     selected = pm.ls(selection=True)
     if not selected:
