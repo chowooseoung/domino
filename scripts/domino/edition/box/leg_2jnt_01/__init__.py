@@ -333,7 +333,7 @@ class Leg2jnt01Rig(piece.Rig):
                                            orig_m,
                                            vis=False,
                                            display_type=1)
-        name = self.naming("lowerDeform", "crv", _s="ctl")
+        name = self.naming("deformLower", "crv", _s="ctl")
         self.deform_lower_crv = nurbs.create(root,
                                              name,
                                              1,
