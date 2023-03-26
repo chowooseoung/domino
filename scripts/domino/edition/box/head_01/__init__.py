@@ -67,10 +67,6 @@ class Head01Rig(piece.Rig):
         data = self.data(Head01Data.SELF)
         assembly_data = self.data(Head01Data.ASSEMBLY)
 
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
-
         m0 = dt.Matrix(data["anchors"][0])
         m1 = dt.Matrix(data["anchors"][1])
         m2 = dt.Matrix(data["anchors"][2])
@@ -96,20 +92,28 @@ class Head01Rig(piece.Rig):
                                              width=distance,
                                              po=(distance / 3.0, 0, 0))
 
+        # refs
         name = self.naming("", "ref", _s="ctl")
         self.ref = self.create_ref(context=context,
                                    name=name,
                                    anchor=True,
                                    m=self.loc)
-        name = self.naming(_s="jnt")
-        self.jnt = self.create_jnt(context=context,
-                                   parent=None,
-                                   name=name,
-                                   description="",
-                                   ref=self.ref,
-                                   m=m,
-                                   leaf=False,
-                                   uni_scale=uni_scale)
+
+        # jnts
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
+
+            name = self.naming(_s="jnt")
+            self.jnt = self.create_jnt(context=context,
+                                       parent=None,
+                                       name=name,
+                                       description="",
+                                       ref=self.ref,
+                                       m=m,
+                                       leaf=False,
+                                       uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Head01Rig, self).attributes(context)

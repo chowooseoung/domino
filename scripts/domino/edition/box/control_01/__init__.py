@@ -41,7 +41,6 @@ class Control01Data(piece.DData):
                         "value": [self._m1],
                         "multi": True},
             "nothing": {"typ": "bool", "value": False},
-            "jnt_rig": {"typ": "bool", "value": True},
             "leaf_jnt": {"typ": "bool", "value": False},
             "uni_scale": {"typ": "bool", "value": False},
             "neutral_rotation": {"typ": "bool", "value": False},
@@ -125,7 +124,7 @@ class Control01Rig(piece.Rig):
                                   anchor=True,
                                   m=loc)
 
-            if data["jnt_rig"]:
+            if data["create_jnt"]:
                 name = self.naming("", "", "jnt")
                 self.create_jnt(context=context,
                                 parent=None,
@@ -135,7 +134,7 @@ class Control01Rig(piece.Rig):
                                 m=m,
                                 leaf=False,
                                 uni_scale=uni_scale)
-        else:
+        elif data["leaf_jnt"] and data["create_jnt"]:
             name = self.naming("", "", "jnt")
             self.create_jnt(context=context,
                             parent=None,

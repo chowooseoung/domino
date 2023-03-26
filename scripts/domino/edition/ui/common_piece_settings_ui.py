@@ -17,7 +17,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(412, 456)
+        Form.resize(412, 479)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -43,7 +43,7 @@ class Ui_Form(object):
 "}")
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 394, 412))
+        self.page.setGeometry(QRect(0, 0, 394, 435))
         sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
@@ -121,33 +121,14 @@ class Ui_Form(object):
         sizePolicy3.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
         self.label_6.setSizePolicy(sizePolicy3)
 
-        self.gridLayout_2.addWidget(self.label_6, 0, 0, 1, 1)
-
-        self.ref_index_spinBox = QSpinBox(self.groupBox_2)
-        self.ref_index_spinBox.setObjectName(u"ref_index_spinBox")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.ref_index_spinBox.sizePolicy().hasHeightForWidth())
-        self.ref_index_spinBox.setSizePolicy(sizePolicy4)
-        self.ref_index_spinBox.setMinimum(-1)
-        self.ref_index_spinBox.setMaximum(999)
-
-        self.gridLayout_2.addWidget(self.ref_index_spinBox, 0, 1, 1, 1)
-
-        self.label_4 = QLabel(self.groupBox_2)
-        self.label_4.setObjectName(u"label_4")
-        sizePolicy4.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
-        self.label_4.setSizePolicy(sizePolicy4)
-
-        self.gridLayout_2.addWidget(self.label_4, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label_6, 1, 0, 1, 1)
 
         self.custom_jnt_name_pushButton = QPushButton(self.groupBox_2)
         self.custom_jnt_name_pushButton.setObjectName(u"custom_jnt_name_pushButton")
         sizePolicy3.setHeightForWidth(self.custom_jnt_name_pushButton.sizePolicy().hasHeightForWidth())
         self.custom_jnt_name_pushButton.setSizePolicy(sizePolicy3)
 
-        self.gridLayout_2.addWidget(self.custom_jnt_name_pushButton, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.custom_jnt_name_pushButton, 2, 1, 1, 1)
 
         self.groupBox_4 = QGroupBox(self.groupBox_2)
         self.groupBox_4.setObjectName(u"groupBox_4")
@@ -192,7 +173,31 @@ class Ui_Form(object):
         self.horizontalLayout.addWidget(self.orientZ_spinBox)
 
 
-        self.gridLayout_2.addWidget(self.groupBox_4, 2, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.groupBox_4, 3, 0, 1, 2)
+
+        self.label_4 = QLabel(self.groupBox_2)
+        self.label_4.setObjectName(u"label_4")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
+        self.label_4.setSizePolicy(sizePolicy4)
+
+        self.gridLayout_2.addWidget(self.label_4, 2, 0, 1, 1)
+
+        self.ref_index_spinBox = QSpinBox(self.groupBox_2)
+        self.ref_index_spinBox.setObjectName(u"ref_index_spinBox")
+        sizePolicy4.setHeightForWidth(self.ref_index_spinBox.sizePolicy().hasHeightForWidth())
+        self.ref_index_spinBox.setSizePolicy(sizePolicy4)
+        self.ref_index_spinBox.setMinimum(-1)
+        self.ref_index_spinBox.setMaximum(999)
+
+        self.gridLayout_2.addWidget(self.ref_index_spinBox, 1, 1, 1, 1)
+
+        self.create_jnt_checkBox = QCheckBox(self.groupBox_2)
+        self.create_jnt_checkBox.setObjectName(u"create_jnt_checkBox")
+
+        self.gridLayout_2.addWidget(self.create_jnt_checkBox, 0, 0, 1, 1)
 
 
         self.verticalLayout.addWidget(self.groupBox_2)
@@ -357,10 +362,11 @@ class Ui_Form(object):
         self.label_3.setText(QCoreApplication.translate("Form", u"Index", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("Form", u"Joint Settings", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"Ref Index", None))
-        self.label_4.setText(QCoreApplication.translate("Form", u"Custom Name", None))
         self.custom_jnt_name_pushButton.setText(QCoreApplication.translate("Form", u"Edit", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("Form", u"Orient Offset", None))
         self.orientZ_spinBox.setSpecialValueText("")
+        self.label_4.setText(QCoreApplication.translate("Form", u"Custom Name", None))
+        self.create_jnt_checkBox.setText(QCoreApplication.translate("Form", u"Create Joint", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("Form", u"Color Settings", None))
         self.label_8.setText(QCoreApplication.translate("Form", u"Ik", None))
         self.color_ik_pushButton.setText("")

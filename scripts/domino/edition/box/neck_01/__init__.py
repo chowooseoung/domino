@@ -124,10 +124,6 @@ class Neck01Rig(piece.Rig):
         data = self.data(Neck01Data.SELF)
         assembly_data = self.data(Neck01Data.ASSEMBLY)
 
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
-
         ik_color = self.get_ik_ctl_color()
         fk_color = self.get_fk_ctl_color()
 
@@ -292,6 +288,7 @@ class Neck01Rig(piece.Rig):
             pm.connectAttr(ctl.attr("rotate"), parent.attr("rotate"))
         nurbs.constraint(self.deform_volume_crv, self.non_scale_fk_pos)
 
+        # refs
         refs = []
         for i in range(len(self.fk_ctls)):
             anchor = False if i < len(self.fk_ctls) - 1 else True
@@ -299,17 +296,23 @@ class Neck01Rig(piece.Rig):
             m = self.fk_locs[i]
             refs.append(self.create_ref(context=context, name=name, anchor=anchor, m=m))
 
-        parent = None
-        for i, r in enumerate(refs):
-            name = self.naming(f"{i}", _s="jnt")
-            parent = self.create_jnt(context=context,
-                                     parent=parent,
-                                     name=name,
-                                     description=str(i),
-                                     ref=r,
-                                     m=r.getMatrix(worldSpace=True),
-                                     leaf=False,
-                                     uni_scale=uni_scale)
+        # jnts
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
+
+            parent = None
+            for i, r in enumerate(refs):
+                name = self.naming(f"{i}", _s="jnt")
+                parent = self.create_jnt(context=context,
+                                         parent=parent,
+                                         name=name,
+                                         description=str(i),
+                                         ref=r,
+                                         m=r.getMatrix(worldSpace=True),
+                                         leaf=False,
+                                         uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Neck01Rig, self).attributes(context)

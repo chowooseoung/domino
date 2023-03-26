@@ -107,19 +107,6 @@ class Clavicle01Rig(piece.Rig):
         name = self.naming("", "ref", _s="ctl")
         self.clavicle_ref = self.create_ref(context=context, name=name, anchor=False, m=self.clavicle_loc)
 
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
-        name = self.naming("", _s="jnt")
-        self.clavicle_jnt = self.create_jnt(context=context,
-                                            parent=None,
-                                            name=name,
-                                            description="",
-                                            ref=self.clavicle_ref,
-                                            m=look_at_m,
-                                            leaf=False,
-                                            uni_scale=uni_scale)
-
         name = self.naming("orbit", _s="ctl")
         self.orbit_ctl, self.orbit_loc = self.create_ctl(context=context,
                                                          parent=self.clavicle_loc,
@@ -134,6 +121,20 @@ class Clavicle01Rig(piece.Rig):
                                                          width=distance / 2)
         name = self.naming("orbit", "ref", _s="ctl")
         self.orbit_ref = self.create_ref(context=context, name=name, anchor=True, m=self.orbit_loc)
+
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
+            name = self.naming("", _s="jnt")
+            self.clavicle_jnt = self.create_jnt(context=context,
+                                                parent=None,
+                                                name=name,
+                                                description="",
+                                                ref=self.clavicle_ref,
+                                                m=look_at_m,
+                                                leaf=False,
+                                                uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Clavicle01Rig, self).attributes(context)

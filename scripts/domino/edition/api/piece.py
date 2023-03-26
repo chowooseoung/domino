@@ -217,6 +217,8 @@ class DData:
                              "value": 17,
                              "minValue": 0,
                              "maxValue": 31},
+                "create_jnt": {"typ": "bool",
+                               "value": True},
                 "jnt_names": {"typ": "string",
                               "value": ""},
                 "blended_jnt_names": {"typ": "string",

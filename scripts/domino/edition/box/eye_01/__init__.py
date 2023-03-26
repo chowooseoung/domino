@@ -135,22 +135,25 @@ class Eye01Rig(piece.Rig):
                                    display_type=2)
         nurbs.constraint(display_crv, [self.aim_loc, self.ref_source])
 
+        # refs
         name = self.naming("ref", _s="ctl")
         ref = self.create_ref(context=context, name=name, anchor=True, m=self.ref_source)
 
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
+        # jnts
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
 
-        name = self.naming("", _s="jnt")
-        jnt = self.create_jnt(context=context,
-                              parent=None,
-                              name=name,
-                              description="0",
-                              ref=ref,
-                              m=ref.getMatrix(worldSpace=True),
-                              leaf=False,
-                              uni_scale=uni_scale)
+            name = self.naming("", _s="jnt")
+            jnt = self.create_jnt(context=context,
+                                  parent=None,
+                                  name=name,
+                                  description="0",
+                                  ref=ref,
+                                  m=ref.getMatrix(worldSpace=True),
+                                  leaf=False,
+                                  uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Eye01Rig, self).attributes(context)

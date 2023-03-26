@@ -213,22 +213,23 @@ class Finger01Rig(piece.Rig):
                                              anchor=True,
                                              m=obj))
         # jnts
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
 
-        parent = None
-        for i, ref in enumerate(self.refs):
-            name = self.naming(f"{i}", _s="jnt")
-            m = ref.getMatrix(worldSpace=True)
-            parent = self.create_jnt(context=context,
-                                     parent=parent,
-                                     name=name,
-                                     description=f"{i}",
-                                     ref=ref,
-                                     m=m,
-                                     leaf=False,
-                                     uni_scale=uni_scale)
+            parent = None
+            for i, ref in enumerate(self.refs):
+                name = self.naming(f"{i}", _s="jnt")
+                m = ref.getMatrix(worldSpace=True)
+                parent = self.create_jnt(context=context,
+                                         parent=parent,
+                                         name=name,
+                                         description=f"{i}",
+                                         ref=ref,
+                                         m=m,
+                                         leaf=False,
+                                         uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Finger01Rig, self).attributes(context)

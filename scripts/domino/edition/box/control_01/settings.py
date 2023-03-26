@@ -28,9 +28,6 @@ class Settings(CommonPieceSettings):
             ui.nothing_checkBox,
             "nothing")
         self.ui_funcs.install_checkBox(
-            ui.joint_checkBox,
-            "jnt_rig")
-        self.ui_funcs.install_checkBox(
             ui.leaf_joint_checkBox,
             "leaf_jnt")
         self.ui_funcs.install_checkBox(

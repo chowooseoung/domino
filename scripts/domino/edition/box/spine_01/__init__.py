@@ -122,10 +122,6 @@ class Spine01Rig(piece.Rig):
         data = self.data(Spine01Data.SELF)
         assembly_data = self.data(Spine01Data.ASSEMBLY)
 
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
-
         ik_color = self.get_ik_ctl_color()
         fk_color = self.get_fk_ctl_color()
 
@@ -365,6 +361,7 @@ class Spine01Rig(piece.Rig):
         m = matrix.set_matrix_position(look_at_m, start_pos)
         self.fk_0_lock_orient_loc = matrix.transform(parent=root, name=name, m=m)
 
+        # refs
         name = self.naming("pelvis", "ref", _s="ctl")
         refs = [self.create_ref(context=context, name=name, anchor=True, m=self.pelvis_loc)]
 
@@ -374,18 +371,24 @@ class Spine01Rig(piece.Rig):
             m = self.fk_locs[i]
             refs.append(self.create_ref(context=context, name=name, anchor=anchor, m=m))
 
-        parent = None
-        for i, r in enumerate(refs):
-            m = r.getMatrix(worldSpace=True)
-            name = self.naming("pelvis", _s="jnt") if i == 0 else self.naming(f"spine{i - 1}", _s="jnt")
-            parent = self.create_jnt(context=context,
-                                     parent=parent,
-                                     name=name,
-                                     description=str(i),
-                                     ref=r,
-                                     m=m,
-                                     leaf=False,
-                                     uni_scale=uni_scale)
+        # jnts
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
+
+            parent = None
+            for i, r in enumerate(refs):
+                m = r.getMatrix(worldSpace=True)
+                name = self.naming("pelvis", _s="jnt") if i == 0 else self.naming(f"spine{i - 1}", _s="jnt")
+                parent = self.create_jnt(context=context,
+                                         parent=parent,
+                                         name=name,
+                                         description=str(i),
+                                         ref=r,
+                                         m=m,
+                                         leaf=False,
+                                         uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Spine01Rig, self).attributes(context)

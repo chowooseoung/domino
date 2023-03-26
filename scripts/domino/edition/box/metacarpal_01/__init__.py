@@ -155,22 +155,23 @@ class Metacarpal01Rig(piece.Rig):
             self.refs.append(ref)
 
         # jnts
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
-        self.jnts = []
-        jnt = None
-        for i, ref in enumerate(self.refs):
-            name = self.naming(f"{i}", _s="jnt")
-            jnt = self.create_jnt(context=context,
-                                  parent=jnt,
-                                  name=name,
-                                  description=f"{i}",
-                                  ref=ref,
-                                  m=matrices[i],
-                                  leaf=False,
-                                  uni_scale=uni_scale)
-            self.jnts.append(jnt)
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
+            self.jnts = []
+            jnt = None
+            for i, ref in enumerate(self.refs):
+                name = self.naming(f"{i}", _s="jnt")
+                jnt = self.create_jnt(context=context,
+                                      parent=jnt,
+                                      name=name,
+                                      description=f"{i}",
+                                      ref=ref,
+                                      m=matrices[i],
+                                      leaf=False,
+                                      uni_scale=uni_scale)
+                self.jnts.append(jnt)
 
     def attributes(self, context):
         super(Metacarpal01Rig, self).attributes(context)

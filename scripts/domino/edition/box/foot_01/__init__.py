@@ -318,26 +318,27 @@ class Foot01Rig(piece.Rig):
             self.refs.append(ref)
 
         # jnts
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
 
-        self.jnts = []
-        parent = None
-        for i, ref in enumerate(self.refs[1:]):
-            if i == 1:
-                pm.connectAttr(parent.attr("message"), root.attr("jnts")[1])
-            name = self.naming(f"{i}", _s="jnt")
-            m = ref.getMatrix(worldSpace=True)
-            parent = self.create_jnt(context=context,
-                                     parent=parent,
-                                     name=name,
-                                     description=f"{i}",
-                                     ref=ref,
-                                     m=m,
-                                     leaf=False,
-                                     uni_scale=uni_scale)
-            self.jnts.append(parent)
+            self.jnts = []
+            parent = None
+            for i, ref in enumerate(self.refs[1:]):
+                if i == 1:
+                    pm.connectAttr(parent.attr("message"), root.attr("jnts")[1])
+                name = self.naming(f"{i}", _s="jnt")
+                m = ref.getMatrix(worldSpace=True)
+                parent = self.create_jnt(context=context,
+                                         parent=parent,
+                                         name=name,
+                                         description=f"{i}",
+                                         ref=ref,
+                                         m=m,
+                                         leaf=False,
+                                         uni_scale=uni_scale)
+                self.jnts.append(parent)
 
     def attributes(self, context):
         super(Foot01Rig, self).attributes(context)

@@ -119,21 +119,24 @@ class Jaw01Rig(piece.Rig):
         name = self.naming("sliding", "aim", _s="ctl")
         self.sliding_aim = matrix.transform(self.sliding_grp, name, m, True)
 
+        # refs
         name = self.naming("", "ref", _s="ctl")
         ref = self.create_ref(context, name, True, self.sliding_aim)
 
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
-        name = self.naming("", _s="jnt")
-        jnt = self.create_jnt(context=context,
-                              parent=None,
-                              name=name,
-                              description="",
-                              ref=ref,
-                              m=m,
-                              leaf=False,
-                              uni_scale=uni_scale)
+        # jnts
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
+            name = self.naming("", _s="jnt")
+            jnt = self.create_jnt(context=context,
+                                  parent=None,
+                                  name=name,
+                                  description="",
+                                  ref=ref,
+                                  m=m,
+                                  leaf=False,
+                                  uni_scale=uni_scale)
 
     def attributes(self, context):
         super(Jaw01Rig, self).attributes(context)

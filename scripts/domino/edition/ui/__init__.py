@@ -564,6 +564,9 @@ class CommonPieceSettings(DominoDialog):
             ui.index_spinBox,
             "index")
 
+        self.ui_funcs.install_checkBox(
+            ui.create_jnt_checkBox,
+            "create_jnt")
         self.ui_funcs.install_spinBox(
             ui.ref_index_spinBox,
             "custom_ref_index")
@@ -611,7 +614,7 @@ class CommonPieceSettings(DominoDialog):
     def resize_window(self):
         index = self.common_settings.toolBox.currentIndex()
         if index == 0:
-            size = QtCore.QSize(370, 530)
+            size = QtCore.QSize(370, 550)
         else:
             size = self.common_settings.toolBox.currentWidget().sizeHint()
         self.resize(size)

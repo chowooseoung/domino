@@ -778,39 +778,40 @@ class Leg3jnt01Rig(piece.Rig):
                                              anchor=anchor,
                                              m=obj))
         # jnts
-        uni_scale = False
-        if assembly_data["force_uni_scale"]:
-            uni_scale = True
+        if data["create_jnt"]:
+            uni_scale = False
+            if assembly_data["force_uni_scale"]:
+                uni_scale = True
 
-        jnt = None
-        twist_index = 0
-        for i, ref in enumerate(self.refs):
-            if i == 0:
-                name = self.naming("1", _s="jnt")
-            elif i == len(division1_v_values):
-                name = self.naming("2", _s="jnt")
-                twist_index = 0
-            elif i == len(division1_v_values) + len(division2_v_values):
-                name = self.naming("3", _s="jnt")
-                twist_index = 0
-            elif i == len(self.refs) - 1:
-                name = self.naming("4", _s="jnt")
-            elif i < len(division1_v_values):
-                name = self.naming(f"upper{twist_index}", _s="jnt")
-            elif len(division1_v_values) < i < len(division1_v_values) + len(division2_v_values):
-                name = self.naming(f"mid{twist_index}", _s="jnt")
-            else:
-                name = self.naming(f"lower{twist_index}", _s="jnt")
-            m = ref.getMatrix(worldSpace=True)
-            jnt = self.create_jnt(context=context,
-                                  parent=jnt,
-                                  name=name,
-                                  description=f"{i}",
-                                  ref=ref,
-                                  m=m,
-                                  leaf=False,
-                                  uni_scale=uni_scale)
-            twist_index += 1
+            jnt = None
+            twist_index = 0
+            for i, ref in enumerate(self.refs):
+                if i == 0:
+                    name = self.naming("1", _s="jnt")
+                elif i == len(division1_v_values):
+                    name = self.naming("2", _s="jnt")
+                    twist_index = 0
+                elif i == len(division1_v_values) + len(division2_v_values):
+                    name = self.naming("3", _s="jnt")
+                    twist_index = 0
+                elif i == len(self.refs) - 1:
+                    name = self.naming("4", _s="jnt")
+                elif i < len(division1_v_values):
+                    name = self.naming(f"upper{twist_index}", _s="jnt")
+                elif len(division1_v_values) < i < len(division1_v_values) + len(division2_v_values):
+                    name = self.naming(f"mid{twist_index}", _s="jnt")
+                else:
+                    name = self.naming(f"lower{twist_index}", _s="jnt")
+                m = ref.getMatrix(worldSpace=True)
+                jnt = self.create_jnt(context=context,
+                                      parent=jnt,
+                                      name=name,
+                                      description=f"{i}",
+                                      ref=ref,
+                                      m=m,
+                                      leaf=False,
+                                      uni_scale=uni_scale)
+                twist_index += 1
 
     def attributes(self, context):
         super(Leg3jnt01Rig, self).attributes(context)
