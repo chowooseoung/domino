@@ -259,7 +259,8 @@ class Leg3jnt01Rig(piece.Rig):
                                                                  ro=(0, 0, 90))
         name = self.naming("chain2Ikh", "source", _s="ctl")
         self.chain2_ikh_source = matrix.transform(self.third_rot_loc, name, third_rot_m)
-        self.chain2_ikh_source.attr("tx").set(vector.get_distance(positions[-2], positions[-3]))
+        offset = vector.get_distance(positions[-2], positions[-3]) * (-1 if self.ddata.negate else 1)
+        self.chain2_ikh_source.attr("tx").set(offset)
 
         # pin ctl
         name = self.naming("pin1", _s="ctl")
@@ -343,7 +344,7 @@ class Leg3jnt01Rig(piece.Rig):
 
         name = self.naming("chain3", "pos", _s="ctl")
         self.chain3_pos_obj = matrix.transform(root, name, matrix.get_matrix_from_pos(positions[-2]))
-        pm.pointConstraint(self.ik_loc, self.chain3_pos_obj)
+        pm.parentConstraint(self.ik_loc, self.chain3_pos_obj)
 
         n = "chain3Spring" if is_spring else "chain3RP"
         s = "ikSpringSolver" if is_spring else "ikRPsolver"
@@ -381,7 +382,8 @@ class Leg3jnt01Rig(piece.Rig):
                          self.ik_jnts[-2],
                          worldUpType="object",
                          worldUpObject=self.third_rot_auto_obj,
-                         maintainOffset=True)
+                         maintainOffset=True,
+                         aimVector=(-1 if self.ddata.negate else 1, 0, 0))
 
         name = self.naming("display", "crv", _s="ctl")
         self.display_curve = nurbs.create(root,
@@ -1014,7 +1016,7 @@ class Leg3jnt01Rig(piece.Rig):
         else:
             pm.connectAttr(self.roll_attr, self.chain3_ik_ikh.attr("twist"))
         pma = pm.createNode("plusMinusAverage")
-        pm.connectAttr(self.chain3_ik_ikh.attr("twist"), pma.attr("input1D")[0])
+        pm.connectAttr(self.roll_attr, pma.attr("input1D")[0])
         pm.connectAttr(self.upper_roll_attr, pma.attr("input1D")[1])
         pm.connectAttr(pma.attr("output1D"), self.chain2_ik_ikh.attr("twist"))
 
