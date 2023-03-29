@@ -14,7 +14,7 @@ from importlib.machinery import SourceFileLoader
 from . import utils
 from .piece import AbstractSubPiece, Rig
 from ...core import log, matrix
-from .utils import DOMINO_SUB_PIECE_DIR
+from .utils import DOMINO_SUB_PIECE_DIR, DOMINO_TEMPLATE_DIR
 
 dt = pm.datatypes
 
@@ -486,7 +486,17 @@ def extract_guide_from_rig(rig_node=None):
     return create_guide(datas=datas)
 
 
-def save(dotfile):
+def save(dotfile=None):
+    if dotfile is None:
+        file_path = pm.fileDialog2(caption="Save Domino guide",
+                                   startingDirectory=os.getenv(DOMINO_TEMPLATE_DIR, None),
+                                   fileFilter="Domino Guide (*.domino)",
+                                   fileMode=0)
+        if file_path:
+            dotfile = file_path[0]
+    if dotfile is None:
+        return None
+
     selected = pm.ls(selection=True)
     if not selected:
         return None
@@ -507,13 +517,24 @@ def save(dotfile):
                 "datas": None}
     pieces = utils.collect_piece(**argument)
     datas = [p.ddata._data for p in pieces]
+    log.Logger.info(f"Save template\t{dotfile}")
     with open(dotfile, "w") as f:
         json.dump(datas, f, indent=2)
 
 
-def load(dotfile, guide=False, rig=True):
+def load(dotfile=None, guide=False, rig=True):
+    if dotfile is None:
+        file_path = pm.fileDialog2(caption="Load Domino guide",
+                                   startingDirectory=os.getenv(DOMINO_TEMPLATE_DIR, None),
+                                   fileFilter="Domino Guide (*.domino)",
+                                   fileMode=1)
+        if file_path:
+            dotfile = file_path[0]
+    if dotfile is None:
+        return None
     if not os.path.exists(dotfile):
         raise RuntimeError(f"Don't exists {dotfile}")
+    log.Logger.info(f"Load template\t{dotfile}")
     with open(dotfile, "r") as f:
         datas = json.load(f)
     if guide:

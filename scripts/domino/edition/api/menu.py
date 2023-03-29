@@ -33,16 +33,10 @@ if selected:
     domino.edition.api.lib.extract_ctl_shapes(selected)"""
 
 cb_save_guide = """import domino.edition.api.lib
-import pymel.core as pm
-selected = pm.ls(selection=True)
-if selected:
-    domino.edition_api.lib.save(selected[0])"""
+domino.edition.api.lib.save()"""
 
 cb_load_guide = """import domino.edition.api.lib
-import pymel.core as pm
-selected = pm.ls(selection=True)
-if selected:
-    domino.edition_api.lib.save(selected[0])"""
+domino.edition.api.lib.load(guide=True, rig=False)"""
 
 
 def install():
@@ -64,7 +58,6 @@ def install():
 
 
 cb_load_template = """import domino.edition.api.lib
-print("Load template", r"{path}")
 domino.edition.api.lib.load(r"{path}", True, False)"""
 
 
