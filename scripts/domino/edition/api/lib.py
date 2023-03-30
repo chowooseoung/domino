@@ -233,9 +233,7 @@ def create_rig(guide=None, rig=None, datas=None, context=None):
     roots_grp = None
     if rig:
         root = rig.getParent(generations=-1)
-        asset_container = pm.container(query=True, findContainer=root)
-        roots_grp_index = pm.containerPublish(asset_container, query=True, bindNode=True).index("roots")
-        roots_grp = pm.containerPublish(asset_container, query=True, bindNode=True)[roots_grp_index + 1]
+        roots_grp = [x for x in root.getChildren() if "roots" in x.name()][0]
         if not roots_grp:
             raise RuntimeError(f"rig arg must be rigging dag node")
 
