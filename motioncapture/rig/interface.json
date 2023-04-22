@@ -10,11 +10,11 @@
     "Neck1": "neck_C0_1_jnt",
     "Neck2": "neck_C0_2_jnt",
     "Head": "head_C0_jnt",
-    "LeftShoulder": "shoulder_L0_jnt",
+    "LeftShoulder": "clavicle_L0_jnt",
     "LeftArm": "arm_L0_humerus_jnt",
     "LeftForeArm": "arm_L0_elbow_jnt",
     "LeftHand": "arm_L0_wrist_jnt",
-    "RightShoulder": "shoulder_R0_jnt",
+    "RightShoulder": "clavicle_R0_jnt",
     "RightArm": "arm_R0_humerus_jnt",
     "RightForeArm": "arm_R0_elbow_jnt",
     "RightHand": "arm_R0_wrist_jnt",
@@ -124,7 +124,7 @@
       ]
     },
     "LeftShoulder": {
-      "shoulder_L0_ctl": [
+      "clavicle_L0_ctl": [
         "tx",
         "ty",
         "tz",
@@ -162,7 +162,7 @@
       ]
     },
     "RightShoulder": {
-      "shoulder_R0_ctl": [
+      "clavicle_R0_ctl": [
         "tx",
         "ty",
         "tz",

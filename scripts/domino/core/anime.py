@@ -66,8 +66,8 @@ def switch_fk_ik(host, frame_range=[], set_key=False):
         host = pm.PyNode(host)
 
     shoulder_ctl = None
-    if host.hasAttr("shoulder_ctl"):
-        shoulder_ctl = host.attr("shoulder_ctl").inputs()[0]
+    if host.hasAttr("clavicle_ctl"):
+        shoulder_ctl = host.attr("clavicle_ctl").inputs()[0]
 
     current_state = round(host.attr("fk_ik").get(), 0)
     if current_state:
@@ -97,7 +97,6 @@ def switch_fk_ik(host, frame_range=[], set_key=False):
                 pm.setAttr(host.attr("fk_ik"), 0)
             pm.setAttr(shoulder_ctl.attr("r"), next_shoulder_rotate[i])
             cons, aim_obj = fix_auto_clavicle(shoulder_ctl, source[0].getTranslation(worldSpace=True))
-
         if current_state:
             ik_to_fk(source=source, target=target, host=host)
         else:
