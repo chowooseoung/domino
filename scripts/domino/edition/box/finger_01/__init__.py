@@ -258,8 +258,8 @@ class Finger01Rig(piece.Rig):
         data = self.data(Finger01Data.SELF)
         host = self.host()
 
-        pm.connectAttr(self.ik_sc_jnts[0].attr("dagLocalMatrix"), self.sc_space_grp.attr("offsetParentMatrix"))
-        pm.connectAttr(self.ik_sc_jnts[1].attr("dagLocalMatrix"), self.rp_auto_rot_loc.attr("offsetParentMatrix"))
+        pm.connectAttr(self.ik_sc_jnts[0].attr("matrix"), self.sc_space_grp.attr("offsetParentMatrix"))
+        pm.connectAttr(self.ik_sc_jnts[1].attr("matrix"), self.rp_auto_rot_loc.attr("offsetParentMatrix"))
         pm.pointConstraint(self.ik_loc, self.rp_auto_rot_loc)
         if self.ddata.negate:
             md = pm.createNode("multiplyDivide")
@@ -323,9 +323,9 @@ class Finger01Rig(piece.Rig):
         fk2_npo = self.fk2_ctl.getParent()
         if pm.controller(fk2_npo, query=True):
             fk2_npo = fk2_npo.getParent()
-        pm.connectAttr(self.ik_jnts[0].attr("dagLocalMatrix"), fk0_npo.attr("offsetParentMatrix"))
-        pm.connectAttr(self.ik_jnts[1].attr("dagLocalMatrix"), fk1_npo.attr("offsetParentMatrix"))
-        pm.connectAttr(self.ik_jnts[2].attr("dagLocalMatrix"), fk2_npo.attr("offsetParentMatrix"))
+        pm.connectAttr(self.ik_jnts[0].attr("matrix"), fk0_npo.attr("offsetParentMatrix"))
+        pm.connectAttr(self.ik_jnts[1].attr("matrix"), fk1_npo.attr("offsetParentMatrix"))
+        pm.connectAttr(self.ik_jnts[2].attr("matrix"), fk2_npo.attr("offsetParentMatrix"))
 
         # space switch
         if data["ik_space_switch_array"]:

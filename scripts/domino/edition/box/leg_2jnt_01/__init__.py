@@ -576,9 +576,35 @@ class Leg2jnt01Rig(piece.Rig):
                 index = len(upper_jnt_v_values) - 1
                 aim_m = self.leg_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
                 aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-                pm.connectAttr(self.leg_output_objs[index + 1].attr("dagLocalMatrix"),
+                pm.connectAttr(self.leg_output_objs[index + 1].attr("matrix"),
                                aim_m.attr("primaryTargetMatrix"),
                                force=True)
+                decom_m = pm.createNode("decomposeMatrix")
+                pm.connectAttr(uvpin1.attr("outputMatrix")[index], decom_m.attr("inputMatrix"))
+
+                pma = pm.createNode("plusMinusAverage")
+                pma.attr("operation").set(2)
+                pm.connectAttr(decom_m.attr("outputTranslate"), pma.attr("input3D")[1])
+
+                mult_m = pm.createNode("multMatrix")
+                pm.connectAttr(uvpin1.attr("outputMatrix")[index], mult_m.attr("matrixIn")[0])
+                pm.connectAttr(self.root.attr("worldInverseMatrix")[0], mult_m.attr("matrixIn")[1])
+
+                offset_obj = pm.createNode("transform", parent=self.root)
+                pm.connectAttr(mult_m.attr("matrixSum"), offset_obj.attr("offsetParentMatrix"))
+                offset_obj.attr("tz").set(1)
+
+                decom_m = pm.createNode("decomposeMatrix")
+                pm.connectAttr(offset_obj.attr("worldMatrix")[0], decom_m.attr("inputMatrix"))
+                pm.connectAttr(decom_m.attr("outputTranslate"), pma.attr("input3D")[0])
+
+                cons = pm.aimConstraint(self.leg_output_objs[index + 1],
+                                        self.leg_output_objs[index],
+                                        aimVector=(-1, 0, 0) if self.ddata.negate else (1, 0, 0),
+                                        upVector=(0, 0, 1),
+                                        worldUpType="vector",
+                                        worldUpVector=(0, 1, 0))
+                pm.connectAttr(pma.attr("output3D"), cons.attr("worldUpVector"))
         else:
             pm.parentConstraint(self.upper_start_bind, self.leg_output_objs[0])
         if data["support_knee_jnt"] and data["upper_division"] > 1 and data["lower_division"] > 1:

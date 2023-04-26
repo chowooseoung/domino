@@ -1,5 +1,6 @@
 # maya
 from pymel import core as pm
+from maya import cmds as mc
 
 # domino
 from domino.core import matrix
@@ -40,10 +41,11 @@ def add_chain(parent, name, positions, normal, last_orient=None, negate=False, v
 
 
 def ikh(parent, name, chain, solver="ikRPsolver", pole_vector=None):
-    ik_h, _ = pm.ikHandle(name=name,
-                          startJoint=chain[0],
-                          endEffector=chain[-1],
+    ik_h, _ = mc.ikHandle(name=name,
+                          startJoint=chain[0].strip(),
+                          endEffector=chain[-1].strip(),
                           solver=solver)
+    ik_h = pm.PyNode(ik_h)
     pm.setAttr(f"{ik_h}.v", 0)
 
     if parent:

@@ -346,6 +346,7 @@ class Leg3jnt01Rig(piece.Rig):
         self.chain3_pos_obj = matrix.transform(root, name, matrix.get_matrix_from_pos(positions[-2]))
         pm.parentConstraint(self.ik_loc, self.chain3_pos_obj)
 
+        pm.setAttr(self.chain3_ik_jnts[0].attr("r"), lock=True)
         n = "chain3Spring" if is_spring else "chain3RP"
         s = "ikSpringSolver" if is_spring else "ikRPsolver"
         name = self.naming(n, "ikh", _s="ctl")
@@ -354,6 +355,7 @@ class Leg3jnt01Rig(piece.Rig):
                                        self.chain3_ik_jnts,
                                        solver=s,
                                        pole_vector=self.pole_vec_loc)
+        pm.setAttr(self.chain3_ik_jnts[0].attr("r"), lock=False)
         if round(positions[1], 6) != round(self.chain3_ik_jnts[1].getTranslation(worldSpace=True), 6):
             self.chain3_ik_ikh.attr("twist").set(180)
 
@@ -698,9 +700,35 @@ class Leg3jnt01Rig(piece.Rig):
             index = len(division1_v_values) - 1
             aim_m = self.leg_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
             aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-            pm.connectAttr(self.leg_output_objs[index + 1].attr("dagLocalMatrix"),
+            pm.connectAttr(self.leg_output_objs[index + 1].attr("matrix"),
                            aim_m.attr("primaryTargetMatrix"),
                            force=True)
+            decom_m = pm.createNode("decomposeMatrix")
+            pm.connectAttr(uvpin1.attr("outputMatrix")[index], decom_m.attr("inputMatrix"))
+
+            pma = pm.createNode("plusMinusAverage")
+            pma.attr("operation").set(2)
+            pm.connectAttr(decom_m.attr("outputTranslate"), pma.attr("input3D")[1])
+
+            mult_m = pm.createNode("multMatrix")
+            pm.connectAttr(uvpin1.attr("outputMatrix")[index], mult_m.attr("matrixIn")[0])
+            pm.connectAttr(self.root.attr("worldInverseMatrix")[0], mult_m.attr("matrixIn")[1])
+
+            offset_obj = pm.createNode("transform", parent=self.root)
+            pm.connectAttr(mult_m.attr("matrixSum"), offset_obj.attr("offsetParentMatrix"))
+            offset_obj.attr("tz").set(1)
+
+            decom_m = pm.createNode("decomposeMatrix")
+            pm.connectAttr(offset_obj.attr("worldMatrix")[0], decom_m.attr("inputMatrix"))
+            pm.connectAttr(decom_m.attr("outputTranslate"), pma.attr("input3D")[0])
+
+            cons = pm.aimConstraint(self.leg_output_objs[index + 1],
+                                    self.leg_output_objs[index],
+                                    aimVector=(-1, 0, 0) if self.ddata.negate else (1, 0, 0),
+                                    upVector=(0, 0, 1),
+                                    worldUpType="vector",
+                                    worldUpVector=(0, 1, 0))
+            pm.connectAttr(pma.attr("output3D"), cons.attr("worldUpVector"))
         else:
             pm.parentConstraint(self.upper_start_bind, self.leg_output_objs[0])
         if data["division2"] > 1:
@@ -725,9 +753,35 @@ class Leg3jnt01Rig(piece.Rig):
             index = len(division1_v_values) + len(division2_v_values) - 1
             aim_m = self.leg_output_objs[index].attr("offsetParentMatrix").inputs(type="aimMatrix")[0]
             aim_m.attr("primaryInputAxisX").set(-1 if self.ddata.negate else 1)
-            pm.connectAttr(self.leg_output_objs[index + 1].attr("dagLocalMatrix"),
+            pm.connectAttr(self.leg_output_objs[index + 1].attr("matrix"),
                            aim_m.attr("primaryTargetMatrix"),
                            force=True)
+            decom_m = pm.createNode("decomposeMatrix")
+            pm.connectAttr(uvpin2.attr("outputMatrix")[len(division2_v_values) - 1], decom_m.attr("inputMatrix"))
+
+            pma = pm.createNode("plusMinusAverage")
+            pma.attr("operation").set(2)
+            pm.connectAttr(decom_m.attr("outputTranslate"), pma.attr("input3D")[1])
+
+            mult_m = pm.createNode("multMatrix")
+            pm.connectAttr(uvpin2.attr("outputMatrix")[len(division2_v_values) - 1], mult_m.attr("matrixIn")[0])
+            pm.connectAttr(self.root.attr("worldInverseMatrix")[0], mult_m.attr("matrixIn")[1])
+
+            offset_obj = pm.createNode("transform", parent=self.root)
+            pm.connectAttr(mult_m.attr("matrixSum"), offset_obj.attr("offsetParentMatrix"))
+            offset_obj.attr("tz").set(1)
+
+            decom_m = pm.createNode("decomposeMatrix")
+            pm.connectAttr(offset_obj.attr("worldMatrix")[0], decom_m.attr("inputMatrix"))
+            pm.connectAttr(decom_m.attr("outputTranslate"), pma.attr("input3D")[0])
+
+            cons = pm.aimConstraint(self.leg_output_objs[index + 1],
+                                    self.leg_output_objs[index],
+                                    aimVector=(-1, 0, 0) if self.ddata.negate else (1, 0, 0),
+                                    upVector=(0, 0, 1),
+                                    worldUpType="vector",
+                                    worldUpVector=(0, 1, 0))
+            pm.connectAttr(pma.attr("output3D"), cons.attr("worldUpVector"))
         else:
             pm.parentConstraint(self.mid_start_bind, self.leg_output_objs[1])
         if data["division3"] > 1:

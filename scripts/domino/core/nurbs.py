@@ -176,7 +176,7 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
                         weightDistribution=1,
                         removeUnusedInfluence=False,
                         nurbsSamples=6)
-    sc.attr("relativeSpaceMode").set(1)
+    # sc.attr("relativeSpaceMode").set(1)
 
     name = name_format.format("uniformCrv")
     uniform_crv, iso = pm.duplicateCurve(nurbs_surf.u[1],
@@ -193,10 +193,10 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
     nurbs_surf_shape, orig = nurbs_surf.getShapes()
 
     uvpin = pm.createNode("uvPin")
-    uvpin.attr("relativeSpaceMode").set(2)
+    # uvpin.attr("relativeSpaceMode").set(2)
     pm.connectAttr(orig.attr("local"), uvpin.attr("originalGeometry"))
     pm.connectAttr(nurbs_surf.attr("local"), uvpin.attr("deformedGeometry"))
-    uvpin.attr("relativeSpaceMatrix").set(parent.attr("worldMatrix")[0].get())
+    # uvpin.attr("relativeSpaceMatrix").set(parent.attr("worldMatrix")[0].get())
     uvpin.attr("normalAxis").set(normal_axis)
 
     for i, x in enumerate(v_values):
@@ -227,10 +227,17 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
         aim_m = pm.createNode("aimMatrix")
         aim_m.attr("primaryInputAxisX").set(x_axis)
         aim_m.attr("secondaryMode").set(2)
-        pm.connectAttr(uvpin.attr("outputMatrix")[i], aim_m.attr("inputMatrix"))
+        mult_m = pm.createNode("multMatrix")
+        pm.connectAttr(uvpin.attr("outputMatrix")[i], mult_m.attr("matrixIn")[0])
+        pm.connectAttr(parent.attr("worldInverseMatrix")[0], mult_m.attr("matrixIn")[1])
+        pm.connectAttr(mult_m.attr("matrixSum"), aim_m.attr("inputMatrix"))
 
-        pm.connectAttr(uvpin.attr("outputMatrix")[next_i], aim_m.attr("primaryTargetMatrix"))
-        pm.connectAttr(uvpin.attr("outputMatrix")[next_i], aim_m.attr("secondaryTargetMatrix"))
+        mult_m = pm.createNode("multMatrix")
+        pm.connectAttr(uvpin.attr("outputMatrix")[next_i], mult_m.attr("matrixIn")[0])
+        pm.connectAttr(parent.attr("worldInverseMatrix")[0], mult_m.attr("matrixIn")[1])
+
+        pm.connectAttr(mult_m.attr("matrixSum"), aim_m.attr("primaryTargetMatrix"))
+        pm.connectAttr(mult_m.attr("matrixSum"), aim_m.attr("secondaryTargetMatrix"))
         pm.connectAttr(aim_m.attr("outputMatrix"), outputs[i].attr("offsetParentMatrix"))
     return uvpin
 

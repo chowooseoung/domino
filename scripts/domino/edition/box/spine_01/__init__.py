@@ -705,8 +705,8 @@ class Spine01Rig(piece.Rig):
 
                 pm.connectAttr(lock_orient, pb.attr("inRotate2"))
                 pm.connectAttr(pb.attr("outRotate"), self.sp_chain[-1].attr("r"))
-            pm.connectAttr(self.sp_chain[i].attr("dagLocalMatrix"), npo.attr("offsetParentMatrix"))
-            pm.connectAttr(self.sp_chain[i].attr("dagLocalMatrix"), self.non_scale_fk_pos[i].attr("offsetParentMatrix"))
+            pm.connectAttr(self.sp_chain[i].attr("matrix"), npo.attr("offsetParentMatrix"))
+            pm.connectAttr(self.sp_chain[i].attr("matrix"), self.non_scale_fk_pos[i].attr("offsetParentMatrix"))
 
         pm.connectAttr(self.sp_chain[0].attr("t"), self.fk_0_lock_orient_loc.attr("t"))
         pm.connectAttr(self.sp_chain[0].attr("s"), self.fk_0_lock_orient_loc.attr("s"))
