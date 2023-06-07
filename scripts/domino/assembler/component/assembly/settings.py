@@ -319,11 +319,16 @@ class CustomStep(assembler.CustomStep):
         self.ui_funcs.update_listWidget(self.custom_step_listWidget, "custom_step")
 
     def edit_custom_step(self):
+        custom_step_dir = os.getenv(DOMINO_CUSTOM_STEP_DIR, "")
         items = self.custom_step_listWidget.selectedItems()
         if not items:
             return
         data = items[0].text()
         full_path = data.split(" | ")[-1]
+
+        custom_step_dir_path = os.path.join(custom_step_dir, full_path)
+        if os.path.exists(custom_step_dir_path):
+            full_path = custom_step_dir_path
 
         if full_path:
             try:
@@ -343,6 +348,7 @@ class CustomStep(assembler.CustomStep):
         self.ui_funcs.remove_items_listWidget(self.custom_step_listWidget, "custom_step")
 
     def run_custom_step(self):
+        custom_step_dir = os.getenv(DOMINO_CUSTOM_STEP_DIR, "")
         items = self.custom_step_listWidget.selectedItems()
         if items:
             context = {}
@@ -350,10 +356,14 @@ class CustomStep(assembler.CustomStep):
                 script_info = item.text().split(" | ")
                 if len(script_info) < 2:
                     continue
+                custom_step_dir_path = os.path.join(custom_step_dir, script_info[1])
+                if os.path.exists(custom_step_dir_path):
+                    script_info[1] = custom_step_dir_path
                 assembler.run_script(context, *script_info)
 
     def localize_custom_step(self):
         root_dir = mc.workspace(query=True, rootDirectory=True)
+        custom_step_dir = os.getenv(DOMINO_CUSTOM_STEP_DIR, "")
         scripts_dir = os.path.join(root_dir, mc.workspace(fileRuleEntry="scripts"))
         items = self.custom_step_listWidget.selectedItems()
         if items:
@@ -362,6 +372,10 @@ class CustomStep(assembler.CustomStep):
                 script_info = orig_str.split(" | ")
                 if len(script_info) < 2:
                     continue
+                custom_step_dir_path = os.path.join(custom_step_dir, script_info[1])
+                if os.path.exists(custom_step_dir_path):
+                    script_info[1] = custom_step_dir_path
+
                 new_path = os.path.normpath(os.path.join(scripts_dir, os.path.basename(script_info[1])))
                 new_str = " | ".join([script_info[0], new_path])
                 item.setText(new_str)
