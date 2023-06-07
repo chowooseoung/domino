@@ -648,7 +648,7 @@ class Rig(assembler.Rig):
                                   self.generate_name("lower", "{}", "ctl"),
                                   positions[1:3],
                                   normal,
-                                  sorted(lower_jnt_v_values),
+                                  sorted(lower_jnt_v_values)[:-1],
                                   lower_bind_jnts,
                                   flexible1_uniform_attr,
                                   self.arm_output_nodes[len(upper_jnt_v_values):],
