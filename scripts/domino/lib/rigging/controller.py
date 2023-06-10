@@ -25,9 +25,7 @@ def add_ctl(parent, name, m, parent_ctl=None, attrs=(), mirror_config=(0,) * 9, 
 
     mc.addAttr(ctl, longName="is_ctl", attributeType="bool", keyable=False)
 
-    lock_hide_attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "ro", "v"]
-    mc.setAttr(ctl + ".ro", lock=False)
-    mc.setAttr(ctl + ".ro", keyable=True)
+    lock_hide_attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
     [lock_hide_attrs.remove(x) for x in attrs]
     [mc.setAttr(ctl + "." + attr, lock=True) for attr in lock_hide_attrs]
     [mc.setAttr(ctl + "." + attr, keyable=False) for attr in lock_hide_attrs]
