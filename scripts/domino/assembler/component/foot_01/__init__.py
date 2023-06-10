@@ -139,8 +139,6 @@ class Rig(assembler.Rig):
                                                            "ro": (0, 0, 90)
                                                        },
                                                        mirror_ctl_name=self.generate_name("roll", "", "ctl", True))
-        mc.setAttr(self.roll_ctl + ".rotateOrder", 5)
-        mc.setAttr(self.roll_ctl + ".rotateOrder", lock=True)
 
         self.in_ctl, self.in_loc = self.create_ctl(context=context,
                                                    parent=root,
