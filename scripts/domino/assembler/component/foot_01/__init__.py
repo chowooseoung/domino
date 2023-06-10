@@ -126,7 +126,7 @@ class Rig(assembler.Rig):
                                                        parent=root,
                                                        name=self.generate_name("roll", "", "ctl"),
                                                        parent_ctl=None,
-                                                       attrs=["rx", "rz", "ro"],
+                                                       attrs=["rx", "rz"],
                                                        m=m,
                                                        cns=False,
                                                        mirror_config=(1, 1, 1, 0, 0, 0, 0, 0, 0),

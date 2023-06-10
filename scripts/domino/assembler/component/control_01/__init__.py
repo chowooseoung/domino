@@ -108,7 +108,7 @@ class Rig(assembler.Rig):
             uni_scale = True
         if not data["leaf_jnt"]:
             mul_size = om2.MTransformationMatrix(om2.MMatrix(data["anchors"][0])).scale(om2.MSpace.kWorld)[2]
-            attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx", "sy", "sz"]
+            attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"]
             key_attrs = [attr for attr in attrs if data["k_" + attr]]
             mirror_config = (0, 0, 0, 0, 0, 0, 0, 0, 0) if data["mirror_behaviour"] else (0, 0, 1, 1, 1, 0, 0, 0, 0)
             self.ctl, loc = self.create_ctl(context=context,

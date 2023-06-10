@@ -164,7 +164,7 @@ class Rig(assembler.Rig):
                                                      name="sub{0}".format(i) + "_ctl",
                                                      m=m,
                                                      parent_ctl=parent_ctl,
-                                                     attrs=("tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx", "sy", "sz"),
+                                                     attrs=("tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"),
                                                      mirror_config=(),
                                                      shape_args={
                                                          "shape": "wave",

@@ -87,7 +87,7 @@ class Rig(assembler.Rig):
                                              name=self.generate_name("", "", "ctl"),
                                              parent_ctl=None,
                                              attrs=["tx", "ty", "tz",
-                                                    "rx", "ry", "rz", "ro",
+                                                    "rx", "ry", "rz",
                                                     "sx", "sy", "sz"],
                                              m=m,
                                              cns=False,

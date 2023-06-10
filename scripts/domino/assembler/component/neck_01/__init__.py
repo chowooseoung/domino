@@ -243,7 +243,7 @@ class Rig(assembler.Rig):
                                              name=self.generate_name("fk" + str(i), "", "ctl"),
                                              parent_ctl=parent_ctl,
                                              attrs=["tx", "ty", "tz",
-                                                    "rx", "ry", "rz", "ro",
+                                                    "rx", "ry", "rz",
                                                     "sx", "sy", "sz"],
                                              m=m,
                                              cns=False,
