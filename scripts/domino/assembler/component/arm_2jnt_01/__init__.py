@@ -1155,6 +1155,7 @@ class Rig(assembler.Rig):
                                                pole_vector=self.pole_vec_loc)
             mc.pointConstraint(self.ik_local_loc, self.auto_clavicle_ikh)
             mc.connectAttr(self.fk_ik_attr, self.auto_clavicle_ikh + ".ikBlend")
+            mc.connectAttr(self.fk0_ctl + ".rotateOrder", self.auto_clavicle_jnts[0] + ".rotateOrder")
 
             self.auto_clavicle_aim_jnt = joint.add_joint(clavicle_root,
                                                          self.generate_name("autoClavicleAim", "", "jnt"),
