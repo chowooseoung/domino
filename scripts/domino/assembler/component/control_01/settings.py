@@ -41,6 +41,9 @@ class Settings(CommonComponentSettings):
         self.ui_funcs.install_spinBox(
             ui.ctl_size_doubleSpinBox,
             "ctl_size")
+        self.ui_funcs.install_checkBox(
+            ui.move_pivot_checkBox,
+            "move_pivot")
         self.ui_funcs.install_comboBox(
             ui.icon_comboBox,
             "icon")

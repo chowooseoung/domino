@@ -1,6 +1,6 @@
 # domino
-from domino.lib import matrix
-from domino.lib.rigging import operators, callback
+from domino.lib import matrix, attribute, icon
+from domino.lib.rigging import operators, callback, nurbs
 from domino import assembler
 
 # built-ins
@@ -9,6 +9,7 @@ import uuid
 
 # maya
 from maya.api import OpenMaya as om2
+from maya import cmds as mc
 
 
 class Author:
@@ -44,6 +45,7 @@ def component_preset():
         "default_rotate_order": {"type": "enum", "enumName": "xyz:yzx:zxy:xzy:yxz:zyx"},
         "space_switch_array": {"type": "string"},
         "ctl_size": {"type": "double"},
+        "move_pivot": {"type": "bool"}
     })
     common_preset["value"].update({
         "component": Author.component,
@@ -71,6 +73,7 @@ def component_preset():
         "k_sz": True,
         "default_rotate_order": "xyz",
         "ctl_size": 1,
+        "move_pivot": False
     })
     return common_preset
 
@@ -131,6 +134,28 @@ class Rig(assembler.Rig):
                                   name=self.generate_name("", "ref", "ctl"),
                                   anchor=True,
                                   m=loc)
+            if data["move_pivot"]:
+                self.pivot_ctl = icon.create(parent=loc,
+                                             name=self.generate_name("pivot", "", "ctl"),
+                                             shape="locator",
+                                             color=om2.MColor((0, 1, 1)),
+                                             m=m,
+                                             width=data["ctl_size"] * mul_size * 0.8,
+                                             height=data["ctl_size"] * mul_size * 0.8,
+                                             depth=data["ctl_size"] * mul_size * 0.8,
+                                             thickness=1,
+                                             po=(0, 0, 0),
+                                             ro=(0, 0, 0))
+                attrs = ["rx", "ry", "rz", "sx", "sy", "sz"]
+                [mc.setAttr(self.pivot_ctl + "." + attr, lock=True) for attr in attrs]
+                [mc.setAttr(self.pivot_ctl + "." + attr, keyable=False) for attr in attrs + ["v"]]
+                self.dp_crv = nurbs.create(parent=self.root,
+                                           name=self.generate_name("dp", "crv", "ctl"),
+                                           degree=1,
+                                           positions=((0, 0, 0), (1, 1, 1)),
+                                           display_type=2)
+                nurbs.constraint(self.dp_crv, [self.ctl, self.pivot_ctl])
+
             if data["create_jnt"]:
                 self.create_jnt(context=context,
                                 parent=None,
@@ -152,10 +177,24 @@ class Rig(assembler.Rig):
 
     def attributes(self, context):
         super().attributes(context)
+        data = self.component.data["value"]
+
+        if data["move_pivot"]:
+            self.pivot_vis_attr = attribute.add_attr(self.ctl,
+                                                     longName="pivot_vis",
+                                                     type="bool",
+                                                     keyable=True,
+                                                     defaultValue=False)
 
     def operators(self, context):
         super().operators(context)
         data = self.component.data["value"]
+
+        if data["move_pivot"] and not data["leaf_jnt"]:
+            mc.connectAttr(self.pivot_ctl + ".t", self.ctl + ".rotatePivot")
+            mc.connectAttr(self.pivot_ctl + ".t", self.ctl + ".scalePivot")
+            mc.connectAttr(self.pivot_vis_attr, self.pivot_ctl + ".v")
+            mc.connectAttr(self.pivot_vis_attr, self.dp_crv + ".v")
 
         if data["nothing"]:
             return None

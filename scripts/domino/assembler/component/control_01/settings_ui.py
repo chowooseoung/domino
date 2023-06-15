@@ -24,20 +24,28 @@ class Ui_Form(object):
         self.groupBox.setObjectName(u"groupBox")
         self.gridLayout_3 = QGridLayout(self.groupBox)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.leaf_joint_checkBox = QCheckBox(self.groupBox)
-        self.leaf_joint_checkBox.setObjectName(u"leaf_joint_checkBox")
+        self.neutral_rotation_checkBox = QCheckBox(self.groupBox)
+        self.neutral_rotation_checkBox.setObjectName(u"neutral_rotation_checkBox")
 
-        self.gridLayout_3.addWidget(self.leaf_joint_checkBox, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.neutral_rotation_checkBox, 3, 0, 1, 1)
 
-        self.uni_scale_checkBox = QCheckBox(self.groupBox)
-        self.uni_scale_checkBox.setObjectName(u"uni_scale_checkBox")
+        self.label = QLabel(self.groupBox)
+        self.label.setObjectName(u"label")
 
-        self.gridLayout_3.addWidget(self.uni_scale_checkBox, 3, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.label, 6, 0, 1, 1)
 
         self.label_2 = QLabel(self.groupBox)
         self.label_2.setObjectName(u"label_2")
 
         self.gridLayout_3.addWidget(self.label_2, 7, 0, 1, 1)
+
+        self.ctl_size_doubleSpinBox = QDoubleSpinBox(self.groupBox)
+        self.ctl_size_doubleSpinBox.setObjectName(u"ctl_size_doubleSpinBox")
+        self.ctl_size_doubleSpinBox.setMinimum(0.010000000000000)
+        self.ctl_size_doubleSpinBox.setMaximum(999.000000000000000)
+        self.ctl_size_doubleSpinBox.setValue(1.000000000000000)
+
+        self.gridLayout_3.addWidget(self.ctl_size_doubleSpinBox, 6, 1, 1, 1)
 
         self.icon_comboBox = QComboBox(self.groupBox)
         self.icon_comboBox.addItem("")
@@ -61,38 +69,30 @@ class Ui_Form(object):
 
         self.gridLayout_3.addWidget(self.icon_comboBox, 7, 1, 1, 1)
 
-        self.label = QLabel(self.groupBox)
-        self.label.setObjectName(u"label")
+        self.mirror_behaviour_checkBox = QCheckBox(self.groupBox)
+        self.mirror_behaviour_checkBox.setObjectName(u"mirror_behaviour_checkBox")
 
-        self.gridLayout_3.addWidget(self.label, 6, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.mirror_behaviour_checkBox, 4, 0, 1, 1)
+
+        self.leaf_joint_checkBox = QCheckBox(self.groupBox)
+        self.leaf_joint_checkBox.setObjectName(u"leaf_joint_checkBox")
+
+        self.gridLayout_3.addWidget(self.leaf_joint_checkBox, 1, 0, 1, 1)
+
+        self.uni_scale_checkBox = QCheckBox(self.groupBox)
+        self.uni_scale_checkBox.setObjectName(u"uni_scale_checkBox")
+
+        self.gridLayout_3.addWidget(self.uni_scale_checkBox, 2, 0, 1, 1)
 
         self.nothing_checkBox = QCheckBox(self.groupBox)
         self.nothing_checkBox.setObjectName(u"nothing_checkBox")
 
         self.gridLayout_3.addWidget(self.nothing_checkBox, 0, 0, 1, 1)
 
-        self.ctl_size_doubleSpinBox = QDoubleSpinBox(self.groupBox)
-        self.ctl_size_doubleSpinBox.setObjectName(u"ctl_size_doubleSpinBox")
-        self.ctl_size_doubleSpinBox.setMinimum(0.010000000000000)
-        self.ctl_size_doubleSpinBox.setMaximum(999.000000000000000)
-        self.ctl_size_doubleSpinBox.setValue(1.000000000000000)
+        self.move_pivot_checkBox = QCheckBox(self.groupBox)
+        self.move_pivot_checkBox.setObjectName(u"move_pivot_checkBox")
 
-        self.gridLayout_3.addWidget(self.ctl_size_doubleSpinBox, 6, 1, 1, 1)
-
-        self.joint_checkBox = QCheckBox(self.groupBox)
-        self.joint_checkBox.setObjectName(u"joint_checkBox")
-
-        self.gridLayout_3.addWidget(self.joint_checkBox, 1, 0, 1, 1)
-
-        self.neutral_rotation_checkBox = QCheckBox(self.groupBox)
-        self.neutral_rotation_checkBox.setObjectName(u"neutral_rotation_checkBox")
-
-        self.gridLayout_3.addWidget(self.neutral_rotation_checkBox, 4, 0, 1, 1)
-
-        self.mirror_behaviour_checkBox = QCheckBox(self.groupBox)
-        self.mirror_behaviour_checkBox.setObjectName(u"mirror_behaviour_checkBox")
-
-        self.gridLayout_3.addWidget(self.mirror_behaviour_checkBox, 5, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.move_pivot_checkBox, 5, 0, 1, 1)
 
 
         self.verticalLayout.addWidget(self.groupBox)
@@ -215,8 +215,8 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.groupBox.setTitle("")
-        self.leaf_joint_checkBox.setText(QCoreApplication.translate("Form", u"Leaf Joint", None))
-        self.uni_scale_checkBox.setText(QCoreApplication.translate("Form", u"Uni Scale", None))
+        self.neutral_rotation_checkBox.setText(QCoreApplication.translate("Form", u"Neutral Rotation", None))
+        self.label.setText(QCoreApplication.translate("Form", u"Ctl Size", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"Icon", None))
         self.icon_comboBox.setItemText(0, QCoreApplication.translate("Form", u"origin", None))
         self.icon_comboBox.setItemText(1, QCoreApplication.translate("Form", u"host", None))
@@ -231,11 +231,11 @@ class Ui_Form(object):
         self.icon_comboBox.setItemText(10, QCoreApplication.translate("Form", u"x", None))
         self.icon_comboBox.setItemText(11, QCoreApplication.translate("Form", u"angle", None))
 
-        self.label.setText(QCoreApplication.translate("Form", u"Ctl Size", None))
-        self.nothing_checkBox.setText(QCoreApplication.translate("Form", u"Nothing", None))
-        self.joint_checkBox.setText(QCoreApplication.translate("Form", u"Joint", None))
-        self.neutral_rotation_checkBox.setText(QCoreApplication.translate("Form", u"Neutral Rotation", None))
         self.mirror_behaviour_checkBox.setText(QCoreApplication.translate("Form", u"Mirror Behaviour", None))
+        self.leaf_joint_checkBox.setText(QCoreApplication.translate("Form", u"Leaf Joint", None))
+        self.uni_scale_checkBox.setText(QCoreApplication.translate("Form", u"Uni Scale", None))
+        self.nothing_checkBox.setText(QCoreApplication.translate("Form", u"Nothing", None))
+        self.move_pivot_checkBox.setText(QCoreApplication.translate("Form", u"Move Pivot", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("Form", u"Keyable", None))
         self.rotate_pushButton.setText(QCoreApplication.translate("Form", u"Rotate", None))
         self.tx_checkBox.setText(QCoreApplication.translate("Form", u"tx", None))
