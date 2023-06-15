@@ -28,7 +28,7 @@ def dump(file_path=None):
 
     node = node[0] if hierarchy.is_assembly(node[0]) else hierarchy.get_parent(node[0], generations=-1)
     if mc.attributeQuery("is_guide", node=node, exists=True):
-        node_hierarchy = assembler.get_guide_hierarchy(node)
+        node_hierarchy = assembler.get_guide_hierarchy(node, full_path=True)
     elif mc.attributeQuery("is_rig", node=node, exists=True):
         assembly_node = mc.listConnections(node + ".assembly_node", source=False, destination=True)[0]
         node_hierarchy = assembler.get_rig_hierarchy(assembly_node)
