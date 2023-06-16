@@ -67,9 +67,6 @@ class Settings(CommonComponentSettings):
             ui.rz_checkBox,
             "k_rz")
         self.ui_funcs.install_checkBox(
-            ui.ro_checkBox,
-            "k_ro")
-        self.ui_funcs.install_checkBox(
             ui.sx_checkBox,
             "k_sx")
         self.ui_funcs.install_checkBox(
@@ -93,7 +90,7 @@ class Settings(CommonComponentSettings):
             [ui.tx_checkBox, ui.ty_checkBox, ui.tz_checkBox])
         self.ui_funcs.install_checkBox_toggle_pushButton(
             ui.rotate_pushButton,
-            [ui.rx_checkBox, ui.ry_checkBox, ui.rz_checkBox, ui.ro_checkBox])
+            [ui.rx_checkBox, ui.ry_checkBox, ui.rz_checkBox])
         self.ui_funcs.install_checkBox_toggle_pushButton(
             ui.scale_pushButton,
             [ui.sx_checkBox, ui.sy_checkBox, ui.sz_checkBox])

@@ -17,7 +17,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(328, 502)
+        Form.resize(328, 480)
         self.verticalLayout = QVBoxLayout(Form)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(Form)
@@ -101,6 +101,22 @@ class Ui_Form(object):
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.gridLayout = QGridLayout(self.groupBox_2)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.ro_comboBox = QComboBox(self.groupBox_2)
+        self.ro_comboBox.addItem("")
+        self.ro_comboBox.addItem("")
+        self.ro_comboBox.addItem("")
+        self.ro_comboBox.addItem("")
+        self.ro_comboBox.addItem("")
+        self.ro_comboBox.addItem("")
+        self.ro_comboBox.setObjectName(u"ro_comboBox")
+
+        self.gridLayout.addWidget(self.ro_comboBox, 4, 1, 1, 1)
+
+        self.scale_pushButton = QPushButton(self.groupBox_2)
+        self.scale_pushButton.setObjectName(u"scale_pushButton")
+
+        self.gridLayout.addWidget(self.scale_pushButton, 0, 2, 1, 1)
+
         self.rotate_pushButton = QPushButton(self.groupBox_2)
         self.rotate_pushButton.setObjectName(u"rotate_pushButton")
 
@@ -116,25 +132,30 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.sy_checkBox, 2, 2, 1, 1)
 
-        self.ty_checkBox = QCheckBox(self.groupBox_2)
-        self.ty_checkBox.setObjectName(u"ty_checkBox")
+        self.ry_checkBox = QCheckBox(self.groupBox_2)
+        self.ry_checkBox.setObjectName(u"ry_checkBox")
 
-        self.gridLayout.addWidget(self.ty_checkBox, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.ry_checkBox, 2, 1, 1, 1)
 
         self.tz_checkBox = QCheckBox(self.groupBox_2)
         self.tz_checkBox.setObjectName(u"tz_checkBox")
 
         self.gridLayout.addWidget(self.tz_checkBox, 3, 0, 1, 1)
 
-        self.ry_checkBox = QCheckBox(self.groupBox_2)
-        self.ry_checkBox.setObjectName(u"ry_checkBox")
-
-        self.gridLayout.addWidget(self.ry_checkBox, 2, 1, 1, 1)
-
         self.sx_checkBox = QCheckBox(self.groupBox_2)
         self.sx_checkBox.setObjectName(u"sx_checkBox")
 
         self.gridLayout.addWidget(self.sx_checkBox, 1, 2, 1, 1)
+
+        self.rz_checkBox = QCheckBox(self.groupBox_2)
+        self.rz_checkBox.setObjectName(u"rz_checkBox")
+
+        self.gridLayout.addWidget(self.rz_checkBox, 3, 1, 1, 1)
+
+        self.ty_checkBox = QCheckBox(self.groupBox_2)
+        self.ty_checkBox.setObjectName(u"ty_checkBox")
+
+        self.gridLayout.addWidget(self.ty_checkBox, 2, 0, 1, 1)
 
         self.rx_checkBox = QCheckBox(self.groupBox_2)
         self.rx_checkBox.setObjectName(u"rx_checkBox")
@@ -150,32 +171,6 @@ class Ui_Form(object):
         self.translate_pushButton.setObjectName(u"translate_pushButton")
 
         self.gridLayout.addWidget(self.translate_pushButton, 0, 0, 1, 1)
-
-        self.scale_pushButton = QPushButton(self.groupBox_2)
-        self.scale_pushButton.setObjectName(u"scale_pushButton")
-
-        self.gridLayout.addWidget(self.scale_pushButton, 0, 2, 1, 1)
-
-        self.rz_checkBox = QCheckBox(self.groupBox_2)
-        self.rz_checkBox.setObjectName(u"rz_checkBox")
-
-        self.gridLayout.addWidget(self.rz_checkBox, 3, 1, 1, 1)
-
-        self.ro_checkBox = QCheckBox(self.groupBox_2)
-        self.ro_checkBox.setObjectName(u"ro_checkBox")
-
-        self.gridLayout.addWidget(self.ro_checkBox, 4, 1, 1, 1)
-
-        self.ro_comboBox = QComboBox(self.groupBox_2)
-        self.ro_comboBox.addItem("")
-        self.ro_comboBox.addItem("")
-        self.ro_comboBox.addItem("")
-        self.ro_comboBox.addItem("")
-        self.ro_comboBox.addItem("")
-        self.ro_comboBox.addItem("")
-        self.ro_comboBox.setObjectName(u"ro_comboBox")
-
-        self.gridLayout.addWidget(self.ro_comboBox, 5, 1, 1, 1)
 
 
         self.verticalLayout.addWidget(self.groupBox_2)
@@ -237,19 +232,6 @@ class Ui_Form(object):
         self.nothing_checkBox.setText(QCoreApplication.translate("Form", u"Nothing", None))
         self.move_pivot_checkBox.setText(QCoreApplication.translate("Form", u"Move Pivot", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("Form", u"Keyable", None))
-        self.rotate_pushButton.setText(QCoreApplication.translate("Form", u"Rotate", None))
-        self.tx_checkBox.setText(QCoreApplication.translate("Form", u"tx", None))
-        self.sy_checkBox.setText(QCoreApplication.translate("Form", u"sy", None))
-        self.ty_checkBox.setText(QCoreApplication.translate("Form", u"ty", None))
-        self.tz_checkBox.setText(QCoreApplication.translate("Form", u"tz", None))
-        self.ry_checkBox.setText(QCoreApplication.translate("Form", u"ry", None))
-        self.sx_checkBox.setText(QCoreApplication.translate("Form", u"sx", None))
-        self.rx_checkBox.setText(QCoreApplication.translate("Form", u"rx", None))
-        self.sz_checkBox.setText(QCoreApplication.translate("Form", u"sz", None))
-        self.translate_pushButton.setText(QCoreApplication.translate("Form", u"Translate", None))
-        self.scale_pushButton.setText(QCoreApplication.translate("Form", u"Scale", None))
-        self.rz_checkBox.setText(QCoreApplication.translate("Form", u"rz", None))
-        self.ro_checkBox.setText(QCoreApplication.translate("Form", u"ro", None))
         self.ro_comboBox.setItemText(0, QCoreApplication.translate("Form", u"xyz", None))
         self.ro_comboBox.setItemText(1, QCoreApplication.translate("Form", u"yzx", None))
         self.ro_comboBox.setItemText(2, QCoreApplication.translate("Form", u"zxy", None))
@@ -257,6 +239,18 @@ class Ui_Form(object):
         self.ro_comboBox.setItemText(4, QCoreApplication.translate("Form", u"yxz", None))
         self.ro_comboBox.setItemText(5, QCoreApplication.translate("Form", u"zyx", None))
 
+        self.scale_pushButton.setText(QCoreApplication.translate("Form", u"Scale", None))
+        self.rotate_pushButton.setText(QCoreApplication.translate("Form", u"Rotate", None))
+        self.tx_checkBox.setText(QCoreApplication.translate("Form", u"tx", None))
+        self.sy_checkBox.setText(QCoreApplication.translate("Form", u"sy", None))
+        self.ry_checkBox.setText(QCoreApplication.translate("Form", u"ry", None))
+        self.tz_checkBox.setText(QCoreApplication.translate("Form", u"tz", None))
+        self.sx_checkBox.setText(QCoreApplication.translate("Form", u"sx", None))
+        self.rz_checkBox.setText(QCoreApplication.translate("Form", u"rz", None))
+        self.ty_checkBox.setText(QCoreApplication.translate("Form", u"ty", None))
+        self.rx_checkBox.setText(QCoreApplication.translate("Form", u"rx", None))
+        self.sz_checkBox.setText(QCoreApplication.translate("Form", u"sz", None))
+        self.translate_pushButton.setText(QCoreApplication.translate("Form", u"Translate", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("Form", u"Space Switch", None))
         self.remove_pushButton.setText(QCoreApplication.translate("Form", u">>", None))
         self.add_pushButton.setText(QCoreApplication.translate("Form", u"<<", None))

@@ -38,7 +38,6 @@ def component_preset():
         "k_rx": {"type": "bool"},
         "k_ry": {"type": "bool"},
         "k_rz": {"type": "bool"},
-        "k_ro": {"type": "bool"},
         "k_sx": {"type": "bool"},
         "k_sy": {"type": "bool"},
         "k_sz": {"type": "bool"},
@@ -67,7 +66,6 @@ def component_preset():
         "k_rx": True,
         "k_ry": True,
         "k_rz": True,
-        "k_ro": True,
         "k_sx": True,
         "k_sy": True,
         "k_sz": True,
@@ -130,6 +128,7 @@ class Rig(assembler.Rig):
                                                 "depth": data["ctl_size"] * mul_size,
                                             },
                                             mirror_ctl_name=self.generate_name("", "", "ctl", True))
+            mc.setAttr(self.ctl + ".ro", ["xyz", "yzx", "zxy", "xzy", "yxz", "zyx"].index(data["default_rotate_order"]))
             ref = self.create_ref(context=context,
                                   name=self.generate_name("", "ref", "ctl"),
                                   anchor=True,
