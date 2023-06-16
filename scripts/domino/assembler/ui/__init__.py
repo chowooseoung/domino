@@ -344,7 +344,7 @@ class UiFunctionSet:
         else:
             slider.setVisible(True)
             s_box.setVisible(False)
-            rgb = self.get_attr_from_root(rgb_attr)
+            rgb = self.get_attr_from_root(rgb_attr)[0]
             color = mc.colorManagementConvert(toDisplaySpace=rgb)
             h_value = sorted(rgb)[2]
             if not h_value:
@@ -355,7 +355,8 @@ class UiFunctionSet:
     def rgb_color_btn(self, use_rgb_c_box, btn, target_attr):
         if not use_rgb_c_box.isChecked():
             return 0
-        mc.colorEditor(rgb=self.get_attr_from_root(target_attr))
+        pos = QtGui.QCursor.pos()
+        mc.colorEditor(rgb=self.get_attr_from_root(target_attr)[0], mini=True, position=(pos.x() - 200, pos.y() - 120))
         if mc.colorEditor(query=True, result=True):
             rgb = mc.colorEditor(query=True, rgb=True)
             self.set_attr_to_root(target_attr, rgb)
@@ -363,7 +364,7 @@ class UiFunctionSet:
             self.update_rgb_color_btn(btn, color)
 
     def rgb_color_slider(self, btn, target_attr, value):
-        rgb = self.get_attr_from_root(target_attr)
+        rgb = self.get_attr_from_root(target_attr)[0]
         hsv_value = sorted(rgb)[2]
         if hsv_value:
             new_rgb = tuple(i / (hsv_value / 1.0) * (value / 100) for i in rgb)
