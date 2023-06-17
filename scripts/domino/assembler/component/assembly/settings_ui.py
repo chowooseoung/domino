@@ -17,7 +17,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(402, 609)
+        Dialog.resize(395, 610)
         self.verticalLayout_7 = QVBoxLayout(Dialog)
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.toolBox = QToolBox(Dialog)
@@ -38,7 +38,7 @@ class Ui_Dialog(object):
         self.toolBox.setFrameShadow(QFrame.Raised)
         self.rig_page = QWidget()
         self.rig_page.setObjectName(u"rig_page")
-        self.rig_page.setGeometry(QRect(0, 0, 384, 519))
+        self.rig_page.setGeometry(QRect(0, 0, 377, 520))
         self.verticalLayout = QVBoxLayout(self.rig_page)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(self.rig_page)
@@ -354,7 +354,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.rig_page, u"Rig Settings")
         self.custom_step_page = QWidget()
         self.custom_step_page.setObjectName(u"custom_step_page")
-        self.custom_step_page.setGeometry(QRect(0, 0, 384, 519))
+        self.custom_step_page.setGeometry(QRect(0, 0, 377, 520))
         self.verticalLayout_3 = QVBoxLayout(self.custom_step_page)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gridLayout_4 = QGridLayout()
@@ -423,7 +423,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.custom_step_page, u"CustomStep Settings")
         self.name_rule_page = QWidget()
         self.name_rule_page.setObjectName(u"name_rule_page")
-        self.name_rule_page.setGeometry(QRect(0, 0, 367, 700))
+        self.name_rule_page.setGeometry(QRect(0, 0, 377, 520))
         self.verticalLayout_6 = QVBoxLayout(self.name_rule_page)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.groupBox_6 = QGroupBox(self.name_rule_page)
@@ -523,51 +523,8 @@ class Ui_Dialog(object):
 
         self.verticalLayout_6.addWidget(self.groupBox_7)
 
-        self.groupBox_9 = QGroupBox(self.name_rule_page)
-        self.groupBox_9.setObjectName(u"groupBox_9")
-        self.gridLayout_9 = QGridLayout(self.groupBox_9)
-        self.gridLayout_9.setObjectName(u"gridLayout_9")
-        self.label_18 = QLabel(self.groupBox_9)
-        self.label_18.setObjectName(u"label_18")
-
-        self.gridLayout_9.addWidget(self.label_18, 0, 0, 1, 1)
-
-        self.l_jnt_side_name_lineEdit = QLineEdit(self.groupBox_9)
-        self.l_jnt_side_name_lineEdit.setObjectName(u"l_jnt_side_name_lineEdit")
-        self.l_jnt_side_name_lineEdit.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_9.addWidget(self.l_jnt_side_name_lineEdit, 0, 1, 1, 1)
-
-        self.label_19 = QLabel(self.groupBox_9)
-        self.label_19.setObjectName(u"label_19")
-
-        self.gridLayout_9.addWidget(self.label_19, 1, 0, 1, 1)
-
-        self.r_jnt_side_name_lineEdit = QLineEdit(self.groupBox_9)
-        self.r_jnt_side_name_lineEdit.setObjectName(u"r_jnt_side_name_lineEdit")
-        self.r_jnt_side_name_lineEdit.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_9.addWidget(self.r_jnt_side_name_lineEdit, 1, 1, 1, 1)
-
-        self.label_20 = QLabel(self.groupBox_9)
-        self.label_20.setObjectName(u"label_20")
-
-        self.gridLayout_9.addWidget(self.label_20, 2, 0, 1, 1)
-
-        self.c_jnt_side_name_lineEdit = QLineEdit(self.groupBox_9)
-        self.c_jnt_side_name_lineEdit.setObjectName(u"c_jnt_side_name_lineEdit")
-        self.c_jnt_side_name_lineEdit.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_9.addWidget(self.c_jnt_side_name_lineEdit, 2, 1, 1, 1)
-
-        self.jnt_side_name_reset_pushButton = QPushButton(self.groupBox_9)
-        self.jnt_side_name_reset_pushButton.setObjectName(u"jnt_side_name_reset_pushButton")
-
-        self.gridLayout_9.addWidget(self.jnt_side_name_reset_pushButton, 3, 1, 1, 1)
-
-
-        self.verticalLayout_6.addWidget(self.groupBox_9)
-
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.groupBox_8 = QGroupBox(self.name_rule_page)
         self.groupBox_8.setObjectName(u"groupBox_8")
         self.gridLayout_7 = QGridLayout(self.groupBox_8)
@@ -611,8 +568,58 @@ class Ui_Dialog(object):
         self.gridLayout_7.addWidget(self.ctl_side_name_reset_pushButton, 3, 1, 1, 1)
 
 
-        self.verticalLayout_6.addWidget(self.groupBox_8)
+        self.horizontalLayout_6.addWidget(self.groupBox_8)
 
+        self.groupBox_9 = QGroupBox(self.name_rule_page)
+        self.groupBox_9.setObjectName(u"groupBox_9")
+        self.gridLayout_9 = QGridLayout(self.groupBox_9)
+        self.gridLayout_9.setObjectName(u"gridLayout_9")
+        self.c_jnt_side_name_lineEdit = QLineEdit(self.groupBox_9)
+        self.c_jnt_side_name_lineEdit.setObjectName(u"c_jnt_side_name_lineEdit")
+        self.c_jnt_side_name_lineEdit.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_9.addWidget(self.c_jnt_side_name_lineEdit, 2, 1, 1, 1)
+
+        self.r_jnt_side_name_lineEdit = QLineEdit(self.groupBox_9)
+        self.r_jnt_side_name_lineEdit.setObjectName(u"r_jnt_side_name_lineEdit")
+        self.r_jnt_side_name_lineEdit.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_9.addWidget(self.r_jnt_side_name_lineEdit, 1, 1, 1, 1)
+
+        self.label_20 = QLabel(self.groupBox_9)
+        self.label_20.setObjectName(u"label_20")
+
+        self.gridLayout_9.addWidget(self.label_20, 2, 0, 1, 1)
+
+        self.jnt_side_name_reset_pushButton = QPushButton(self.groupBox_9)
+        self.jnt_side_name_reset_pushButton.setObjectName(u"jnt_side_name_reset_pushButton")
+
+        self.gridLayout_9.addWidget(self.jnt_side_name_reset_pushButton, 3, 1, 1, 1)
+
+        self.label_18 = QLabel(self.groupBox_9)
+        self.label_18.setObjectName(u"label_18")
+
+        self.gridLayout_9.addWidget(self.label_18, 0, 0, 1, 1)
+
+        self.l_jnt_side_name_lineEdit = QLineEdit(self.groupBox_9)
+        self.l_jnt_side_name_lineEdit.setObjectName(u"l_jnt_side_name_lineEdit")
+        self.l_jnt_side_name_lineEdit.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_9.addWidget(self.l_jnt_side_name_lineEdit, 0, 1, 1, 1)
+
+        self.label_19 = QLabel(self.groupBox_9)
+        self.label_19.setObjectName(u"label_19")
+
+        self.gridLayout_9.addWidget(self.label_19, 1, 0, 1, 1)
+
+
+        self.horizontalLayout_6.addWidget(self.groupBox_9)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_6)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.groupBox_11 = QGroupBox(self.name_rule_page)
         self.groupBox_11.setObjectName(u"groupBox_11")
         self.gridLayout_6 = QGridLayout(self.groupBox_11)
@@ -645,7 +652,7 @@ class Ui_Dialog(object):
         self.gridLayout_6.addWidget(self.extensions_name_reset_pushButton, 2, 1, 1, 1)
 
 
-        self.verticalLayout_6.addWidget(self.groupBox_11)
+        self.horizontalLayout_5.addWidget(self.groupBox_11)
 
         self.groupBox_10 = QGroupBox(self.name_rule_page)
         self.groupBox_10.setObjectName(u"groupBox_10")
@@ -677,7 +684,10 @@ class Ui_Dialog(object):
         self.formLayout_2.setWidget(2, QFormLayout.SpanningRole, self.index_padding_reset_pushButton)
 
 
-        self.verticalLayout_6.addWidget(self.groupBox_10)
+        self.horizontalLayout_5.addWidget(self.groupBox_10)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_5)
 
         self.verticalSpacer_4 = QSpacerItem(20, 52, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -778,16 +788,16 @@ class Ui_Dialog(object):
         self.jnt_description_letter_case_comboBox.setItemText(2, QCoreApplication.translate("Dialog", u"upper", None))
         self.jnt_description_letter_case_comboBox.setItemText(3, QCoreApplication.translate("Dialog", u"capitalize", None))
 
-        self.groupBox_9.setTitle(QCoreApplication.translate("Dialog", u"Joints Side Nameing", None))
-        self.label_18.setText(QCoreApplication.translate("Dialog", u"Left", None))
-        self.label_19.setText(QCoreApplication.translate("Dialog", u"Right", None))
-        self.label_20.setText(QCoreApplication.translate("Dialog", u"Center", None))
-        self.jnt_side_name_reset_pushButton.setText(QCoreApplication.translate("Dialog", u"Reset", None))
         self.groupBox_8.setTitle(QCoreApplication.translate("Dialog", u"Controls Side Nameing", None))
         self.label_15.setText(QCoreApplication.translate("Dialog", u"Left", None))
         self.label_16.setText(QCoreApplication.translate("Dialog", u"Right", None))
         self.label_17.setText(QCoreApplication.translate("Dialog", u"Center", None))
         self.ctl_side_name_reset_pushButton.setText(QCoreApplication.translate("Dialog", u"Reset", None))
+        self.groupBox_9.setTitle(QCoreApplication.translate("Dialog", u"Joints Side Nameing", None))
+        self.label_20.setText(QCoreApplication.translate("Dialog", u"Center", None))
+        self.jnt_side_name_reset_pushButton.setText(QCoreApplication.translate("Dialog", u"Reset", None))
+        self.label_18.setText(QCoreApplication.translate("Dialog", u"Left", None))
+        self.label_19.setText(QCoreApplication.translate("Dialog", u"Right", None))
         self.groupBox_11.setTitle(QCoreApplication.translate("Dialog", u"Extensions Naming", None))
         self.label_23.setText(QCoreApplication.translate("Dialog", u"Controls", None))
         self.label_24.setText(QCoreApplication.translate("Dialog", u"Joints", None))

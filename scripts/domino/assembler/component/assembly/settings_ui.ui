@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>609</height>
+    <width>395</width>
+    <height>610</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,8 +45,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>384</width>
-        <height>519</height>
+        <width>377</width>
+        <height>520</height>
        </rect>
       </property>
       <attribute name="label">
@@ -616,8 +616,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>384</width>
-        <height>519</height>
+        <width>377</width>
+        <height>520</height>
        </rect>
       </property>
       <attribute name="label">
@@ -741,8 +741,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>367</width>
-        <height>700</height>
+        <width>377</width>
+        <height>520</height>
        </rect>
       </property>
       <attribute name="label">
@@ -902,200 +902,208 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_9">
-         <property name="title">
-          <string>Joints Side Nameing</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_9">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Left</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="l_jnt_side_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_19">
-            <property name="text">
-             <string>Right</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="r_jnt_side_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_20">
-            <property name="text">
-             <string>Center</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="c_jnt_side_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="jnt_side_name_reset_pushButton">
-            <property name="text">
-             <string>Reset</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QGroupBox" name="groupBox_8">
+           <property name="title">
+            <string>Controls Side Nameing</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Left</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="l_ctl_side_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>Right</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="r_ctl_side_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>Center</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="c_ctl_side_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QPushButton" name="ctl_side_name_reset_pushButton">
+              <property name="text">
+               <string>Reset</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_9">
+           <property name="title">
+            <string>Joints Side Nameing</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="c_jnt_side_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="r_jnt_side_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Center</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QPushButton" name="jnt_side_name_reset_pushButton">
+              <property name="text">
+               <string>Reset</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_18">
+              <property name="text">
+               <string>Left</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="l_jnt_side_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_19">
+              <property name="text">
+               <string>Right</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_8">
-         <property name="title">
-          <string>Controls Side Nameing</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Left</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="l_ctl_side_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Right</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="r_ctl_side_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Center</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="c_ctl_side_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="ctl_side_name_reset_pushButton">
-            <property name="text">
-             <string>Reset</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_11">
-         <property name="title">
-          <string>Extensions Naming</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_23">
-            <property name="text">
-             <string>Controls</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="ctl_extensions_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_24">
-            <property name="text">
-             <string>Joints</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="jnt_extensions_name_lineEdit">
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="extensions_name_reset_pushButton">
-            <property name="text">
-             <string>Reset</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_10">
-         <property name="title">
-          <string>Index Padding</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_21">
-            <property name="text">
-             <string>Controls</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="ctl_index_padding_spinBox"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_22">
-            <property name="text">
-             <string>Joints</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="jnt_index_padding_spinBox"/>
-          </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QPushButton" name="index_padding_reset_pushButton">
-            <property name="text">
-             <string>Reset</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QGroupBox" name="groupBox_11">
+           <property name="title">
+            <string>Extensions Naming</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_23">
+              <property name="text">
+               <string>Controls</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="ctl_extensions_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_24">
+              <property name="text">
+               <string>Joints</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="jnt_extensions_name_lineEdit">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QPushButton" name="extensions_name_reset_pushButton">
+              <property name="text">
+               <string>Reset</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_10">
+           <property name="title">
+            <string>Index Padding</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>Controls</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="ctl_index_padding_spinBox"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_22">
+              <property name="text">
+               <string>Joints</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="jnt_index_padding_spinBox"/>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QPushButton" name="index_padding_reset_pushButton">
+              <property name="text">
+               <string>Reset</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer_4">
