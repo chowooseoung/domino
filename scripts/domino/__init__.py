@@ -142,86 +142,13 @@ def templates_menu(parent_menu_id):
     menu.add("Templates", commands, parent_menu_id)
 
 
-cb_add_npo = """import domino.lib.rigging.controller
-from maya import cmds as mc
-
-selected = mc.ls(selection=True, long=True)
-npos = []
-for sel in selected:
-    npos.append(domino.lib.rigging.controller.add_npo(sel.split("|")[-1], None)[0])
-mc.select(npos)"""
-
-cb_add_ctl = """import domino.lib.rigging.controller
-from maya import cmds as mc
-from maya.api import OpenMaya as om2
-
-selected = mc.ls(selection=True, long=True)
-ctls = []
-for sel in selected:
-    ctls.append(domino.lib.rigging.controller.add_ctl(
-        sel,
-        sel.split("|")[-1] + "_ctl",
-        mc.xform(sel, query=True, matrix=True, worldSpace=True),
-        shape_args={
-            "shape": "cube",
-            "color": (1, 1, 0),
-            "thickness": 1,
-            "width": 1,
-            "height": 1,
-            "depth": 1,
-            "po": (0, 0, 0),
-            "ro": (0, 0, 0)
-        }
-    ))
-if not selected:
-    ctls.append(domino.lib.rigging.controller.add_ctl(
-        None,
-        "ctl",
-        om2.MMatrix(),
-        shape_args={
-            "shape": "cube",
-            "color": (1, 1, 0),
-            "thickness": 1,
-            "width": 1,
-            "height": 1,
-            "depth": 1,
-            "po": (0, 0, 0),
-            "ro": (0, 0, 0)
-        }
-    ))
-mc.select(ctls)"""
-
-cb_add_jnt = """import domino.lib.rigging.joint
-from maya import cmds as mc
-from maya.api import OpenMaya as om2
-
-selected = mc.ls(selection=True, long=True)
-joints = []
-for sel in selected:
-    joints.append(domino.lib.rigging.joint.add_joint(
-        sel,
-        sel.split("|")[-1] + "_jnt",
-        mc.xform(sel, query=True, matrix=True, worldSpace=True),
-    ))
-if not selected:
-    joints.append(domino.lib.rigging.joint.add_joint(
-        None,
-        "jnt",
-        om2.MMatrix(),
-    ))
-mc.select(joints)"""
-
 cb_pose_manager_ui = """import domino.assembler.ui as assembler_ui
 assembler_ui.open_pose_manager()"""
 
 
 def rigging_menu():
     command = (
-        ("Add NeutralPose", cb_add_npo, ""),
-        ("Add Controller", cb_add_ctl, ""),
-        ("Add Joint", cb_add_jnt, ""),
-        ("---", None),
-        ("Pose Manager", cb_pose_manager_ui, "")
+        ("Pose Manager", cb_pose_manager_ui, ""),
     )
     menu.add("Rigging Tools", command)
 
