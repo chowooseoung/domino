@@ -685,7 +685,7 @@ class JntNameSetting(DominoDialog, jnt_name_setting_ui.Ui_Dialog):
         self.create_connections()
 
     def populate_controls(self):
-        jointNames = mc.getAttr(self.root + ".jnt_names").split(",")
+        jointNames = mc.getAttr(self.root.fullPathName() + ".jnt_names") or "".split(",")
         if jointNames[-1]:
             jointNames.append("")
 
@@ -715,12 +715,10 @@ class JntNameSetting(DominoDialog, jnt_name_setting_ui.Ui_Dialog):
             jointNames.append(item.text())
 
         value = ",".join(jointNames[0:-1])
-        mc.setAttr(self.root + ".jnt_names", value, type="string")
+        mc.setAttr(self.root.fullPathName() + ".jnt_names", value, type="string")
 
         self.tableWidget.setVerticalHeaderLabels(
             [str(i) for i in range(len(jointNames))])
-
-        self.attributeChanged.emit()
 
     def add(self):
         row = max(0, self.tableWidget.currentRow() or 0)
