@@ -473,13 +473,16 @@ class Guide:
         return True
 
     def rename(self):
-        all_position_guide_node = mc.listConnections(self.root + ".anchors", source=True, destination=False) or []
-        orientation_guide_node = mc.listConnections(self.root + "._orientation", source=True, destination=False) or []
-        pole_vec_guide_node = mc.listConnections(self.root + "._pole_vec", source=True, destination=False) or []
-        display_curve_guide_node = mc.listConnections(self.root + "._display_curve", source=True,
-                                                      destination=False) or []
+        attrs = ["anchors", "_orientation", "_pole_vec", "_display_curve"]
         new_names = []
-        for node in all_position_guide_node + orientation_guide_node + pole_vec_guide_node + display_curve_guide_node:
+        sel_list = om2.MSelectionList()
+        count = 0
+        for attr in attrs:
+            for node in mc.listConnections(self.root + "." + attr, source=True, destination=False) or []:
+                sel_list.add(node)
+                count += 1
+        for i in range(count):
+            node = sel_list.getDagPath(i).fullPathName()
             extension = mc.getAttr(node + "._extension")
             new_names.append(mc.rename(node, self.identifier + "_" + extension))
         return new_names
