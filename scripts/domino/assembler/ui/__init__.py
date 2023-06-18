@@ -876,7 +876,7 @@ class Manager(ManagerUI):
         if selected:
             try:
                 mc.undoInfo(openChunk=True)
-                assembler.extract_ctl_shapes(selected)
+                assembler.extract_shape(selected)
             finally:
                 mc.undoInfo(closeChunk=True)
 
