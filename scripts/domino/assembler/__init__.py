@@ -281,24 +281,24 @@ class Guide:
             return ctr
 
         def _position(_parent, _extension, _m, _shape=None):
-            pos = mc.createNode("transform")
-            icon.guide_position(pos, _parent, _m)
+            _pos = mc.createNode("transform")
+            icon.guide_position(_pos, _parent, _m)
             guide_container = _parent
             if mc.nodeType(guide_container) != "dagContainer":
                 guide_container = mc.container(query=True, findContainer=_parent)
             index = len(mc.listConnections(guide_container + ".anchors", source=True, destination=False))
-            pos = mc.rename(pos, self.identifier + "_" + _extension)
-            mc.setAttr(pos + ".displayHandle", True)
-            attribute.add_attr(pos, longName="is_guide", type="bool", keyable=False)
-            attribute.add_attr(pos, longName="_extension", type="string")
-            mc.setAttr(pos + "._extension", _extension, type="string")
-            mc.connectAttr(pos + ".worldMatrix[0]", guide_container + ".anchors[{0}]".format(index))
+            _pos = mc.rename(_pos, self.identifier + "_" + _extension)
+            mc.setAttr(_pos + ".displayHandle", True)
+            attribute.add_attr(_pos, longName="is_guide", type="bool", keyable=False)
+            attribute.add_attr(_pos, longName="_extension", type="string")
+            mc.setAttr(_pos + "._extension", _extension, type="string")
+            mc.connectAttr(_pos + ".worldMatrix[0]", guide_container + ".anchors[{0}]".format(index))
 
             if _shape is not None:
                 s = icon.create(None, "TEMP", "axis", None, om2.MMatrix(), po=(0, 0, 0), ro=(0, 0, 0))
                 mc.setAttr(s + ".s", 0.3, 0.3, 0.3)
                 mc.makeIdentity(s, apply=True, scale=True)
-                icon.replace(s, pos)
+                icon.replace(s, _pos)
                 mc.delete(s)
 
         def _orientation(_parent, _target, _extension):
@@ -314,7 +314,7 @@ class Guide:
             mc.connectAttr(_parent + ".offset", aim + ".offsetX")
             mc.connectAttr(ori + ".worldMatrix[0]", _parent + ".offset_matrix")
             lock_attrs = ("rx", "ry", "rz")
-            [mc.setAttr(ori + "." + attr, lock=True) for attr in lock_attrs]
+            [mc.setAttr(ori + "." + _attr, lock=True) for _attr in lock_attrs]
             ori = mc.rename(ori, self.identifier + "_" + _extension)
             mc.setAttr(ori + ".hiddenInOutliner", True)
             attribute.add_attr(ori, longName="is_guide", type="bool", keyable=False)
@@ -338,8 +338,8 @@ class Guide:
             vector.set_pole_vector(pole_vec_node, _source_nodes, distance_attr)
 
             lock_hide_attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
-            [mc.setAttr(pole_vec_node + "." + attr, lock=True) for attr in lock_hide_attrs]
-            [mc.setAttr(pole_vec_node + "." + attr, keyable=False) for attr in lock_hide_attrs]
+            [mc.setAttr(pole_vec_node + "." + _attr, lock=True) for _attr in lock_hide_attrs]
+            [mc.setAttr(pole_vec_node + "." + _attr, keyable=False) for _attr in lock_hide_attrs]
             mc.connectAttr(pole_vec_node + ".worldMatrix[0]", _parent + ".offset_pole_vec_matrix")
             attribute.add_attr(pole_vec_node, longName="is_guide", type="bool", keyable=False)
             attribute.add_attr(pole_vec_node, longName="_extension", type="string")
@@ -360,8 +360,8 @@ class Guide:
             nurbs.constraint(display_curve, _nodes)
             mc.connectAttr(_parent + ".worldInverseMatrix[0]", display_curve + ".offsetParentMatrix")
             lock_hide_attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
-            [mc.setAttr(display_curve + "." + attr, lock=True) for attr in lock_hide_attrs]
-            [mc.setAttr(display_curve + "." + attr, keyable=False) for attr in lock_hide_attrs]
+            [mc.setAttr(display_curve + "." + _attr, lock=True) for _attr in lock_hide_attrs]
+            [mc.setAttr(display_curve + "." + _attr, keyable=False) for _attr in lock_hide_attrs]
             display_curve = mc.parent(display_curve, _parent)[0]
             mc.setAttr(display_curve + ".hiddenInOutliner", True)
             display_curve = mc.rename(display_curve, self.identifier + "_displayCrv")
