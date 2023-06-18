@@ -175,8 +175,10 @@ class Rig(assembler.Rig):
                             uni_scale=uni_scale)
 
     def attributes(self, context):
-        super().attributes(context)
         data = self.component.data["value"]
+        if data["nothing"]:
+            return
+        super().attributes(context)
 
         if data["move_pivot"]:
             self.pivot_vis_attr = attribute.add_attr(self.ctl,
@@ -186,6 +188,10 @@ class Rig(assembler.Rig):
                                                      defaultValue=False)
 
     def operators(self, context):
+        data = self.component.data["value"]
+        if data["nothing"]:
+            return
+
         super().operators(context)
         data = self.component.data["value"]
 
@@ -194,9 +200,6 @@ class Rig(assembler.Rig):
             mc.connectAttr(self.pivot_ctl + ".t", self.ctl + ".scalePivot")
             mc.connectAttr(self.pivot_vis_attr, self.pivot_ctl + ".v")
             mc.connectAttr(self.pivot_vis_attr, self.dp_crv + ".v")
-
-        if data["nothing"]:
-            return None
 
         host = context[self.identifier]["host"]
         if data["space_switch_array"] and not data["leaf_jnt"]:
@@ -207,4 +210,7 @@ class Rig(assembler.Rig):
                 context["callbacks"].append(script_node)
 
     def connections(self, context):
+        data = self.component.data["value"]
+        if data["nothing"]:
+            return
         super().connections(context)
