@@ -685,7 +685,7 @@ class JntNameSetting(DominoDialog, jnt_name_setting_ui.Ui_Dialog):
         self.create_connections()
 
     def populate_controls(self):
-        jointNames = mc.getAttr(self.root.fullPathName() + ".jnt_names") or "".split(",")
+        jointNames = (mc.getAttr(self.root.fullPathName() + ".jnt_names") or "").split(",")
         if jointNames[-1]:
             jointNames.append("")
 
