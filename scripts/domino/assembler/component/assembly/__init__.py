@@ -68,7 +68,7 @@ def component_preset():
         "c_RGB_ik": {"type": "float3"},
         "run_custom_step": {"type": "bool"},
         "custom_step": {"type": "string"},
-        "ctl_shapes": {"type": "message", "multi": True},
+        "ctl_shapes": {"type": "nurbsCurve", "multi": True},
         "icon_name": {"type": "string"},
         "pose_json": {"type": "string"},
         "publish_notes": {"type": "string"},
