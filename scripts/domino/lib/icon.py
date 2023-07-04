@@ -166,6 +166,9 @@ def create(parent, name, shape, color, m, **kwargs):
         return axis(parent=parent,
                     name=name,
                     m=m,
+                    width=kwargs["width"],
+                    height=kwargs["height"],
+                    depth=kwargs["depth"],
                     po=kwargs["po"],
                     ro=kwargs["ro"])
 
@@ -869,12 +872,15 @@ def dodecahedron(parent,
 def axis(parent,
          name,
          m=om2.MMatrix(),
+         width=1,
+         height=1,
+         depth=1,
          po=(0, 0, 0),
          ro=(0, 0, 0)):
     dlen = 2
-    v0 = om2.MVector(dlen, 0, 0)
-    v1 = om2.MVector(0, dlen, 0)
-    v2 = om2.MVector(0, 0, dlen)
+    v0 = om2.MVector(dlen * width, 0, 0)
+    v1 = om2.MVector(0, dlen * height, 0)
+    v2 = om2.MVector(0, 0, dlen * depth)
 
     node = mc.createNode("transform", name=name, parent=parent)
     matrix.set_matrix(node, m)
