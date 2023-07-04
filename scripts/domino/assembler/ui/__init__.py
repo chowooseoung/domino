@@ -1,4 +1,6 @@
 # gui
+import uuid
+
 from PySide2 import QtWidgets, QtCore, QtGui
 from . import common_component_settings_ui, jnt_name_setting_ui, manager_ui, pose_manager_ui
 
@@ -577,6 +579,72 @@ class UiFunctionSet:
         items_data = data.split(",")
         for d in items_data:
             list_widget.addItem(d)
+
+    def select_curve_btn(self, line_edit, target_attr):
+        selection = mc.ls(selection=True)
+        if not selection:
+            source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
+            if source:
+                mc.delete(source[0])
+                line_edit.setText("")
+            return
+
+        shape = mc.listRelatives(selection[0], shapes=True, fullPath=True)[0]
+        if mc.nodeType(shape) != "nurbsCurve":
+            return
+
+        new_shape = mc.duplicateCurve(shape, name=str(uuid.uuid4()), constructionHistory=False)
+        new_shape = mc.parent(new_shape, self.root)[0]
+        shape = mc.listRelatives(new_shape, shapes=True)[0]
+
+        source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
+        if source:
+            mc.delete(source[0])
+
+        mc.connectAttr(shape + ".worldSpace[0]", self.root + "." + target_attr, force=True)
+        mc.setAttr(shape + ".dispHull", 1)
+        mc.setAttr(shape + ".dispCV", 1)
+        mc.setAttr(new_shape + ".overrideEnabled", 1)
+        mc.setAttr(new_shape + ".overrideDisplayType", 2)
+        line_edit.setText("Registered")
+
+    def install_curve_btn(self, line_edit, btn, target_attr):
+        source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
+        if source:
+            line_edit.setText("Registered")
+        btn.clicked.connect(
+            partial(self.select_curve_btn,
+                    line_edit,
+                    target_attr))
+
+    def update_parent_comp_btn(self, line_edit, target_attr):
+        line_edit.setText(self.get_attr_from_root(target_attr))
+
+    def add_parent_comp_btn(self, line_edit, target_attr):
+        selection = mc.ls(selection=True, long=True)
+        if not selection:
+            return
+        if not mc.attributeQuery("is_guide", node=selection[0], exists=True):
+            return
+
+        root = selection[0]
+        if mc.getAttr(root + ".component") == "assembly":
+            identifier = mc.getAttr(root + ".name")
+        else:
+            name = mc.getAttr(root + ".name")
+            side = mc.getAttr(root + ".side", asString=True)
+            index = str(mc.getAttr(root + ".index"))
+            identifier = "_".join([name, side, index])
+
+        self.set_attr_to_root(target_attr, identifier)
+        self.update_parent_comp_btn(line_edit, target_attr)
+
+    def install_parent_comp_btn(self, line_edit, btn, target_attr):
+        self.update_parent_comp_btn(line_edit, target_attr)
+        btn.clicked.connect(
+            partial(self.add_parent_comp_btn,
+                    line_edit,
+                    target_attr))
 
 
 class CommonComponentSettingUI(QtWidgets.QWidget, common_component_settings_ui.Ui_Form):
