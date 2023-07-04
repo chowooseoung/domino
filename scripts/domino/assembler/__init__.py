@@ -108,11 +108,13 @@ class Component:
                     selection_list.add(node + "." + child_attr)
                     plug = selection_list.getPlug(0)
 
-                    crv = mc.listConnections(node + "." + child_attr, destination=False, source=True)[0]
-                    curve_data[str(plug.logicalIndex())] = nurbs.data(crv)
+                    crv = mc.listConnections(node + "." + child_attr, destination=False, source=True)
+                    if crv:
+                        curve_data[str(plug.logicalIndex())] = nurbs.data(crv[0])
             else:
-                crv = mc.listConnections(node + "." + __attr, destination=False, source=True)[0]
-                curve_data["0"] = nurbs.data(crv)
+                crv = mc.listConnections(node + "." + __attr, destination=False, source=True)
+                if crv:
+                    curve_data["0"] = nurbs.data(crv[0])
             return curve_data
 
         def _enum(__attr):
