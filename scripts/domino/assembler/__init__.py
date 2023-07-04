@@ -189,18 +189,29 @@ class Component:
 
     def push_data_to_node(self, node):
         def _nurbs_curve(__attr, __value):
-            if mc.nodeType(node) == "dagContainer" and attr == "ctl_shapes" and __value:
-                root = hierarchy.get_parent(node, generations=-1)
-                if root is None:
-                    root = node
-                parent = root + "|ctl_shapes"
+            if mc.nodeType(node) == "dagContainer" and __value:
+                if attr == "ctl_shapes":
+                    root = hierarchy.get_parent(node, generations=-1)
+                    if root is None:
+                        root = node
+                    parent = root + "|ctl_shapes"
+                else:
+                    parent = node
                 if "multi" in attributes[attr]:
                     for index in __value.keys():
                         crv = nurbs.build(__value[index], parent=parent)
                         mc.connectAttr(crv + ".worldSpace[0]", node + "." + __attr + "[{0}]".format(index))
+                        mc.setAttr(crv + ".dispHull", 1)
+                        mc.setAttr(crv + ".dispCV", 1)
+                        mc.setAttr(crv + ".overrideEnabled", 1)
+                        mc.setAttr(crv + ".overrideDisplayType", 2)
                 else:
                     crv = nurbs.build(__value[str(0)], parent=parent)
                     mc.connectAttr(crv + ".worldSpace[0]", node + "." + __attr)
+                    mc.setAttr(crv + ".dispHull", 1)
+                    mc.setAttr(crv + ".dispCV", 1)
+                    mc.setAttr(crv + ".overrideEnabled", 1)
+                    mc.setAttr(crv + ".overrideDisplayType", 2)
 
         def _enum(__attr, __value):
             enum_name = mc.attributeQuery(__attr, node=node, listEnum=True)[0]
