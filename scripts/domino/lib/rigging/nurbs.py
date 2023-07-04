@@ -33,7 +33,7 @@ def data(crv):
     return curve_data
 
 
-def build(curve_data, name="", parent=None, replace="", match=False):
+def build(curve_data, name="", parent=None, replace="", match=False, inherits=True):
     if parent is None:
         if curve_data["parent"]:
             if mc.objExists(curve_data["parent"][0]):
@@ -43,6 +43,8 @@ def build(curve_data, name="", parent=None, replace="", match=False):
         mc.delete(mc.listRelatives(crv, shapes=True, fullPath=True))
     else:
         crv = mc.createNode("transform", name=curve_data["name"] if not name else name, parent=parent)
+    if not inherits:
+        mc.setAttr(crv + ".inheritsTransform", 0)
     temp_crv_name = "curve_build_temp"
     for d in curve_data["shapes"]:
         shape = mc.curve(name=temp_crv_name,
@@ -61,7 +63,6 @@ def build(curve_data, name="", parent=None, replace="", match=False):
         mc.delete(temp_crv_name)
     if match:
         mc.xform(crv, matrix=curve_data["transform"], worldSpace=True)
-        crv.setMatrix(curve_data["transform"], worldSpace=True)
     return crv
 
 
@@ -80,10 +81,8 @@ def create(parent, name, degree, positions, m=om2.MTransformationMatrix(), bezie
     if not vis:
         mc.setAttr(crv + ".v", 0)
     if not inherits:
-        mc.setAttr(crv + ".t", 0, 0, 0)
-        mc.setAttr(crv + ".r", 0, 0, 0)
-        mc.setAttr(crv + ".s", 1, 1, 1)
         mc.setAttr(crv + ".inheritsTransform", 0)
+        mc.xform(crv, matrix=m, worldSpace=True)
     if display_type != 0:
         mc.setAttr(crv + ".overrideEnabled", 1)
         mc.setAttr(crv + ".overrideDisplayType", display_type)
