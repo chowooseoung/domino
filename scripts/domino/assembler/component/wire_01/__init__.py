@@ -1,5 +1,5 @@
 # domino
-from domino.lib import matrix, attribute, hierarchy, color
+from domino.lib import matrix, attribute, hierarchy
 from domino.lib.rigging import nurbs, joint
 from domino import assembler
 
@@ -20,7 +20,10 @@ class Author:
     name = "wire"
     side = "C"
     index = 0
-    description = "wire component 입니다. head, tail 을 고정시킬수있습니다. splineIK를 사용합니다."
+    description = ("wire component 입니다. head, tail을 고정시킬수있습니다. splineIK를 사용합니다."
+                   "nurbsCurve를 등록. curve의 cvPoint에 컨트롤러가 생성됩니다."
+                   "range숫자만큼의 앞, 뒤 컨트롤러를 다른 component에 parent할수있습니다."
+                   "path 컨트롤러는 fk 구조를 가질수있습니다.")
 
 
 def component_preset():
@@ -126,7 +129,7 @@ class Rig(assembler.Rig):
         for i, m in enumerate(matrices):
             ctl, loc = self.create_ctl(context=context,
                                        parent=parent,
-                                       name=self.generate_name("ik" + str(i), "", "ctl"),
+                                       name=self.generate_name("path" + str(i), "", "ctl"),
                                        m=m,
                                        parent_ctl=None,
                                        attrs=["tx", "ty", "tz", "rx", "ry", "rz"],
@@ -138,7 +141,7 @@ class Rig(assembler.Rig):
                                            "depth": 0.2,
                                            "color": ik_color
                                        },
-                                       mirror_ctl_name=self.generate_name("ik" + str(i), "", "ctl", True))
+                                       mirror_ctl_name=self.generate_name("path" + str(i), "", "ctl", True))
             mc.cluster([self.path_deform_curve + ".cv[{0}]".format(i),
                         self.path_up_curve + ".cv[{0}]".format(i)],
                        bindState=True,
@@ -654,12 +657,3 @@ class Rig(assembler.Rig):
             for ctl in tail_ctls:
                 npo = hierarchy.get_parent(ctl)
                 mc.parent(npo, tail_parent)
-
-
-
-
-
-
-
-
-
