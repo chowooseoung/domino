@@ -388,7 +388,7 @@ class Guide:
         value = self.component.data["value"]
 
         if "flexible_position" in self.guide_recipe:
-            position_min_value, guide_name_extension, v = self.guide_recipe["flexible_position"]
+            position_min_value, guide_name_extension, direction_vector = self.guide_recipe["flexible_position"]
             div_value = 0
             if len(value["anchors"]) <= position_min_value:
                 result = mc.promptDialog(title="Divide input",
@@ -401,10 +401,10 @@ class Guide:
                         div_value = int(text)
                     except ValueError:
                         pass
-                self.suitable_anchors(div_value, v)
+                self.suitable_anchors(div_value, direction_vector)
             if len(self.guide_recipe["position"]) < position_min_value:
-                v = len(value["anchors"]) - len(self.guide_recipe["position"]) - 1
-                self.suitable_recipe(div_value if div_value else v)
+                direction_vector = len(value["anchors"]) - len(self.guide_recipe["position"]) - 1
+                self.suitable_recipe(div_value if div_value else direction_vector)
             if len(value["anchors"]) <= position_min_value:
                 return False
 
@@ -514,10 +514,11 @@ class Guide:
             name = self.guide_recipe["flexible_position"][1] % i
             self.guide_recipe["position"].append((parent_index, name))
 
-    def suitable_anchors(self, div_value, v=(1, 0, 0)):
+    def suitable_anchors(self, div_value, direction_vector=(1, 0, 0)):
         for i in range(div_value):
             m = om2.MTransformationMatrix()
-            m.setTranslation(om2.MVector(v) + om2.MVector([x * i for x in v]), om2.MSpace.kWorld)
+            m.setTranslation(om2.MVector(direction_vector) + om2.MVector([x * i for x in direction_vector]),
+                             om2.MSpace.kWorld)
             self.component.data["value"]["anchors"].append(list(m.asMatrix()))
 
     def suitable_index(self, name, side, remove_index=None):
