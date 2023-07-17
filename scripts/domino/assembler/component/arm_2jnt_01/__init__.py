@@ -993,7 +993,7 @@ class Rig(assembler.Rig):
                                  outTangentType="linear")
             mc.setDrivenKeyframe(md + ".input2X",
                                  currentDriver=self.blend_nodes[1] + ".rz",
-                                 driverValue=-180,
+                                 driverValue=180,
                                  value=length / float(distance2) / 5,
                                  inTangentType="linear",
                                  outTangentType="linear")
