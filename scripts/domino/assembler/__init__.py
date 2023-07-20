@@ -201,14 +201,14 @@ class Component:
                     parent = node
                 if "multi" in attributes[attr]:
                     for index in __value.keys():
-                        crv = nurbs.build(__value[index], parent=parent)
+                        crv = nurbs.build(__value[index], parent=parent, match=True)
                         mc.connectAttr(crv + ".worldSpace[0]", node + "." + __attr + "[{0}]".format(index))
                         mc.setAttr(crv + ".dispHull", 1)
                         mc.setAttr(crv + ".dispCV", 1)
                         mc.setAttr(crv + ".overrideEnabled", 1)
                         mc.setAttr(crv + ".overrideDisplayType", 2)
                 else:
-                    crv = nurbs.build(__value[str(0)], parent=parent)
+                    crv = nurbs.build(__value[str(0)], parent=parent, match=True)
                     mc.connectAttr(crv + ".worldSpace[0]", node + "." + __attr)
                     mc.setAttr(crv + ".dispHull", 1)
                     mc.setAttr(crv + ".dispCV", 1)
