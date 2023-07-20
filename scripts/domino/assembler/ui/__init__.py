@@ -580,42 +580,63 @@ class UiFunctionSet:
         for d in items_data:
             list_widget.addItem(d)
 
-    def select_curve_btn(self, line_edit, target_attr):
+    def select_curve_btn(self, combobox, target_attr, role):
+        combobox.clear()
+        orig_curves = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
+        if orig_curves:
+            mc.delete(orig_curves)
+
         selection = mc.ls(selection=True)
         if not selection:
-            source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
-            if source:
-                mc.delete(source[0])
-                line_edit.setText("")
             return
 
-        shape = mc.listRelatives(selection[0], shapes=True, fullPath=True)[0]
-        if mc.nodeType(shape) != "nurbsCurve":
-            return
+        is_multi = mc.attributeQuery(target_attr, node=self.root, multi=True)
+        if not is_multi:
+            selection = [selection[0]]
+            target_attrs = [target_attr]
+        else:
+            target_attrs = [target_attr + "[{0}]".format(i) for i in range(len(selection))]
 
-        new_shape = mc.duplicateCurve(shape, name=str(uuid.uuid4()), constructionHistory=False)
-        new_shape = mc.parent(new_shape, self.root)[0]
-        shape = mc.listRelatives(new_shape, shapes=True)[0]
+        model = combobox.model()
+        i = 0
+        for sel, target_attr in zip(selection, target_attrs):
+            shape = mc.listRelatives(sel, shapes=True, fullPath=True)[0]
+            if mc.nodeType(shape) != "nurbsCurve":
+                return
 
-        source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
-        if source:
-            mc.delete(source[0])
+            new_shape = mc.duplicateCurve(shape, name=str(uuid.uuid4()), constructionHistory=False)
+            new_shape = mc.parent(new_shape, self.root)[0]
+            shape = mc.listRelatives(new_shape, shapes=True)[0]
 
-        mc.connectAttr(shape + ".worldSpace[0]", self.root + "." + target_attr, force=True)
-        mc.setAttr(shape + ".dispHull", 1)
-        mc.setAttr(shape + ".dispCV", 1)
-        mc.setAttr(new_shape + ".overrideEnabled", 1)
-        mc.setAttr(new_shape + ".overrideDisplayType", 2)
-        line_edit.setText("Registered")
+            mc.connectAttr(shape + ".worldSpace[0]", self.root + "." + target_attr, force=True)
+            mc.setAttr(shape + ".dispHull", 1)
+            mc.setAttr(shape + ".dispCV", 1)
+            mc.setAttr(new_shape + ".overrideEnabled", 1)
+            mc.setAttr(new_shape + ".overrideDisplayType", 2)
 
-    def install_curve_btn(self, line_edit, btn, target_attr):
-        source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False)
-        if source:
-            line_edit.setText("Registered")
+            item = QtGui.QStandardItem()
+            item.setText(str(i))
+            item.setData(new_shape, role)
+            model.appendRow(item)
+            i += 1
+
+    def install_curve_btn(self, combobox, btn, target_attr, role=QtCore.Qt.UserRole):
+        source = mc.listConnections(self.root + "." + target_attr, source=True, destination=False) or []
+        combobox.clear()
+        model = combobox.model()
+        for i, s in enumerate(source):
+            item = QtGui.QStandardItem()
+            item.setText(str(i))
+            item.setData(s, role)
+            model.appendRow(item)
+
+        combobox.activated.connect(lambda: mc.select(combobox.currentData(role)))
+
         btn.clicked.connect(
             partial(self.select_curve_btn,
-                    line_edit,
-                    target_attr))
+                    combobox,
+                    target_attr,
+                    role))
 
     def update_parent_comp_btn(self, line_edit, target_attr):
         line_edit.setText(self.get_attr_from_root(target_attr))
