@@ -42,10 +42,17 @@ def add_chain_joint(parent, name, positions, normal, last_orient=None, negate=Fa
 
 
 def ikh(parent, name, chain, solver="ikRPsolver", pole_vector=None):
+    is_spring = False
+    if solver == "ikSpringSolver":
+        solver = "ikRPsolver"
+        is_spring = True
     ik_h, _ = mc.ikHandle(name=name,
+                          autoPriority=False,
                           startJoint=chain[0],
                           endEffector=chain[-1],
                           solver=solver)
+    if is_spring:
+        mc.connectAttr("ikSpringSolver.message", "%s.ikSolver" % ik_h, force=True)
     ik_h = "|" + ik_h
     mc.setAttr(ik_h + ".v", 0)
 

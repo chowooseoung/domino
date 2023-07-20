@@ -259,3 +259,38 @@ def point_on_curve(crv, division):
         mc.setAttr(mp + ".uValue", ratio * i)
         positions.append(mc.getAttr(mp + ".allCoordinates")[0])
     return positions
+
+
+def loft(parent, curve1, curve2, name, retopo=None):
+    mesh, loft_node = mc.loft(curve1,
+                              curve2,
+                              name=name,
+                              constructionHistory=True,
+                              uniform=1,
+                              close=0,
+                              autoReverse=1,
+                              degree=3,
+                              sectionSpans=1,
+                              range=0,
+                              polygon=1,
+                              reverseSurfaceNormals=True)
+    mesh = mc.parent(mesh, parent)[0]
+
+    tessellate = mc.listConnections(loft_node + ".outputSurface",
+                                    source=False,
+                                    destination=True)[0]
+    mc.setAttr(tessellate + ".format", 0)
+    mc.setAttr(tessellate + ".polygonType", 1)
+    mc.setAttr(tessellate + ".polygonCount", 200)
+    mc.delete(mesh, ch=True)
+
+    if retopo:
+        mc.polyRetopo(constructionHistory=False,
+                      replaceOriginal=1,
+                      preserveHardEdges=0,
+                      topologyRegularity=0.5,
+                      faceUniformity=0,
+                      anisotropy=0.75,
+                      targetFaceCount=1000,
+                      targetFaceCountTolerance=10)
+    return mesh
