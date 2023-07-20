@@ -352,14 +352,33 @@ class Rig(assembler.Rig):
         if is_spring:
             mel.eval("ikSpringSolver;")
         n = "chain3Spring%s" if is_spring else "chain3RP%s"
-        name = self.generate_name(n, "", "jnt")
-        self.chain3_ik_jnts = joint.add_chain_joint(root,
+        name = self.generate_name(n, "jnt", "ctl")
+        parent = root
+        if is_spring:
+            inverse_node_m = matrix.get_chain_matrix(positions[:-1], normal, negate)[0]
+            inverse_node = matrix.transform(root,
+                                            name=self.generate_name("springRev", "space", "ctl"),
+                                            m=inverse_node_m)
+            inverse_mult_m = mc.createNode("multMatrix")
+            mc.setAttr(inverse_mult_m + ".matrixIn[0]",
+                       matrix.get_matrix(inverse_node),
+                       type="matrix")
+            mc.setAttr(inverse_mult_m + ".matrixIn[1]", orig_m, type="matrix")
+            mc.connectAttr(inverse_node + ".parentInverseMatrix",
+                           inverse_mult_m + ".matrixIn[2]")
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(inverse_mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputRotate", inverse_node + ".r")
+            mc.connectAttr(decom_m + ".outputScale", inverse_node + ".s")
+            parent = inverse_node
+        self.chain3_ik_jnts = joint.add_chain_joint(parent,
                                                     name,
                                                     positions[:-1],
                                                     normal,
                                                     last_orient=fk3_m,
                                                     negate=negate,
                                                     vis=False)
+
         name = self.generate_name("thirdRot", "auto", "ctl")
         self.third_rot_auto_obj = matrix.transform(self.chain3_ik_jnts[-1], name, third_rot_m)
         name = self.generate_name("thirdRot", "fix", "ctl")
@@ -393,26 +412,14 @@ class Rig(assembler.Rig):
         n = "chain3Spring" if is_spring else "chain3RP"
         s = "ikSpringSolver" if is_spring else "ikRPsolver"
         name = self.generate_name(n, "ikh", "ctl")
-        orig_pos = vector.get_position(self.chain3_ik_jnts[1])
         self.chain3_ik_ikh = joint.ikh(self.chain3_pos_obj,
                                        name,
                                        self.chain3_ik_jnts,
                                        solver=s,
                                        pole_vector=self.pole_vec_loc)
-        new_pos = vector.get_position(self.chain3_ik_jnts[1])
-
-        # spring solver bug.
-        if [round(x, 4) for x in orig_pos] != [round(x, 4) for x in new_pos]:
-            mc.setAttr(self.chain3_ik_ikh + ".twist", 180)
-        if is_spring:
-            pick_m = mc.createNode("pickMatrix")
-            mc.connectAttr(self.root + ".worldInverseMatrix[0]", pick_m + ".inputMatrix")
-            mc.setAttr(pick_m + ".useTranslate", False)
-            mc.setAttr(pick_m + ".useScale", False)
-            mc.connectAttr(pick_m + ".outputMatrix", self.chain3_ik_jnts[0] + ".offsetParentMatrix")
 
         # ik jnts
-        name = self.generate_name("ik%s", "", "jnt")
+        name = self.generate_name("ik%s", "jnt", "ctl")
         self.fk_match_source = self.ik_jnts = joint.add_chain_joint(root,
                                                                     name,
                                                                     positions[:-1],
@@ -455,7 +462,7 @@ class Rig(assembler.Rig):
         self.blend_nodes = []
         parent = root
         for i, jnt in enumerate(self.ik_jnts):
-            name = self.generate_name(f"fkik{i}", "blend", "jnt")
+            name = self.generate_name(f"fkik{i}", "blend", "ctl")
             m = mc.xform(jnt, query=True, matrix=True, worldSpace=True)
             parent = matrix.transform(parent=parent, name=name, m=m, offset_parent_matrix=True)
             self.blend_nodes.append(parent)
@@ -523,14 +530,14 @@ class Rig(assembler.Rig):
         name = self.generate_name("upperSC", "offset", "ctl")
         self.upper_sc_offset = matrix.transform(parent=root, name=name, m=fk0_m)
 
-        name = self.generate_name("upperFixSC%s", "", "jnt")
+        name = self.generate_name("upperFixSC%s", "jnt", "ctl")
         self.upper_fix_sc_jnts = joint.add_chain_joint(self.upper_sc_offset,
                                                        name,
                                                        positions[:2],
                                                        normal,
                                                        negate=negate)
         mc.connectAttr(self.blend_nodes[0] + ".t", self.upper_fix_sc_jnts[0] + ".t")
-        name = self.generate_name("upperRotSC%s", "", "jnt")
+        name = self.generate_name("upperRotSC%s", "jnt", "ctl")
         self.upper_rot_sc_jnts = joint.add_chain_joint(self.upper_sc_offset,
                                                        name,
                                                        positions[:2],
@@ -546,12 +553,12 @@ class Rig(assembler.Rig):
         mc.pointConstraint(self.pin1_loc, self.upper_rot_sc_ikh)
         mc.orientConstraint(self.blend_nodes[0], self.upper_rot_sc_ikh, maintainOffset=True)
 
-        name = self.generate_name("upperStart", "bind", "jnt")
+        name = self.generate_name("upperStart", "bind", "ctl")
         self.upper_start_bind = joint.add_joint(self.upper_fix_sc_jnts[0],
                                                 name,
                                                 matrix.get_matrix(self.upper_fix_sc_jnts[0]),
                                                 vis=False)
-        name = self.generate_name("upperEnd", "bind", "jnt")
+        name = self.generate_name("upperEnd", "bind", "ctl")
         self.upper_end_bind = joint.add_joint(self.upper_rot_sc_jnts[1],
                                               name,
                                               matrix.get_matrix(self.upper_rot_sc_jnts[1]),
@@ -560,7 +567,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(self.pin1_ctl + ".rx", self.upper_end_bind + ".rx")
 
         # mid
-        name = self.generate_name("midFixSC%s", "", "jnt")
+        name = self.generate_name("midFixSC%s", "jnt", "ctl")
         self.mid_fix_sc_jnts = joint.add_chain_joint(root, name, positions[1:3], normal, negate=negate)
         mc.pointConstraint(self.pin1_loc, self.mid_fix_sc_jnts[0])
 
@@ -569,7 +576,7 @@ class Rig(assembler.Rig):
         mc.pointConstraint(self.blend_nodes[-2], self.mid_fix_sc_ikh)
         mc.orientConstraint(self.upper_end_bind, self.mid_fix_sc_ikh, maintainOffset=True)
 
-        name = self.generate_name("midRotSC%s", "", "jnt")
+        name = self.generate_name("midRotSC%s", "jnt", "ctl")
         self.mid_rot_sc_jnts = joint.add_chain_joint(root, name, positions[1:3], normal, negate=negate)
         mc.pointConstraint(self.pin1_loc, self.mid_rot_sc_jnts[0])
 
@@ -578,12 +585,12 @@ class Rig(assembler.Rig):
         mc.pointConstraint(self.blend_nodes[-2], self.mid_rot_sc_ikh)
         mc.orientConstraint(self.blend_nodes[-3], self.mid_rot_sc_ikh, maintainOffset=True)
 
-        name = self.generate_name("midStart", "bind", "jnt")
+        name = self.generate_name("midStart", "bind", "ctl")
         self.mid_start_bind = joint.add_joint(self.mid_fix_sc_jnts[0],
                                               name,
                                               matrix.get_matrix(self.mid_fix_sc_jnts[0]),
                                               vis=False)
-        name = self.generate_name("midEnd", "bind", "jnt")
+        name = self.generate_name("midEnd", "bind", "ctl")
         self.mid_end_bind = joint.add_joint(self.mid_rot_sc_jnts[1],
                                             name,
                                             matrix.get_matrix(self.mid_rot_sc_jnts[1]),
@@ -592,7 +599,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(self.pin2_ctl + ".rx", self.mid_end_bind + ".rx")
 
         # lower
-        name = self.generate_name("lowerFixSC%s", "", "jnt")
+        name = self.generate_name("lowerFixSC%s", "jnt", "ctl")
         self.lower_fix_sc_jnts = joint.add_chain_joint(root, name, positions[1:3], normal, negate=negate)
         mc.pointConstraint(self.pin2_loc, self.lower_fix_sc_jnts[0])
 
@@ -601,7 +608,7 @@ class Rig(assembler.Rig):
         mc.pointConstraint(self.blend_nodes[-1], self.lower_fix_sc_ikh)
         mc.orientConstraint(self.mid_end_bind, self.lower_fix_sc_ikh, maintainOffset=True)
 
-        name = self.generate_name("lowerRotSC%s", "", "jnt")
+        name = self.generate_name("lowerRotSC%s", "jnt", "ctl")
         self.lower_rot_sc_jnts = joint.add_chain_joint(root, name, positions[1:3], normal, negate=negate)
         mc.pointConstraint(self.pin2_loc, self.lower_rot_sc_jnts[0])
 
@@ -610,12 +617,12 @@ class Rig(assembler.Rig):
         mc.pointConstraint(self.blend_nodes[-1], self.lower_rot_sc_ikh)
         mc.orientConstraint(self.blend_nodes[-1], self.lower_rot_sc_ikh, maintainOffset=True)
 
-        name = self.generate_name("lowerStart", "bind", "jnt")
+        name = self.generate_name("lowerStart", "bind", "ctl")
         self.lower_start_bind = joint.add_joint(self.lower_fix_sc_jnts[0],
                                                 name,
                                                 matrix.get_matrix(self.lower_fix_sc_jnts[0]),
                                                 vis=False)
-        name = self.generate_name("lowerEnd", "bind", "jnt")
+        name = self.generate_name("lowerEnd", "bind", "ctl")
         self.lower_end_bind = joint.add_joint(self.lower_rot_sc_jnts[1],
                                               name,
                                               matrix.get_matrix(self.lower_rot_sc_jnts[1]),
@@ -656,7 +663,7 @@ class Rig(assembler.Rig):
                                 },
                                 mirror_ctl_name=self.generate_name("flexible0", "", "ctl", True))
 
-            name = self.generate_name("upperMid", "bind", "jnt")
+            name = self.generate_name("upperMid", "bind", "ctl")
             self.upper_flexible_bind = joint.add_joint(self.flexible0_loc, name, m, vis=False)
             upper_bind_jnts.append(self.upper_flexible_bind)
             flexible0_npo = hierarchy.get_parent(self.flexible0_ctl)
@@ -690,7 +697,7 @@ class Rig(assembler.Rig):
                                 },
                                 mirror_ctl_name=self.generate_name("flexible1", "", "ctl", True))
 
-            name = self.generate_name("midMid", "bind", "jnt")
+            name = self.generate_name("midMid", "bind", "ctl")
             self.mid_flexible_bind = joint.add_joint(self.flexible1_loc, name, m, vis=False)
             mid_bind_jnts.append(self.mid_flexible_bind)
             flexible1_npo = hierarchy.get_parent(self.flexible1_ctl)
@@ -722,7 +729,7 @@ class Rig(assembler.Rig):
                                     "color": ik_color
                                 },
                                 mirror_ctl_name=self.generate_name("flexible2", "", "ctl", True))
-            name = self.generate_name("lowerMid", "bind", "jnt")
+            name = self.generate_name("lowerMid", "bind", "ctl")
             self.lower_flexible_bind = joint.add_joint(self.flexible2_loc, name, m, vis=False)
             lower_bind_jnts.append(self.lower_flexible_bind)
             flexible2_npo = hierarchy.get_parent(self.flexible2_ctl)
