@@ -44,12 +44,6 @@ class Ui_Form(object):
 
         self.gridLayout.addWidget(self.tail_range_spinBox, 10, 1, 1, 3)
 
-        self.wire_curve_lineEdit = QLineEdit(self.groupBox)
-        self.wire_curve_lineEdit.setObjectName(u"wire_curve_lineEdit")
-        self.wire_curve_lineEdit.setReadOnly(True)
-
-        self.gridLayout.addWidget(self.wire_curve_lineEdit, 3, 1, 1, 2)
-
         self.label_6 = QLabel(self.groupBox)
         self.label_6.setObjectName(u"label_6")
 
@@ -167,6 +161,11 @@ class Ui_Form(object):
         self.fk_path_checkBox.setObjectName(u"fk_path_checkBox")
 
         self.gridLayout.addWidget(self.fk_path_checkBox, 5, 0, 1, 1)
+
+        self.curve_comboBox = QComboBox(self.groupBox)
+        self.curve_comboBox.setObjectName(u"curve_comboBox")
+
+        self.gridLayout.addWidget(self.curve_comboBox, 3, 1, 1, 2)
 
 
         self.horizontalLayout.addWidget(self.groupBox)

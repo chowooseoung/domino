@@ -30,7 +30,7 @@ class Settings(CommonComponentSettings):
             ui.turning_point_doubleSpinBox,
             "turning_point")
         self.ui_funcs.install_curve_btn(
-            ui.wire_curve_lineEdit,
+            ui.curve_comboBox,
             ui.select_wire_curve_pushButton,
             "wire_curve")
         self.ui_funcs.install_spinBox(
@@ -43,7 +43,7 @@ class Settings(CommonComponentSettings):
             ui.up_normal_z_doubleSpinBox,
             "up_normal_z")
 
-        self.ui_funcs.install_parent_btn(
+        self.ui_funcs.install_parent_comp_btn(
             ui.head_parent_lineEdit,
             ui.add_head_parent_pushButton,
             "head_parent")
@@ -51,7 +51,7 @@ class Settings(CommonComponentSettings):
             ui.head_range_spinBox,
             "head_range")
 
-        self.ui_funcs.install_parent_btn(
+        self.ui_funcs.install_parent_comp_btn(
             ui.tail_parent_lineEdit,
             ui.add_tail_parent_pushButton,
             "tail_parent")
