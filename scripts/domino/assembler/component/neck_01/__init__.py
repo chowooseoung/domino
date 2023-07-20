@@ -160,7 +160,6 @@ class Rig(assembler.Rig):
                                                    parent=self.orbit_loc,
                                                    name=self.generate_name("ik", "", "ctl"),
                                                    parent_ctl=self.orbit_ctl,
-                                                   color=ik_color,
                                                    attrs=["tx", "ty", "tz", "rx", "ry", "rz"],
                                                    m=m,
                                                    cns=False,
@@ -180,6 +179,20 @@ class Rig(assembler.Rig):
         name = self.generate_name("cv1", "pos", "ctl")
         m = matrix.set_matrix_translate(m, pos1)
         self.cv1_pos = matrix.transform(self.look_at_start_grp, name, m, False)
+        self.cv1_ctl, self.cv1_loc = self.create_ctl(context=context,
+                                                     parent=self.cv1_pos,
+                                                     name=self.generate_name("cv1", "", "ctl"),
+                                                     parent_ctl=self.ik_ctl,
+                                                     attrs=["tx", "ty", "tz"],
+                                                     m=m,
+                                                     cns=False,
+                                                     mirror_config=(1, 0, 0, 0, 1, 1, 0, 0, 0),
+                                                     shape_args={
+                                                         "shape": "circle3",
+                                                         "width": 0.3,
+                                                         "color": ik_color
+                                                     },
+                                                     mirror_ctl_name=self.generate_name("cv1", "", "ctl", True))
 
         name = self.generate_name("lookAtEnd", "grp", "ctl")
         m = matrix.get_look_at_matrix(pos2, pos3, normal, "-xz", negate)
@@ -188,6 +201,20 @@ class Rig(assembler.Rig):
         name = self.generate_name("cv2", "pos", "ctl")
         m = matrix.set_matrix_translate(m, pos3)
         self.cv2_pos = matrix.transform(self.look_at_end_grp, name, m, False)
+        self.cv2_ctl, self.cv2_loc = self.create_ctl(context=context,
+                                                     parent=self.cv2_pos,
+                                                     name=self.generate_name("cv2", "", "ctl"),
+                                                     parent_ctl=self.ik_ctl,
+                                                     attrs=["tx", "ty", "tz"],
+                                                     m=m,
+                                                     cns=False,
+                                                     mirror_config=(1, 0, 0, 0, 1, 1, 0, 0, 0),
+                                                     shape_args={
+                                                         "shape": "circle3",
+                                                         "width": 0.3,
+                                                         "color": ik_color
+                                                     },
+                                                     mirror_ctl_name=self.generate_name("cv2", "", "ctl", True))
 
         name = self.generate_name("original", "crv", "ctl")
         self.original_crv = nurbs.create(root,
@@ -210,10 +237,10 @@ class Rig(assembler.Rig):
                                        vis=False,
                                        inherits=False,
                                        display_type=1)
-        nurbs.constraint(self.deform_crv, [self.look_at_start_grp, self.cv1_pos, self.cv2_pos, self.ik_loc])
+        nurbs.constraint(self.deform_crv, [self.look_at_start_grp, self.cv1_loc, self.cv2_loc, self.ik_loc])
 
         neck_jnt_positions = nurbs.point_on_curve(self.deform_crv, data["division"])
-        name = self.generate_name("SP%s", "", "jnt")
+        name = self.generate_name("SP%s", "jnt", "ctl")
         self.sp_chain = joint.add_chain_joint(root,
                                               name,
                                               neck_jnt_positions,
@@ -397,6 +424,11 @@ class Rig(assembler.Rig):
                                          type="bool",
                                          keyable=True,
                                          defaultValue=False)
+        self.cv_vis = attribute.add_attr(host,
+                                         longName="cv_vis",
+                                         type="bool",
+                                         keyable=True,
+                                         defaultValue=False)
 
     def operators(self, context):
         super().operators(context)
@@ -408,6 +440,11 @@ class Rig(assembler.Rig):
         for ctl in self.fk_ctls:
             for shape in mc.listRelatives(ctl, shapes=True, fullPath=True):
                 mc.connectAttr(self.fk_vis, shape + ".v")
+
+        # cv vis
+        for ctl in [self.cv1_ctl, self.cv2_ctl]:
+            for shape in mc.listRelatives(ctl, shapes=True, fullPath=True):
+                mc.connectAttr(self.cv_vis, shape + ".v")
 
         # spline ik handle
         mc.setAttr(self.sp_ik_h + ".dTwistControlEnable", True)
