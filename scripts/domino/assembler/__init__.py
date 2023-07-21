@@ -1324,6 +1324,8 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         [mc.setAttr(xxx + "." + attr, keyable=False) for attr in attrs + ["v"]]
 
     def custom_step():
+        if not context["run_custom_step"]:
+            return
         for _p in custom_step_scripts.copy():
             if _p in ["objects", "attributes", "operators", "connections", "finalize"]:
                 break
@@ -1383,6 +1385,7 @@ def create_rig(guide=None, rig=None, data=None, context=None):
 
     def finalize():
         container.set_current_asset(None)
+        values = context.values()
 
         # create sets
         name = comp.data["value"]["name"]
@@ -1401,18 +1404,24 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         if not pose_data["neutral"]:
             neutral_pose_data = {}
             for v in context.values():
+                if type(v) is bool:
+                    continue
                 if "ctls" in v:
                     neutral_pose_data.update(**attribute.collect_attr([x.fullPathName() for x in v["ctls"]]))
             pose_data["neutral"] = neutral_pose_data
             mc.setAttr(assembly_root + ".pose_json", json.dumps(pose_data), type="string")
 
         # root setup
-        for v in context.values():
+        for v in values:
+            if type(v) is bool:
+                continue
             if "root" in v and isinstance(v, dict):
                 mc.sets(v["root"], edit=True, addElement=root_sets)
 
         # ctls setup
-        for v in context.values():
+        for v in values:
+            if type(v) is bool:
+                continue
             if "ctls" in v:
                 for ctl in v["ctls"]:
                     ctl_name = ctl.fullPathName()
@@ -1425,7 +1434,9 @@ def create_rig(guide=None, rig=None, data=None, context=None):
                 mc.sets(v["ctls"], edit=True, addElement=controller_sets)
 
         # jnts setup
-        for v in context.values():
+        for v in values:
+            if type(v) is bool:
+                continue
             if "jnts" in v:
                 for jnt in v["jnts"]:
                     mc.setAttr(jnt + ".segmentScaleCompensate", False)
@@ -1436,7 +1447,9 @@ def create_rig(guide=None, rig=None, data=None, context=None):
                     mc.sets(v["jnts"], edit=True, addElement=skeleton_sets)
 
         # host setup
-        for v in context.values():
+        for v in values:
+            if type(v) is bool:
+                continue
             if "host" in v:
                 mc.connectAttr(v["root"] + ".message", v["host"] + ".component_root")
                 mc.connectAttr(v["host"] + ".message", v["host"] + ".component_host")
@@ -1504,6 +1517,7 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         log.Logger.info("{: ^50}".format("- domino -"))
         mc.undoInfo(openChunk=True)
         custom_step_scripts = comp.data["value"]["custom_step"].split(",")
+        context["run_custom_step"] = comp.data["value"]["run_custom_step"]
         custom_step()
         rig_grp()
         end_point_check = build()
