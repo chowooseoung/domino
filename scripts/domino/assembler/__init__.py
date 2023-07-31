@@ -67,7 +67,7 @@ class Component:
         return tuple(other) == self.identifier
 
     def __str__(self):
-        return "{0} instance [{1}]".format(self.__class__.__name__, "_".join([x for x in self.identifier if x]))
+        return "{0} instance [{1}]".format(self.__class__.__name__, "_".join([str(x) for x in self.identifier if x]))
 
     def __init__(self, data=None):
         self.data = {k: data[k] for k in data.keys() if not k.startswith("_")} if data else common_component_preset()
