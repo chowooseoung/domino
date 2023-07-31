@@ -1088,7 +1088,7 @@ def create_guide(data):
     mc.select(guide.root)
 
 
-def add_guide(parent, component_name):
+def add_guide(parent, component_name, component_data=None):
     if parent:
         guide_root = hierarchy.get_parent(parent, generations=-1)
         if guide_root is None:
@@ -1102,7 +1102,10 @@ def add_guide(parent, component_name):
         comp = convert_node_to_component(guide_hierarchy)
         guide = Guide(component=comp, root=guide_root)
         new_comp_mod = import_component_module(component_name)
-        new_comp_preset = new_comp_mod.component_preset()
+        if component_data:
+            new_comp_preset = component_data
+        else:
+            new_comp_preset = new_comp_mod.component_preset()
         name = new_comp_preset["value"]["name"]
         side = new_comp_preset["value"]["side"]
         if mc.objExists(parent_root + ".side"):
