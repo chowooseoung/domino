@@ -1180,11 +1180,18 @@ def mirror_guide(guide):
             side_enum = mc.attributeQuery("side", node=new_node, listEnum=True)[0]
             mc.setAttr(new_node + ".side", side_enum.split(":").index(side))
 
-            asset_container = mc.getAttr(new_node + ".asset_container") or ""
-            if asset_container:
-                n, s, i = asset_container.split("_")
-                if s != "C":
-                    mc.setAttr(new_node + ".asset_container", "_".join([n, side, i]), type="string")
+            mirror_attributes = ["asset_container"]
+            for mirror_attr in mirror_attributes:
+                if mc.attributeQuery(mirror_attr, node=new_node, exists=True):
+                    data = mc.getAttr(new_node + "." + mirror_attr) or ""
+                    if data:
+                        containers = data.split(",")
+                        new_data = []
+                        for _container in containers:
+                            n, s, i = _container.split("_")
+                            if s != "C":
+                                new_data.append("_".join([n, side, i]))
+                        mc.setAttr(new_node + "." + mirror_attr, ",".join(new_data), type="string")
 
             # space switch mirror
             for attr in mc.listAttr(new_node, userDefined=True) or []:
