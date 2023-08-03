@@ -167,6 +167,7 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
 
     sc = mc.skinCluster(bind_jnts,
                         nurbs_surf,
+                        name=name_format.format("sc"),
                         toSelectedBones=True,
                         bindMethod=1,
                         dropoffRate=2.5,
@@ -261,7 +262,7 @@ def point_on_curve(crv, division):
     return positions
 
 
-def loft(parent, curve1, curve2, name, retopo=None):
+def loft(parent, curve1, curve2, name, count=None):
     mesh, loft_node = mc.loft(curve1,
                               curve2,
                               name=name,
@@ -284,13 +285,13 @@ def loft(parent, curve1, curve2, name, retopo=None):
     mc.setAttr(tessellate + ".polygonCount", 200)
     mc.delete(mesh, ch=True)
 
-    if retopo:
+    if count:
         mc.polyRetopo(constructionHistory=False,
                       replaceOriginal=1,
                       preserveHardEdges=0,
                       topologyRegularity=0.5,
                       faceUniformity=0,
                       anisotropy=0.75,
-                      targetFaceCount=1000,
+                      targetFaceCount=count,
                       targetFaceCountTolerance=10)
     return mesh
