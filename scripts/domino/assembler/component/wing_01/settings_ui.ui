@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>399</width>
+    <height>447</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
+       <widget class="QComboBox" name="primary_curve2_comboBox"/>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="primary_under_coverts_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <widget class="QPushButton" name="secondary_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="primary_coverts_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QComboBox" name="secondary_coverts_curve1_comboBox"/>
+      </item>
+      <item row="12" column="2">
+       <widget class="QPushButton" name="secondary_under_coverts_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>primaries_coverts_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="1">
+       <widget class="QComboBox" name="secondary_under_coverts_curve2_comboBox"/>
+      </item>
+      <item row="5" column="2">
+       <widget class="QPushButton" name="primary_under_coverts_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>primaries_under_coverts_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="0">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>tertiaries_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="2">
+       <widget class="QPushButton" name="tertiary_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
+       <widget class="QPushButton" name="secondary_coverts_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QComboBox" name="secondary_coverts_curve2_comboBox"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="primary_coverts_curve2_comboBox"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>secondaries_coverts_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>secondaries_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="2" rowspan="2">
+       <widget class="QPushButton" name="secondary_under_coverts_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="2">
+       <widget class="QPushButton" name="tertiary_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>secondaries_under_coverts_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="2">
+       <widget class="QPushButton" name="secondary_coverts_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>primaries_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="primary_coverts_curve1_comboBox"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>primaries_coverts_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>secondaries_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="primary_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>primaries_under_coverts_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="primary_curve1_comboBox"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="primary_under_coverts_curve2_comboBox"/>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>secondaries_under_coverts_curve1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="primary_under_coverts_curve1_comboBox"/>
+      </item>
+      <item row="7" column="2">
+       <widget class="QPushButton" name="secondary_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" rowspan="2">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>secondaries_coverts_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="1">
+       <widget class="QComboBox" name="tertiary_curve1_comboBox"/>
+      </item>
+      <item row="14" column="1">
+       <widget class="QComboBox" name="tertiary_curve2_comboBox"/>
+      </item>
+      <item row="11" column="1">
+       <widget class="QComboBox" name="secondary_under_coverts_curve1_comboBox"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="primary_coverts_curve2_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>tertiaries_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>primaries_curve2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QComboBox" name="secondary_curve1_comboBox"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="primary_curve1_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QComboBox" name="secondary_curve2_comboBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
