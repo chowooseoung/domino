@@ -10,7 +10,7 @@ from domino.lib import matrix
 import math
 
 
-def add_joint(parent=None, name="", m=om2.MTransformationMatrix(), radius=0.5, vis=True):
+def add_joint(parent=None, name="", m=om2.MMatrix(), radius=0.5, vis=True):
     jnt = mc.createNode("joint", name=name, parent=parent)
     mc.xform(jnt, matrix=m, worldSpace=True)
     mc.setAttr(jnt + ".radius", radius)
