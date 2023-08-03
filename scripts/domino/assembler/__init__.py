@@ -1483,6 +1483,8 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         mc.connectAttr(geometry_sets + ".message", context["asset"][1] + ".geo_sets")
         mc.connectAttr(controller_sets + ".message", context["asset"][1] + ".ctl_sets")
         mc.connectAttr(skeleton_sets + ".message", context["asset"][1] + ".jnt_sets")
+        if context["specific_sets"]:
+            mc.sets(context["specific_sets"], edit=True, addElement=rig_sets)
 
         # callback
         if context["callbacks"]:
