@@ -23,6 +23,10 @@ class Settings(CommonComponentSettings):
         self.common_settings.toolBox.addItem(ui, "Individual Settings")
         self.resize_window()
 
+        self.ui_funcs.install_spinBox(
+            ui.extrude_offset_doubleSpinBox,
+            "extrude_offset")
+
         self.ui_funcs.install_curve_btn(
             ui.primary_curve1_comboBox,
             ui.primary_curve1_pushButton,

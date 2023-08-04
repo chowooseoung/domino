@@ -47,46 +47,47 @@ def component_preset():
         "secondary_under_coverts_curve2": {"type": "nurbsCurve"},
         "tertiary_curve1": {"type": "nurbsCurve"},
         "tertiary_curve2": {"type": "nurbsCurve"},
+        "extrude_offset": {"type": "float"}
     })
 
     def _anchors():
         m = om2.MMatrix()
         m1 = matrix.set_matrix_translate(m, (0, 0, 0))
-        m2 = matrix.set_matrix_translate(m, (1.5, 0, 0.5))
+        m2 = matrix.set_matrix_translate(m, (1.5, 0, -0.5))
         m3 = matrix.set_matrix_translate(m, (3, 0, 0))
-        m4 = matrix.set_matrix_translate(m, (3.3, 0, 0.05))
-        m5 = matrix.set_matrix_translate(m, (4, 0, 0.3))
-        m6 = matrix.set_matrix_translate(m, (5, 0, 0.7))
+        m4 = matrix.set_matrix_translate(m, (3.3, 0, -0.05))
+        m5 = matrix.set_matrix_translate(m, (4, 0, -0.3))
+        m6 = matrix.set_matrix_translate(m, (5, 0, -0.7))
 
         # guideA
-        m7 = matrix.set_matrix_translate(m, (0, 0, 1))
-        m8 = matrix.set_matrix_translate(m, (0, 0, 2))
-        m9 = matrix.set_matrix_translate(m, (0, 0, 3))
-        m10 = matrix.set_matrix_translate(m, (0, 0, 4))
+        m7 = matrix.set_matrix_translate(m, (0, 0, -1))
+        m8 = matrix.set_matrix_translate(m, (0, 0, -2))
+        m9 = matrix.set_matrix_translate(m, (0, 0, -3))
+        m10 = matrix.set_matrix_translate(m, (0, 0, -4))
 
         # guideB
-        m11 = matrix.set_matrix_translate(m, (1.5, 0, 1))
-        m12 = matrix.set_matrix_translate(m, (1.5, 0, 2))
-        m13 = matrix.set_matrix_translate(m, (1.5, 0, 3))
-        m14 = matrix.set_matrix_translate(m, (1.5, 0, 4))
+        m11 = matrix.set_matrix_translate(m, (1.5, 0, -1))
+        m12 = matrix.set_matrix_translate(m, (1.5, 0, -2))
+        m13 = matrix.set_matrix_translate(m, (1.5, 0, -3))
+        m14 = matrix.set_matrix_translate(m, (1.5, 0, -4))
 
         # guideC
-        m15 = matrix.set_matrix_translate(m, (3, 0, 1))
-        m16 = matrix.set_matrix_translate(m, (3, 0, 2))
-        m17 = matrix.set_matrix_translate(m, (3, 0, 3))
-        m18 = matrix.set_matrix_translate(m, (3, 0, 4))
+        m15 = matrix.set_matrix_translate(m, (3, 0, -1))
+        m16 = matrix.set_matrix_translate(m, (3, 0, -2))
+        m17 = matrix.set_matrix_translate(m, (3, 0, -3))
+        m18 = matrix.set_matrix_translate(m, (3, 0, -4))
 
         # guideD
-        m19 = matrix.set_matrix_translate(m, (4, 0, 1))
-        m20 = matrix.set_matrix_translate(m, (4, 0, 2))
-        m21 = matrix.set_matrix_translate(m, (4, 0, 3))
-        m22 = matrix.set_matrix_translate(m, (4, 0, 4))
+        m19 = matrix.set_matrix_translate(m, (4, 0, -1))
+        m20 = matrix.set_matrix_translate(m, (4, 0, -2))
+        m21 = matrix.set_matrix_translate(m, (4, 0, -3))
+        m22 = matrix.set_matrix_translate(m, (4, 0, -4))
 
         # guideE
-        m23 = matrix.set_matrix_translate(m, (5, 0, 1))
-        m24 = matrix.set_matrix_translate(m, (5, 0, 2))
-        m25 = matrix.set_matrix_translate(m, (5, 0, 3))
-        m26 = matrix.set_matrix_translate(m, (5, 0, 4))
+        m23 = matrix.set_matrix_translate(m, (5, 0, -1))
+        m24 = matrix.set_matrix_translate(m, (5, 0, -2))
+        m25 = matrix.set_matrix_translate(m, (5, 0, -3))
+        m26 = matrix.set_matrix_translate(m, (5, 0, -4))
         return m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16, m17, m18, m19, m20, m21, m22, \
             m23, m24, m25, m26
 
@@ -100,6 +101,8 @@ def component_preset():
         "anchors": [list(x) for x in _anchors()],
         "offset_pole_vec": 5,
         "offset_pole_vec_matrix": list(om2.MMatrix()),
+        "offset": 1,
+        "extrude_offset": 1
     })
     common_preset["anim"].update({
         "stretch_volume_fcurve": {"name": "stretch_volume_fcurve_UU",
@@ -1006,7 +1009,7 @@ class Rig(assembler.Rig):
             mc.polyExtrudeEdge(edges,
                                constructionHistory=0,
                                keepFacesTogether=1,
-                               offset=2)
+                               offset=data["extrude_offset"])
 
         # guide aim
         self.fix_aim0_node = matrix.transform(parent=root,
