@@ -512,22 +512,23 @@ class UiFunctionSet:
 
     def add_container_lineEdit(self, line_edit, target_attr):
         selected = mc.ls(selection=True)
-        if not selected:
+        containers = [container for container in selected if mc.attributeQuery("is_guide", node=container, exists=True)]
+        if not containers:
             self.set_attr_to_root(target_attr, "")
             line_edit.setText("")
             return None
 
-        if not mc.attributeQuery("is_guide", node=selected[0], exists=True):
-            return None
-        if mc.getAttr(selected[0] + ".component") == "assembly":
-            return None
-        guide = selected[0]
+        data = []
+        for container in containers:
+            if mc.getAttr(container + ".component") == "assembly":
+                continue
 
-        name = mc.getAttr(guide + ".name")
-        side = mc.getAttr(guide + ".side", asString=True)
-        index = str(mc.getAttr(guide + ".index"))
+            name = mc.getAttr(container + ".name")
+            side = mc.getAttr(container + ".side", asString=True)
+            index = str(mc.getAttr(container + ".index"))
+            data.append("_".join([name, side, index]))
 
-        self.set_attr_to_root(target_attr, "_".join([name, side, index]))
+        self.set_attr_to_root(target_attr, ",".join(data))
         self.update_container_lineEdit(line_edit, target_attr)
 
     def update_container_lineEdit(self, line_edit, target_attr):
