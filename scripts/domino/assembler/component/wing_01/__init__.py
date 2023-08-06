@@ -653,18 +653,18 @@ class Rig(assembler.Rig):
         mc.setAttr(cons + ".interpType", 2)
 
         # ribbon
-        self.arm_output_nodes = []
+        self.wing_output_nodes = []
         m = matrix.get_matrix(root, world_space=True)
         for i in range(len(upper_jnt_v_values)):
-            self.arm_output_nodes.append(matrix.transform(root, self.generate_name(str(i), "space", "ctl"), m))
+            self.wing_output_nodes.append(matrix.transform(root, self.generate_name(str(i), "space", "ctl"), m))
         for i in range(len(lower_jnt_v_values) - 1):
-            self.arm_output_nodes.append(matrix.transform(root,
-                                                          self.generate_name(str(i + len(upper_jnt_v_values)),
-                                                                             "space",
-                                                                             "ctl"),
-                                                          m))
-        node = matrix.transform(root, self.generate_name(str(len(self.arm_output_nodes)), "space", "ctl"), fk2_m)
-        self.arm_output_nodes.append(node)
+            self.wing_output_nodes.append(matrix.transform(root,
+                                                           self.generate_name(str(i + len(upper_jnt_v_values)),
+                                                                              "space",
+                                                                              "ctl"),
+                                                           m))
+        node = matrix.transform(root, self.generate_name(str(len(self.wing_output_nodes)), "space", "ctl"), fk2_m)
+        self.wing_output_nodes.append(node)
 
         # upper
         flexible0_uniform_attr = attribute.add_attr(self.flexible0_ctl,
@@ -681,15 +681,15 @@ class Rig(assembler.Rig):
                               sorted(upper_jnt_v_values),
                               upper_bind_jnts,
                               flexible0_uniform_attr,
-                              self.arm_output_nodes[:len(lower_jnt_v_values) * -1],
+                              self.wing_output_nodes[:len(lower_jnt_v_values) * -1],
                               negate=negate)
         # upper last aim fix
-        pick_m = mc.listConnections(self.arm_output_nodes[len(upper_jnt_v_values) - 1] + ".offsetParentMatrix",
+        pick_m = mc.listConnections(self.wing_output_nodes[len(upper_jnt_v_values) - 1] + ".offsetParentMatrix",
                                     source=True,
                                     destination=False)[0]
         aim_m = mc.listConnections(pick_m + ".inputMatrix", source=True, destination=False)[0]
         mc.setAttr(aim_m + ".primaryInputAxisX", -1 if negate else 1)
-        mc.connectAttr(self.arm_output_nodes[len(upper_jnt_v_values)] + ".offsetParentMatrix",
+        mc.connectAttr(self.wing_output_nodes[len(upper_jnt_v_values)] + ".offsetParentMatrix",
                        aim_m + ".primaryTargetMatrix",
                        force=True)
 
@@ -708,16 +708,16 @@ class Rig(assembler.Rig):
                               sorted(lower_jnt_v_values)[:-1],
                               lower_bind_jnts,
                               flexible1_uniform_attr,
-                              self.arm_output_nodes[len(upper_jnt_v_values):],
+                              self.wing_output_nodes[len(upper_jnt_v_values):],
                               negate=negate)
 
         # last-1 aim reverse
-        pick_m = mc.listConnections(self.arm_output_nodes[-2] + ".offsetParentMatrix",
+        pick_m = mc.listConnections(self.wing_output_nodes[-2] + ".offsetParentMatrix",
                                     source=True,
                                     destination=False)[0]
         aim_m = mc.listConnections(pick_m + ".inputMatrix", source=True, destination=False)[0]
         mc.setAttr(aim_m + ".primaryInputAxisX", -1 if negate else 1)
-        mc.connectAttr(self.arm_output_nodes[-1] + ".matrix", aim_m + ".primaryTargetMatrix", force=True)
+        mc.connectAttr(self.wing_output_nodes[-1] + ".matrix", aim_m + ".primaryTargetMatrix", force=True)
 
         mc.parentConstraint(self.blend_nodes[-1], node, maintainOffset=False)
         mc.scaleConstraint(self.blend_nodes[-1], node, maintainOffset=False)
@@ -729,7 +729,7 @@ class Rig(assembler.Rig):
         offset = ((positions[4] - positions[3]) / 2.0).length()
         po = offset * -1 if negate else offset
         self.fk3_ctl, self.fk3_loc = self.create_ctl(context=context,
-                                                     parent=self.arm_output_nodes[-1],
+                                                     parent=self.wing_output_nodes[-1],
                                                      name=self.generate_name("fk3", "", "ctl"),
                                                      parent_ctl=self.fk2_ctl,
                                                      attrs=["tx", "ty", "tz",
@@ -775,6 +775,8 @@ class Rig(assembler.Rig):
         xxx_split_output_grp = mc.createNode("transform",
                                              parent=root,
                                              name=self.generate_name("splitOutput", "grp", "ctl"))
+        mc.setAttr(xxx_split_output_grp + ".overrideEnabled", 1)
+        mc.setAttr(xxx_split_output_grp + ".overrideDisplayType", 2)
         xxx_split_skin_grp = mc.createNode("transform",
                                            parent=xxx_mesh_grp,
                                            name=self.generate_name("splitSkin", "grp", "ctl"))
@@ -945,7 +947,9 @@ class Rig(assembler.Rig):
         if not negate:
             for grp in [xxx_split_output_grp, xxx_split_skin_grp]:
                 for child in mc.listRelatives(grp, children=True):
-                    mc.polyNormal(child, normalMode=0, userNormalMode=0, ch=0)
+                    normal_str = mc.polyInfo(child + ".f[0]", faceNormals=True)[0]
+                    if float(normal_str.split(" ")[-2]) < 0:
+                        mc.polyNormal(child, normalMode=0, userNormalMode=0, ch=0)
 
         dup_meshes = []
         indexes = []
@@ -966,6 +970,20 @@ class Rig(assembler.Rig):
                       xxx_split_output_grp,
                       name=self.generate_name("splitMesh", "bs", "ctl"),
                       weight=(0, 1))
+
+        # feather_01 connector
+        context[self.identifier]["split_meshes"] = self.split_meshes
+        context[self.identifier]["proximity_pin"] = [[], [], [], [], [], [], []]
+        for i, array in enumerate(context[self.identifier]["proximity_pin"]):
+            output_mesh = self.split_meshes[i]
+            shape, orig_shape = mc.listRelatives(output_mesh, shapes=True)
+            pin = mc.createNode("proximityPin")
+            mc.setAttr(pin + ".offsetTranslation", 1)
+            mc.setAttr(pin + ".offsetOrientation", 1)
+            mc.connectAttr(orig_shape + ".outMesh", pin + ".originalGeometry")
+            mc.connectAttr(shape + ".worldMesh[0]", pin + ".deformedGeometry")
+            array.append(pin)
+            array.append(0)
 
         self.combine_mesh = mc.polyUnite(dup_meshes,
                                          constructionHistory=False,
@@ -1015,37 +1033,37 @@ class Rig(assembler.Rig):
         self.fix_aim0_node = matrix.transform(parent=root,
                                               name=self.generate_name("fixAim0", "pos", "ctl"),
                                               m=matrix.set_matrix_translate(m, guide_a_positions[-1]))
-        self.move_aim0_node = matrix.transform(parent=self.arm_output_nodes[0],
+        self.move_aim0_node = matrix.transform(parent=self.wing_output_nodes[0],
                                                name=self.generate_name("moveAim0", "pos", "ctl"),
                                                m=matrix.set_matrix_translate(m, guide_a_positions[-1]))
-        self.blend_aim0_source_node = self.arm_output_nodes[0]
+        self.blend_aim0_source_node = self.wing_output_nodes[0]
         self.blend_aim0_target_node = matrix.transform(parent=root,
                                                        name=self.generate_name("blendAim0", "pos", "ctl"),
                                                        m=matrix.set_matrix_translate(m, guide_a_positions[-1]))
-        mc.pointConstraint(self.arm_output_nodes[0], self.fix_aim0_node, maintainOffset=True)
+        mc.pointConstraint(self.wing_output_nodes[0], self.fix_aim0_node, maintainOffset=True)
         self.guide_a_cons = mc.pointConstraint(self.fix_aim0_node,
                                                self.move_aim0_node,
                                                self.blend_aim0_target_node)[0]
 
-        self.fix_aim1_node = matrix.transform(parent=self.arm_output_nodes[0],
+        self.fix_aim1_node = matrix.transform(parent=self.wing_output_nodes[0],
                                               name=self.generate_name("fixAim1", "pos", "ctl"),
                                               m=matrix.set_matrix_translate(m, guide_b_positions[-1]))
-        self.move_aim1_node = matrix.transform(parent=self.arm_output_nodes[int(len(self.arm_output_nodes) / 2)],
+        self.move_aim1_node = matrix.transform(parent=self.wing_output_nodes[int(len(self.wing_output_nodes) / 2)],
                                                name=self.generate_name("moveAim1", "pos", "ctl"),
                                                m=matrix.set_matrix_translate(m, guide_b_positions[-1]))
-        self.blend_aim1_source_node = self.arm_output_nodes[int(len(self.arm_output_nodes) / 2)]
+        self.blend_aim1_source_node = self.wing_output_nodes[int(len(self.wing_output_nodes) / 2)]
         self.blend_aim1_target_node = matrix.transform(parent=root,
                                                        name=self.generate_name("blendAim1", "pos", "ctl"),
                                                        m=matrix.set_matrix_translate(m, guide_b_positions[-1]))
         self.guide_b_cons = mc.pointConstraint(self.fix_aim1_node, self.move_aim1_node, self.blend_aim1_target_node)[0]
 
-        self.fix_aim2_node = matrix.transform(parent=self.arm_output_nodes[int(len(self.arm_output_nodes) / 2)],
+        self.fix_aim2_node = matrix.transform(parent=self.wing_output_nodes[int(len(self.wing_output_nodes) / 2)],
                                               name=self.generate_name("fixAim2", "pos", "ctl"),
                                               m=matrix.set_matrix_translate(m, guide_c_positions[-1]))
         self.move_aim2_node = matrix.transform(parent=self.fk3_loc,
                                                name=self.generate_name("moveAim2", "pos", "ctl"),
                                                m=matrix.set_matrix_translate(m, guide_c_positions[-1]))
-        self.blend_aim2_source_node = self.arm_output_nodes[-1]
+        self.blend_aim2_source_node = self.wing_output_nodes[-1]
         self.blend_aim2_target_node = matrix.transform(parent=root,
                                                        name=self.generate_name("blendAim2", "pos", "ctl"),
                                                        m=matrix.set_matrix_translate(m, guide_c_positions[-1]))
@@ -1097,14 +1115,14 @@ class Rig(assembler.Rig):
             self.guide_a_locs.append(loc)
             parent = loc
             parent_ctl = ctl
-        self.guide_a_up_move = matrix.transform(parent=self.arm_output_nodes[0],
+        self.guide_a_up_move = matrix.transform(parent=self.wing_output_nodes[0],
                                                 name=self.generate_name("guideA", "upMove", "ctl"),
                                                 m=matrix.get_matrix(self.guide_a_ctls[0]))
         mc.setAttr(self.guide_a_up_move + ".tz", 1)
         self.guide_a_up_fix = matrix.transform(parent=root,
                                                name=self.generate_name("guideA", "upFix", "ctl"),
                                                m=matrix.get_matrix(self.guide_a_up_move))
-        mc.pointConstraint(self.arm_output_nodes[0], self.guide_a_up_fix, maintainOffset=True)
+        mc.pointConstraint(self.wing_output_nodes[0], self.guide_a_up_fix, maintainOffset=True)
         self.guide_a_up = matrix.transform(parent=root,
                                            name=self.generate_name("guideA", "up", "ctl"),
                                            m=matrix.get_matrix(self.guide_a_up_move))
@@ -1156,7 +1174,7 @@ class Rig(assembler.Rig):
             self.guide_b_locs.append(loc)
             parent = loc
             parent_ctl = ctl
-        self.guide_b_up = matrix.transform(parent=self.arm_output_nodes[int(len(self.arm_output_nodes) / 2)],
+        self.guide_b_up = matrix.transform(parent=self.wing_output_nodes[int(len(self.wing_output_nodes) / 2)],
                                            name=self.generate_name("guideB", "up", "ctl"),
                                            m=matrix.get_matrix(self.guide_b_ctls[0]))
         mc.setAttr(self.guide_b_up + ".tz", 1)
@@ -1207,7 +1225,7 @@ class Rig(assembler.Rig):
             self.guide_c_locs.append(loc)
             parent = loc
             parent_ctl = ctl
-        self.guide_c_up = matrix.transform(parent=self.arm_output_nodes[-1],
+        self.guide_c_up = matrix.transform(parent=self.wing_output_nodes[-1],
                                            name=self.generate_name("guideC", "up", "ctl"),
                                            m=matrix.get_matrix(self.guide_c_ctls[0]))
         mc.setAttr(self.guide_c_up + ".tz", 1)
@@ -1710,7 +1728,7 @@ class Rig(assembler.Rig):
         # refs
         self.refs = []
         twist_index = 0
-        for i, node in enumerate(self.arm_output_nodes + [self.fk3_loc, self.fk4_loc]):
+        for i, node in enumerate(self.wing_output_nodes + [self.fk3_loc, self.fk4_loc]):
             if i == 0:
                 anchor = True
                 name = self.generate_name("humerus", "ref", "ctl")
@@ -1718,13 +1736,13 @@ class Rig(assembler.Rig):
                 anchor = True
                 name = self.generate_name("elbow", "ref", "ctl")
                 twist_index = 0
-            elif i == len(self.arm_output_nodes) - 1:
+            elif i == len(self.wing_output_nodes) - 1:
                 anchor = True
                 name = self.generate_name("carpus", "ref", "ctl")
-            elif i == len(self.arm_output_nodes):
+            elif i == len(self.wing_output_nodes):
                 anchor = True
                 name = self.generate_name("metacarpus", "ref", "ctl")
-            elif i == len(self.arm_output_nodes) + 1:
+            elif i == len(self.wing_output_nodes) + 1:
                 anchor = True
                 name = self.generate_name("phalanges", "ref", "ctl")
             else:
@@ -1751,11 +1769,11 @@ class Rig(assembler.Rig):
                 elif i == len(upper_jnt_v_values):
                     name = self.generate_name("elbow", "", "jnt")
                     twist_index = 0
-                elif i == len(self.arm_output_nodes) - 1:
+                elif i == len(self.wing_output_nodes) - 1:
                     name = self.generate_name("carpus", "", "jnt")
-                elif i == len(self.arm_output_nodes):
+                elif i == len(self.wing_output_nodes):
                     name = self.generate_name("metacarpus", "", "jnt")
-                elif i == len(self.arm_output_nodes) + 1:
+                elif i == len(self.wing_output_nodes) + 1:
                     name = self.generate_name("phalanges", "", "jnt")
                 elif i < len(upper_jnt_v_values):
                     bind = False
@@ -2078,7 +2096,7 @@ class Rig(assembler.Rig):
                          self.squash_attrs,
                          self.stretch_attrs,
                          self.volume_attr,
-                         self.arm_output_nodes[:-1])
+                         self.wing_output_nodes[:-1])
 
         # guide blend
         cons = [self.guide_a_cons, self.guide_b_cons, self.guide_c_cons, self.guide_d_cons]
@@ -2131,11 +2149,12 @@ class Rig(assembler.Rig):
                                     normalizeWeights=1,
                                     weightDistribution=1,
                                     removeUnusedInfluence=False)[0]
-        mc.polySmooth(self.combine_skin_mesh,
-                      name=self.generate_name("combine", "smooth", "ctl"),
-                      keepBorder=0,
-                      continuity=1,
-                      constructionHistory=1)
+        smooth = mc.polySmooth(self.combine_skin_mesh,
+                               name=self.generate_name("combine", "smooth", "ctl"),
+                               keepBorder=0,
+                               continuity=1,
+                               constructionHistory=1,
+                               divisions=2)
 
         wing_skin_sets = mc.sets([self.combine_skin_mesh,
                                   self.primary_skin_mesh,
