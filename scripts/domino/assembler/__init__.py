@@ -217,7 +217,7 @@ class Component:
 
         def _enum(__attr, __value):
             enum_name = mc.attributeQuery(__attr, node=node, listEnum=True)[0]
-            mc.setAttr(node + "." + __attr, enum_name.split(":").index(__value))
+            mc.setAttr(node + "." + __attr, enum_name.split(":").index(str(__value)))
 
         def _matrix(__attr, __value):
             inputs = mc.listConnections(node + "." + __attr, source=True, destination=False)
