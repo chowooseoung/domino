@@ -465,6 +465,8 @@ class Guide:
         if "display_curve" in self.guide_recipe:
             for dp_crv_info in self.guide_recipe["display_curve"]:
                 source_indexes = dp_crv_info[0]
+                if not source_indexes:
+                    source_indexes = range(len(self.guide_recipe["position"]) + 1)
                 guide_name_extension = dp_crv_info[1]
                 degree = 1
                 thickness = 2
