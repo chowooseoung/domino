@@ -488,6 +488,11 @@ class Guide:
                 for attr in attrs:
                     mc.setAttr(pos + "." + attr, lock=True)
 
+        if "post" in self.guide_recipe:
+            anchors = mc.listConnections(self.root + ".anchors", source=True, destination=False)
+            script = self.guide_recipe["post"]["script"]
+            mc.evalDeferred(script.format(*[anchors[x] for x in self.guide_recipe["post"]["indexes"]]))
+
         if value["component"] == "assembly":
             ctl_shapes = mc.createNode("transform", name="ctl_shapes", parent=self.root)
             mc.setAttr(ctl_shapes + ".v", False)

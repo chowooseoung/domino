@@ -13,9 +13,15 @@ from domino.lib import hierarchy
 MAYA_LOCATION = os.environ["MAYA_LOCATION"]
 
 # Source Mel Files
+if not mc.pluginInfo("mayaHIK", query=True, loaded=True):
+    mc.loadPlugin("mayaHIK")
+if not mc.pluginInfo("mayaCharacterization", query=True, loaded=True):
+    mc.loadPlugin("mayaCharacterization")
 mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikGlobalUtils.mel"')
 mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikCharacterControlsUI.mel"')
 mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikDefinitionOperations.mel"')
+mel.eval("ToggleCharacterControls;")
+mel.eval("ToggleCharacterControls;")
 
 
 def prepare_rig(file):
@@ -47,6 +53,7 @@ def load_interface(interface_file, map_file, definition):
     with open(map_file, "r", encoding="UTF-8") as f:
         map_data = json.load(f)
 
+    bake_ctl_sets = mc.sets(name="bake_ctl_sets", empty=True)
     skip_t = ["tx", "ty", "tz"]
     skip_r = ["rx", "ry", "rz"]
     for interface, rig in map_data["match"].items():
@@ -64,6 +71,7 @@ def load_interface(interface_file, map_file, definition):
             if _skip_r:
                 argument["skipRotate"] = [x[1:] for x in _skip_r]
             mc.parentConstraint(interface_node, rig, **argument)
+            mc.sets(rig, edit=True, addElement=bake_ctl_sets)
     interface_root = hierarchy.get_parent(new_joints[0], generations=-1) or new_joints[0]
     mc.makeIdentity(interface_root, apply=True, rotate=True)
 
@@ -139,12 +147,34 @@ def set_source(character, source):
     mel.eval('hikUpdateContextualUI();')
 
 
-def bake_anim(ctls):
-    pass
+def bake_anim():
+    ctls = mc.sets("bake_ctl_sets", query=True)
+    min_time = mc.playbackOptions(minTime=True, query=True)
+    max_time = mc.playbackOptions(maxTime=True, query=True)
+    mc.bakeResults(ctls,
+                   at=["tx", "ty", "tz", "rx", "ry", "rz"],
+                   t=(min_time - 1, max_time + 1),
+                   simulation=True,  # need auto clavicle cycle
+                   sampleBy=1,
+                   oversamplingRate=1,
+                   disableImplicitControl=True,
+                   preserveOutsideKeys=True,
+                   sparseAnimCurveBake=False,
+                   removeBakedAttributeFromLayer=False,
+                   removeBakedAnimFromLayer=False,
+                   bakeOnOverrideLayer=True,
+                   minimizeRotation=True,
+                   controlPoints=False,
+                   shape=True)
 
 
-def export(file, bake=[]):
-    if bake:
-        bake_anim(bake)
+def remove_interface():
+    namespaces = mc.namespaceInfo(listOnlyNamespaces=True)[1:-1]
+    interface_namespace = [x for x in namespaces if x.startswith("interface")][0]
+    mc.delete(mc.namespaceInfo("interface", listNamespace=True))
+    mc.namespace(removeNamespace=interface_namespace)
+
+
+def export(file):
     mc.file(rename=file)
     mc.file(save=True, type="mayaAscii")

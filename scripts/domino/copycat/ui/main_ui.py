@@ -17,7 +17,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(457, 247)
+        Dialog.resize(457, 271)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(Dialog)
@@ -91,17 +91,32 @@ class Ui_Dialog(object):
         self.label_7 = QLabel(self.groupBox_3)
         self.label_7.setObjectName(u"label_7")
 
-        self.gridLayout_3.addWidget(self.label_7, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.label_7, 1, 0, 1, 1)
 
         self.export_directory_lineEdit = QLineEdit(self.groupBox_3)
         self.export_directory_lineEdit.setObjectName(u"export_directory_lineEdit")
 
-        self.gridLayout_3.addWidget(self.export_directory_lineEdit, 0, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.export_directory_lineEdit, 1, 1, 1, 1)
 
         self.export_pushButton = QPushButton(self.groupBox_3)
         self.export_pushButton.setObjectName(u"export_pushButton")
 
-        self.gridLayout_3.addWidget(self.export_pushButton, 0, 2, 1, 1)
+        self.gridLayout_3.addWidget(self.export_pushButton, 1, 2, 1, 1)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.bake_key_checkBox = QCheckBox(self.groupBox_3)
+        self.bake_key_checkBox.setObjectName(u"bake_key_checkBox")
+
+        self.horizontalLayout.addWidget(self.bake_key_checkBox)
+
+        self.remove_interface_checkBox = QCheckBox(self.groupBox_3)
+        self.remove_interface_checkBox.setObjectName(u"remove_interface_checkBox")
+
+        self.horizontalLayout.addWidget(self.remove_interface_checkBox)
+
+
+        self.gridLayout_3.addLayout(self.horizontalLayout, 0, 0, 1, 3)
 
 
         self.verticalLayout.addWidget(self.groupBox_3)
@@ -128,5 +143,7 @@ class Ui_Dialog(object):
         self.groupBox_3.setTitle(QCoreApplication.translate("Dialog", u"Export", None))
         self.label_7.setText(QCoreApplication.translate("Dialog", u"Export Directory", None))
         self.export_pushButton.setText(QCoreApplication.translate("Dialog", u"Export", None))
+        self.bake_key_checkBox.setText(QCoreApplication.translate("Dialog", u"Bake Key", None))
+        self.remove_interface_checkBox.setText(QCoreApplication.translate("Dialog", u"Remove Interface", None))
     # retranslateUi
 

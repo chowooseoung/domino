@@ -17,7 +17,7 @@ from domino.lib import log
 
 
 class CopyCatUI(QtWidgets.QDialog, main_ui.Ui_Dialog):
-    ui_name = "DominoMotionCaptureCopyCatUI"
+    ui_name = "DominoCopyCatUI"
 
     def __init__(self, parent=None):
         super(CopyCatUI, self).__init__(parent=parent)
@@ -116,7 +116,10 @@ class CopyCat(CopyCatUI):
             copycat.load_motion(motion_file, motion_definition_file)
 
             copycat.set_source("interfaceCharacter", "motionCharacter")
-
+            if self.bake_key_checkBox.isChecked():
+                copycat.bake_anim()
+            if self.remove_interface_checkBox.isChecked():
+                copycat.remove_interface()
             retargeted_file = os.path.join(export_directory, "retargeted_" + fbx.replace(".fbx", ".ma"))
             log.Logger.info(f"Retargeted : '{retargeted_file}'")
             copycat.export(retargeted_file)
