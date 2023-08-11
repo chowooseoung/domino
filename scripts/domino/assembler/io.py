@@ -56,7 +56,7 @@ def load(file_path=None, guide=False, rig=True, context=None):
         else:
             return None
 
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="UTF-8") as f:
         data = json.load(f)
 
     if guide:
