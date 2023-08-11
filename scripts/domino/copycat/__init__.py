@@ -1,23 +1,27 @@
 # maya
-from pymel import core as pm
+from maya import cmds as mc
+from maya import mel
 
 # built-ins
 import os
 import json
 from xml.etree import ElementTree
 
+# domino
+from domino.lib import hierarchy
+
 MAYA_LOCATION = os.environ["MAYA_LOCATION"]
 
 # Source Mel Files
-pm.mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikGlobalUtils.mel"')
-pm.mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikCharacterControlsUI.mel"')
-pm.mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikDefinitionOperations.mel"')
+mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikGlobalUtils.mel"')
+mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikCharacterControlsUI.mel"')
+mel.eval('source "' + MAYA_LOCATION + '/scripts/others/hikDefinitionOperations.mel"')
 
 
 def prepare_rig(file):
-    pm.newFile(force=True)
+    mc.file(newFile=True, force=True)
 
-    pm.importFile(file, namespace=":")
+    mc.file(file, namespace=":", i=True)
 
 
 def load_interface(interface_file, map_file, definition):
@@ -34,20 +38,21 @@ def load_interface(interface_file, map_file, definition):
     """
     if not (os.path.exists(interface_file) and os.path.exists(map_file) and os.path.exists(definition)):
         return 0
-    pm.FBXResetImport()
-    pm.mel.eval('FBXImportMode -v "add";')
+    mel.eval("FBXResetImport();")
+    mel.eval('FBXImportMode -v "add";')
 
-    new_nodes = pm.importFile(interface_file, returnNewNodes=True, usingNamespaces=True, namespace="interface")
-    new_joints = [x for x in new_nodes if x.type() == "joint" or x.type() == "transform"]
+    new_nodes = mc.file(interface_file, i=True, returnNewNodes=True, usingNamespaces=True, namespace="interface")
+    new_joints = [x for x in new_nodes if mc.nodeType(x) == "joint" or mc.nodeType(x) == "transform"]
 
-    with open(map_file, "r") as f:
+    with open(map_file, "r", encoding="UTF-8") as f:
         map_data = json.load(f)
 
     skip_t = ["tx", "ty", "tz"]
     skip_r = ["rx", "ry", "rz"]
     for interface, rig in map_data["match"].items():
         interface_node = f"interface:{interface}"
-        pm.matchTransform(interface_node, rig, position=True, rotation=True)
+        m = mc.xform(rig, query=True, matrix=True, worldSpace=True)
+        mc.xform(interface_node, matrix=m, worldSpace=True)
     for interface, data in map_data["connector"].items():
         interface_node = f"interface:{interface}"
         for rig, cons_attrs in data.items():
@@ -58,65 +63,82 @@ def load_interface(interface_file, map_file, definition):
             _skip_r = list(set(skip_r) - set(cons_attrs))
             if _skip_r:
                 argument["skipRotate"] = [x[1:] for x in _skip_r]
-            pm.parentConstraint(interface_node, rig, **argument)
-    interface_root = new_joints[0].getParent(generations=-1)
-    pm.makeIdentity(interface_root, apply=True, rotate=True)
+            mc.parentConstraint(interface_node, rig, **argument)
+    interface_root = hierarchy.get_parent(new_joints[0], generations=-1)
+    if interface_root is None:
+        interface_root = new_joints[0]
+    mc.makeIdentity(interface_root, apply=True, rotate=True)
 
     tree = ElementTree.parse(definition)
     match_list = tree.getroot()[0]
-    character = pm.mel.eval('hikCreateCharacter("interfaceCharacter");')
+    character = mel.eval('hikCreateCharacter("interfaceCharacter");')
 
     for n, li in enumerate(match_list):
         if li.attrib["value"]:
             interface_node = f"interface:{li.attrib['value']}"
-            if pm.objExists(interface_node):
-                pm.mel.eval(f'hikSetCharacterObject("{interface_node}", "{character}", {n}, 0);')
+            if mc.objExists(interface_node):
+                mel.eval(f'hikSetCharacterObject("{interface_node}", "{character}", {n}, 0);')
 
-    is_locked = pm.getAttr(character + ".InputCharacterizationLock")
+    is_locked = mc.getAttr(character + ".InputCharacterizationLock")
     if not is_locked:
-        pm.mel.eval("hikToggleLockDefinition();")
+        mel.eval("hikToggleLockDefinition();")
 
 
 def load_motion(file, definition):
     if not (os.path.exists(file) and os.path.exists(definition)):
         return 0
-    pm.mel.eval('FBXImportMode -v "merge";')
-    pm.mel.eval(f'FBXImport -f "{file.replace(os.sep, "/")}";')
+    namespace = os.path.splitext(os.path.basename(definition))[0]
+    mel.eval('FBXImportMode -v "merge";')
+    mel.eval(f'FBXImport -f "{file.replace(os.sep, "/")}";')
 
     tree = ElementTree.parse(definition)
     match_list = tree.getroot()[0]
-    character = pm.mel.eval('hikCreateCharacter("motionCharacter");')
+    character = mel.eval('hikCreateCharacter("motionCharacter");')
+
+    # hip position setup
+    hip_node = match_list[1].attrib["value"]  # hip
+    if not mc.objExists(hip_node):
+        hip_node = f"{namespace}:{hip_node}"
+    left_foot_node = match_list[4].attrib["value"]  # left foot
+    if not mc.objExists(left_foot_node):
+        left_foot_node = f"{namespace}:{left_foot_node}"
+
+    hip_pos = mc.xform(hip_node, query=True, translation=True, worldSpace=True)
+    left_foot_pos = mc.xform(left_foot_node, query=True, translation=True, worldSpace=True)
+    mc.setAttr(hip_node + ".ty", hip_pos[1] - left_foot_pos[1])
 
     for n, li in enumerate(match_list):
         if li.attrib["value"]:
             motion_node = li.attrib["value"]
-            if not pm.objExists(motion_node):
-                motion_node = f"{pm.Path(definition).namebase}:{motion_node}"
-            if pm.objExists(motion_node):
-                pm.mel.eval(f'hikSetCharacterObject("{motion_node}", "{character}", {n}, 0);')
-    root = pm.PyNode(motion_node).getParent(generations=-1)
-    [x.attr("r").set((0, 0, 0)) for x in pm.ls(root, dagObjects=True)]
+            if not mc.objExists(motion_node):
+                motion_node = f"{namespace}:{motion_node}"
+            if mc.objExists(motion_node):
+                mel.eval(f'hikSetCharacterObject("{motion_node}", "{character}", {n}, 0);')
+    root = hierarchy.get_parent(motion_node, generations=-1)
+    [mc.setAttr(x + ".r", 0, 0, 0) for x in mc.ls(root, dagObjects=True)]
 
-    is_locked = pm.getAttr(character + ".InputCharacterizationLock")
+    is_locked = mc.getAttr(character + ".InputCharacterizationLock")
     if not is_locked:
-        pm.mel.eval("hikToggleLockDefinition();")
+        mel.eval("hikToggleLockDefinition();")
 
 
 def set_source(character, source):
-    uiss = pm.lsUI(long=True, type="optionMenuGrp")
+    uiss = mc.lsUI(long=True, type="optionMenuGrp")
     for ui in uiss:
         if "hikCharacterList" in ui:
             ui_hik_character = ui
-    pm.optionMenuGrp(ui_hik_character, edit=True, value=character)
-    pm.mel.eval('hikUpdateCurrentCharacterFromUI();')
-    pm.mel.eval('hikUpdateContextualUI();')
+            break
+    mc.optionMenuGrp(ui_hik_character, edit=True, value=character)
+    mel.eval('hikUpdateCurrentCharacterFromUI();')
+    mel.eval('hikUpdateContextualUI();')
 
     for ui in uiss:
         if "hikSourceList" in ui:
             ui_hik_source = ui
-    pm.optionMenuGrp(ui_hik_source, edit=True, value=f" {source}")
-    pm.mel.eval('hikUpdateCurrentSourceFromUI();')
-    pm.mel.eval('hikUpdateContextualUI();')
+            break
+    mc.optionMenuGrp(ui_hik_source, edit=True, value=f" {source}")
+    mel.eval('hikUpdateCurrentSourceFromUI();')
+    mel.eval('hikUpdateContextualUI();')
 
 
 def bake_anim(ctls):
@@ -126,4 +148,5 @@ def bake_anim(ctls):
 def export(file, bake=[]):
     if bake:
         bake_anim(bake)
-    pm.saveAs(file, force=True)
+    mc.file(rename=file)
+    mc.file(save=True, type="mayaAscii")
