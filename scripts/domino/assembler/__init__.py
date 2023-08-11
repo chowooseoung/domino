@@ -632,6 +632,26 @@ class Rig:
             ctls.append(context[identifier]["ctls"][int(index)].fullPathName())
         return ctls
 
+    def find_component(self, identifier):
+        assembly_comp = self.component.get_parent(generations=-1)
+
+        target_comp = None
+
+        def _find(comp):
+            nonlocal target_comp
+
+            if target_comp is not None:
+                return
+
+            if "_".join([str(x) for x in comp.identifier if x is not None]) == identifier:
+                target_comp = comp
+
+            for child_comp in comp.children:
+                _find(child_comp)
+
+        _find(assembly_comp)
+        return target_comp
+
     def create_root(self, context):
         name = self.generate_name(description="", extension="_root", rule="ctl")
 
