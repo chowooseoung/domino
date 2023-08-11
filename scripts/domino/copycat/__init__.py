@@ -64,9 +64,7 @@ def load_interface(interface_file, map_file, definition):
             if _skip_r:
                 argument["skipRotate"] = [x[1:] for x in _skip_r]
             mc.parentConstraint(interface_node, rig, **argument)
-    interface_root = hierarchy.get_parent(new_joints[0], generations=-1)
-    if interface_root is None:
-        interface_root = new_joints[0]
+    interface_root = hierarchy.get_parent(new_joints[0], generations=-1) or new_joints[0]
     mc.makeIdentity(interface_root, apply=True, rotate=True)
 
     tree = ElementTree.parse(definition)
