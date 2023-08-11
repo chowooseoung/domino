@@ -1010,6 +1010,9 @@ class Rig(assembler.Rig):
                                                             host,
                                                             switch_attr_name="ik_space_switch")
             context["callbacks"].append(self.ik_ctl_script_node)
+            sel_list = om2.MSelectionList()
+            sel_list.add(self.ik_ctl_cons)
+            self.ik_ctl_cons = sel_list.getDagPath(0)
         if data["pv_space_switch_array"]:
             source_ctls = self.find_ctls(context, data["pv_space_switch_array"])
             self.pv_ctl_cons = operators.space_switch(source_ctls, self.pole_vec_ctl, host, attr_name="pv_space_switch")
@@ -1018,6 +1021,9 @@ class Rig(assembler.Rig):
                                                             host,
                                                             switch_attr_name="pv_space_switch")
             context["callbacks"].append(self.pv_ctl_script_node)
+            sel_list = om2.MSelectionList()
+            sel_list.add(self.pv_ctl_cons)
+            self.pv_ctl_cons = sel_list.getDagPath(0)
         if data["pin_space_switch_array"]:
             selection_list = om2.MSelectionList()
             selection_list.add(self.pin_ctl)
@@ -1123,8 +1129,6 @@ class Rig(assembler.Rig):
             sel_list.add(self.ik_local_loc)
             sel_list.add(self.ik_ctl)
             sel_list.add(self.pole_vec_ctl)
-            sel_list.add(self.ik_ctl_cons)
-            sel_list.add(self.pv_ctl_cons)
 
             ik_npo = hierarchy.get_parent(self.ik_ctl)
             if mc.controller(ik_npo, query=True):
@@ -1138,8 +1142,6 @@ class Rig(assembler.Rig):
             self.ik_local_loc = sel_list.getDagPath(1).fullPathName()
             self.ik_ctl = sel_list.getDagPath(2).fullPathName()
             self.pole_vec_ctl = sel_list.getDagPath(3).fullPathName()
-            self.ik_ctl_cons = sel_list.getDagPath(4).fullPathName()
-            self.pv_ctl_cons = sel_list.getDagPath(5).fullPathName()
 
             parent = clavicle_root
             self.auto_clavicle_jnts = []
