@@ -90,9 +90,18 @@
         "rz"
       ]
     },
-    "Neck1": {},
+    "Neck1": {
+      "neck_C0_fk1_ctl": [
+        "tx",
+        "ty",
+        "tz",
+        "rx",
+        "ry",
+        "rz"
+      ]
+    },
     "Neck2": {
-      "neck_C0_ik_ctl": [
+      "neck_C0_fk2_ctl": [
         "tx",
         "ty",
         "tz",
