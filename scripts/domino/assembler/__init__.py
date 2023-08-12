@@ -203,10 +203,11 @@ class Component:
                     for index in __value.keys():
                         crv = nurbs.build(__value[index], parent=parent, match=True)
                         mc.connectAttr(crv + ".worldSpace[0]", node + "." + __attr + "[{0}]".format(index))
-                        mc.setAttr(crv + ".dispHull", 1)
-                        mc.setAttr(crv + ".dispCV", 1)
-                        mc.setAttr(crv + ".overrideEnabled", 1)
-                        mc.setAttr(crv + ".overrideDisplayType", 2)
+                        for shape in mc.listRelatives(crv, shapes=True, fullPath=True):
+                            mc.setAttr(shape + ".dispHull", 1)
+                            mc.setAttr(shape + ".dispCV", 1)
+                            mc.setAttr(shape + ".overrideEnabled", 1)
+                            mc.setAttr(shape + ".overrideDisplayType", 2)
                 else:
                     crv = nurbs.build(__value[str(0)], parent=parent, match=True)
                     mc.connectAttr(crv + ".worldSpace[0]", node + "." + __attr)
@@ -1417,11 +1418,11 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         _build(_rig, 3)
         if comp.data["value"]["end_point"] == "connections":
             return False
+        container.set_current_asset(None)
         custom_step()
         return True
 
     def finalize():
-        container.set_current_asset(None)
         values = context.values()
 
         # create sets
@@ -1494,12 +1495,16 @@ def create_rig(guide=None, rig=None, data=None, context=None):
                 container.publish_attribute(v["host"])
                 mc.sets(v["host"], edit=True, addElement=controller_sets)
 
-        # sets final
+        # -- sets final --#
+
+        # geometry sets
         mc.sets(context["geometry"], addElement=model_sets)
         geometries = list(
             set([hierarchy.get_parent(x) for x in mc.ls(context["geometry"], dagObjects=True, type="mesh")]))
         if geometries:
             mc.sets(geometries, edit=True, addElement=geometry_sets)
+
+        # rig sets
         s = [root_sets, model_sets, geometry_sets, skeleton_sets, controller_sets]
         mc.sets(s, edit=True, addElement=rig_sets)
         attribute.add_attr(context["asset"][1], longName="root_sets", type="message")
@@ -1510,8 +1515,11 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         mc.connectAttr(geometry_sets + ".message", context["asset"][1] + ".geo_sets")
         mc.connectAttr(controller_sets + ".message", context["asset"][1] + ".ctl_sets")
         mc.connectAttr(skeleton_sets + ".message", context["asset"][1] + ".jnt_sets")
+
+        # specific sets
         if "specific_sets" in context:
             mc.sets(context["specific_sets"], edit=True, addElement=rig_sets)
+        # --------- #
 
         # callback
         if context["callbacks"]:
