@@ -17,10 +17,12 @@ def _null(*args, **kwargs):
 
 
 def __switch_fk_ik(hosts, set_key, *args, **kwargs):
+    selected = mc.ls(selection=True)
     time_slider = mel.eval("$tmpVar=$gPlayBackSlider")
     frame_range = mc.timeControl(time_slider, query=True, rangeArray=True)
     for host in hosts:
         anime.switch_fk_ik(host, frame_range=frame_range, set_key=set_key)
+    mc.select(selected)
 
 
 def __reset_SRT(*args):
