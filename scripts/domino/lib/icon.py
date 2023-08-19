@@ -171,6 +171,26 @@ def create(parent, name, shape, color, m, **kwargs):
                     depth=kwargs["depth"],
                     po=kwargs["po"],
                     ro=kwargs["ro"])
+    elif shape == "bracket":
+        return bracket(parent=parent,
+                       name=name,
+                       color=color,
+                       m=m,
+                       thickness=kwargs["thickness"],
+                       width=kwargs["width"],
+                       height=kwargs["height"],
+                       po=kwargs["po"],
+                       ro=kwargs["ro"])
+    elif shape == "slider":
+        return slider(parent=parent,
+                      name=name,
+                      color=color,
+                      m=m,
+                      thickness=kwargs["thickness"],
+                      width=kwargs["width"],
+                      height=kwargs["height"],
+                      po=kwargs["po"],
+                      ro=kwargs["ro"])
 
     node = mc.createNode("transform", name=name, parent=parent)
     matrix.set_matrix(node, m)
@@ -1004,6 +1024,60 @@ def guide_orientation(node):
     hide_attrs = ("tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v")
     [mc.setAttr(node + "." + attr, lock=True) for attr in lock_attrs]
     [mc.setAttr(node + "." + attr, keyable=False) for attr in hide_attrs]
+    return node
+
+
+def bracket(parent,
+            name,
+            color,
+            thickness=1,
+            width=1,
+            height=1,
+            m=om2.MMatrix(),
+            po=(0, 0, 0),
+            ro=(0, 0, 0)):
+    dlen = 0.5
+    v0 = om2.MVector(0, dlen, 0)
+    v1 = om2.MVector(0, 0, 0)
+    v2 = om2.MVector(dlen * -1, 0, 0)
+
+    node = mc.createNode("transform", name=name, parent=parent)
+    matrix.set_matrix(node, m)
+
+    generate(node=node,
+             points=[v0 * height, v1, v2 * width],
+             degree=1,
+             color=color,
+             thickness=thickness,
+             po=po,
+             ro=ro)
+    return node
+
+
+def slider(parent,
+           name,
+           color,
+           thickness=1,
+           width=1,
+           height=1,
+           m=om2.MMatrix(),
+           po=(0, 0, 0),
+           ro=(0, 0, 0)):
+    v0 = om2.MVector(0, 0.25, 0) * height
+    v1 = om2.MVector(0, -0.25, 0) * height
+    v2 = om2.MVector(0, 0, 0)
+    v3 = om2.MVector(1, 0, 0) * width
+
+    node = mc.createNode("transform", name=name, parent=parent)
+    matrix.set_matrix(node, m)
+
+    generate(node=node,
+             points=[v0, v1, v2, v3],
+             degree=1,
+             color=color,
+             thickness=thickness,
+             po=po,
+             ro=ro)
     return node
 
 
