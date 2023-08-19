@@ -212,11 +212,17 @@ class Rig(assembler.Rig):
             mc.setAttr(minus_y_icon + ".overrideEnabled", 1)
             mc.setAttr(minus_y_icon + ".overrideDisplayType", 1)
 
+        keyable_attr = ["tx", "ty"]
+        if not data["plus_x"] and not data["minus_x"]:
+            keyable_attr.remove("tx")
+        if not data["plus_y"] and not data["minus_y"]:
+            keyable_attr.remove("ty")
+
         self.ctl, self.loc = self.create_ctl(context=context,
                                              parent=self.root,
                                              name=self.generate_name("", "", "ctl"),
                                              parent_ctl=None,
-                                             attrs=["tx", "ty"],
+                                             attrs=keyable_attr,
                                              m=data["anchors"][0],
                                              cns=False,
                                              mirror_config=(1, 1, 1, 0, 1, 1, 0, 0, 0),
