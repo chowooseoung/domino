@@ -67,11 +67,22 @@ def component_preset():
 
 
 def guide_recipe():
+    script = """import maya.cmds as mc
+for pos in ["{0}", "{1}"]:
+    mc.setAttr(pos + ".sx", lock=False)
+    mc.setAttr(pos + ".sy", lock=False)
+    mc.setAttr(pos + ".sz", lock=False)
+    mc.setAttr(pos + ".s", 0.3, 0.3, 0.3)
+    mc.makeIdentity(pos, apply=True, scale=True)
+    mc.setAttr(pos + ".sx", lock=True)
+    mc.setAttr(pos + ".sy", lock=True)
+    mc.setAttr(pos + ".sz", lock=True)
+"""
     return {
         "position": [
             (0, "heel"),
-            (1, "in", "ori"),  # parent node index, extension
-            (1, "out", "ori"),
+            (1, "in", "axis"),  # parent node index, extension, icon
+            (1, "out", "axis"),
             (1, "tip"),
             (4, "toe")
         ],
@@ -81,7 +92,11 @@ def guide_recipe():
             ((1, 2), "dpInCrv"),  # source node indexes, extension
             ((1, 3), "dpOutCrv"),  # source node indexes, extension
         ],
-        "flexible_position": (7, "pos%s", (0, 0, 1))  # anchor min value, extension
+        "flexible_position": (7, "pos%s", (0, 0, 1)),  # anchor min value, extension
+        "post": {
+            "script": script,
+            "indexes": [2, 3]
+        }
     }
 
 

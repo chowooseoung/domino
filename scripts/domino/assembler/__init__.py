@@ -309,18 +309,17 @@ class Guide:
             mc.connectAttr(_pos + ".worldMatrix[0]", guide_container + ".anchors[{0}]".format(index))
 
             if _shape is not None:
-                s = icon.create(None,
-                                "TEMP",
-                                "axis",
-                                None,
-                                om2.MMatrix(),
+                s = icon.create(parent=None,
+                                name="TEMP",
+                                shape=_shape,
+                                color=(1, 1, 0),
+                                m=om2.MMatrix(),
+                                thickness=1,
                                 width=1,
                                 height=1,
                                 depth=1,
                                 po=(0, 0, 0),
                                 ro=(0, 0, 0))
-                mc.setAttr(s + ".s", 0.3, 0.3, 0.3)
-                mc.makeIdentity(s, apply=True, scale=True)
                 icon.replace(s, _pos)
                 mc.delete(s)
 
