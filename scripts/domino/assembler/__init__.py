@@ -1422,6 +1422,7 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         return True
 
     def finalize():
+        container.set_current_asset(context["asset"][0])
         values = context.values()
 
         # create sets
@@ -1570,6 +1571,7 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         if not end_point_check:
             return None
         finalize()
+        container.set_current_asset(None)
         custom_step()
     finally:
         if context["mode"] == "DEBUG":
