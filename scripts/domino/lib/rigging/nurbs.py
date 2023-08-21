@@ -282,7 +282,7 @@ def loft(parent, curve1, curve2, name, count=None):
                                     destination=True)[0]
     mc.setAttr(tessellate + ".format", 0)
     mc.setAttr(tessellate + ".polygonType", 1)
-    mc.setAttr(tessellate + ".polygonCount", 200)
+    mc.setAttr(tessellate + ".polygonCount", 50)
     mc.delete(mesh, ch=True)
 
     if count:

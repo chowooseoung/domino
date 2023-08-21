@@ -218,10 +218,6 @@ class Rig(assembler.Rig):
         guide_c_matrices = [om2.MMatrix(m) for m in data["anchors"][14:18]]
         guide_d_matrices = [om2.MMatrix(m) for m in data["anchors"][18:22]]
         guide_e_matrices = [om2.MMatrix(m) for m in data["anchors"][22:]]
-        guide7_matrices = [om2.MMatrix(m) for m in data["anchors"][34:38]]
-        guide5_matrices = [om2.MMatrix(m) for m in data["anchors"][26:30]]
-        guide3_matrices = [om2.MMatrix(m) for m in data["anchors"][18:22]]
-        guide1_matrices = [om2.MMatrix(m) for m in data["anchors"][10:14]]
 
         positions = [om2.MVector(list(x)[12:-1]) for x in matrices]
         guide_a_positions = [positions[0]] + [om2.MVector(list(m)[12:-1]) for m in guide_a_matrices]
@@ -229,10 +225,6 @@ class Rig(assembler.Rig):
         guide_c_positions = [positions[2]] + [om2.MVector(list(m)[12:-1]) for m in guide_c_matrices]
         guide_d_positions = [positions[4]] + [om2.MVector(list(m)[12:-1]) for m in guide_d_matrices]
         guide_e_positions = [positions[5]] + [om2.MVector(list(m)[12:-1]) for m in guide_e_matrices]
-        guide7_positions = [(positions[4] + positions[5]) / 2] + [om2.MVector(list(m)[12:-1]) for m in guide7_matrices]
-        guide5_positions = [(positions[2] + positions[4]) / 2] + [om2.MVector(list(m)[12:-1]) for m in guide5_matrices]
-        guide3_positions = [(positions[1] + positions[2]) / 2] + [om2.MVector(list(m)[12:-1]) for m in guide3_matrices]
-        guide1_positions = [(positions[0] + positions[1]) / 2] + [om2.MVector(list(m)[12:-1]) for m in guide1_matrices]
 
         upper_jnt_v_values = [0]
         lower_jnt_v_values = [0, 1]
@@ -732,8 +724,7 @@ class Rig(assembler.Rig):
                                                      parent=self.wing_output_nodes[-1],
                                                      name=self.generate_name("fk3", "", "ctl"),
                                                      parent_ctl=self.fk2_ctl,
-                                                     attrs=["tx", "ty", "tz",
-                                                            "rx", "ry", "rz",
+                                                     attrs=["tx", "ty", "tz", "rz",
                                                             "sx", "sy", "sz"],
                                                      m=fk3_m,
                                                      cns=False,
@@ -796,13 +787,11 @@ class Rig(assembler.Rig):
         self.primary_output_mesh = nurbs.loft(xxx_split_output_grp,
                                               self.primary1_crv,
                                               self.primary2_crv,
-                                              self.generate_name("primary", "mesh", "ctl"),
-                                              100)
+                                              self.generate_name("primary", "mesh", "ctl"))
         self.primary_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                             self.primary1_crv,
                                             self.primary2_crv,
-                                            self.generate_name("primarySkin", "mesh", "ctl"),
-                                            100)
+                                            self.generate_name("primarySkin", "mesh", "ctl"))
         self.primary_coverts1_crv = nurbs.build(curve_data=nurbs_curve_data["primary_coverts_curve1"]["0"],
                                                 name=self.generate_name("primaryCoverts1", "crv", "ctl"),
                                                 match=True,
@@ -816,13 +805,11 @@ class Rig(assembler.Rig):
         self.primary_converts_output_mesh = nurbs.loft(xxx_split_output_grp,
                                                        self.primary_coverts1_crv,
                                                        self.primary_coverts2_crv,
-                                                       self.generate_name("primaryCoverts", "mesh", "ctl"),
-                                                       100)
+                                                       self.generate_name("primaryCoverts", "mesh", "ctl"))
         self.primary_converts_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                                      self.primary_coverts1_crv,
                                                      self.primary_coverts2_crv,
-                                                     self.generate_name("primaryCovertsSkin", "mesh", "ctl"),
-                                                     100)
+                                                     self.generate_name("primaryCovertsSkin", "mesh", "ctl"))
         self.primary_under1_crv = nurbs.build(curve_data=nurbs_curve_data["primary_under_coverts_curve1"]["0"],
                                               name=self.generate_name("primaryUnder1", "crv", "ctl"),
                                               match=True,
@@ -836,13 +823,11 @@ class Rig(assembler.Rig):
         self.primary_under_output_mesh = nurbs.loft(xxx_split_output_grp,
                                                     self.primary_under1_crv,
                                                     self.primary_under2_crv,
-                                                    self.generate_name("primaryUnder", "mesh", "ctl"),
-                                                    100)
+                                                    self.generate_name("primaryUnder", "mesh", "ctl"))
         self.primary_under_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                                   self.primary_under1_crv,
                                                   self.primary_under2_crv,
-                                                  self.generate_name("primaryUnderSkin", "mesh", "ctl"),
-                                                  100)
+                                                  self.generate_name("primaryUnderSkin", "mesh", "ctl"))
         self.secondary1_crv = nurbs.build(curve_data=nurbs_curve_data["secondary_curve1"]["0"],
                                           name=self.generate_name("secondary1", "crv", "ctl"),
                                           match=True,
@@ -856,13 +841,11 @@ class Rig(assembler.Rig):
         self.secondary_output_mesh = nurbs.loft(xxx_split_output_grp,
                                                 self.secondary1_crv,
                                                 self.secondary2_crv,
-                                                self.generate_name("secondary", "mesh", "ctl"),
-                                                100)
+                                                self.generate_name("secondary", "mesh", "ctl"))
         self.secondary_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                               self.secondary1_crv,
                                               self.secondary2_crv,
-                                              self.generate_name("secondarySkin", "mesh", "ctl"),
-                                              100)
+                                              self.generate_name("secondarySkin", "mesh", "ctl"))
         self.secondary_coverts1_crv = nurbs.build(curve_data=nurbs_curve_data["secondary_coverts_curve1"]["0"],
                                                   name=self.generate_name("secondaryCoverts1", "crv", "ctl"),
                                                   match=True,
@@ -876,13 +859,11 @@ class Rig(assembler.Rig):
         self.secondary_converts_output_mesh = nurbs.loft(xxx_split_output_grp,
                                                          self.secondary_coverts1_crv,
                                                          self.secondary_coverts2_crv,
-                                                         self.generate_name("secondaryCoverts", "mesh", "ctl"),
-                                                         100)
+                                                         self.generate_name("secondaryCoverts", "mesh", "ctl"))
         self.secondary_converts_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                                        self.secondary_coverts1_crv,
                                                        self.secondary_coverts2_crv,
-                                                       self.generate_name("secondaryCovertsSkin", "mesh", "ctl"),
-                                                       100)
+                                                       self.generate_name("secondaryCovertsSkin", "mesh", "ctl"))
         self.secondary_under1_crv = nurbs.build(curve_data=nurbs_curve_data["secondary_under_coverts_curve1"]["0"],
                                                 name=self.generate_name("secondaryUnder1", "crv", "ctl"),
                                                 match=True,
@@ -896,13 +877,11 @@ class Rig(assembler.Rig):
         self.secondary_under_output_mesh = nurbs.loft(xxx_split_output_grp,
                                                       self.secondary_under1_crv,
                                                       self.secondary_under2_crv,
-                                                      self.generate_name("secondaryUnder", "mesh", "ctl"),
-                                                      100)
+                                                      self.generate_name("secondaryUnder", "mesh", "ctl"))
         self.secondary_under_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                                     self.secondary_under1_crv,
                                                     self.secondary_under2_crv,
-                                                    self.generate_name("secondaryUnderSkin", "mesh", "ctl"),
-                                                    100)
+                                                    self.generate_name("secondaryUnderSkin", "mesh", "ctl"))
         self.tertiary1_crv = nurbs.build(curve_data=nurbs_curve_data["tertiary_curve1"]["0"],
                                          name=self.generate_name("tertiary1", "crv", "ctl"),
                                          match=True,
@@ -916,13 +895,11 @@ class Rig(assembler.Rig):
         self.tertiary_output_mesh = nurbs.loft(xxx_split_output_grp,
                                                self.tertiary1_crv,
                                                self.tertiary2_crv,
-                                               self.generate_name("tertiary", "mesh", "ctl"),
-                                               100)
+                                               self.generate_name("tertiary", "mesh", "ctl"))
         self.tertiary_skin_mesh = nurbs.loft(xxx_split_skin_grp,
                                              self.tertiary1_crv,
                                              self.tertiary2_crv,
-                                             self.generate_name("tertiarySkin", "mesh", "ctl"),
-                                             100)
+                                             self.generate_name("tertiarySkin", "mesh", "ctl"))
         mc.hide([self.primary1_crv,
                  self.primary2_crv,
                  self.primary_coverts1_crv,
@@ -1725,6 +1702,34 @@ class Rig(assembler.Rig):
         self.bind_jnts += self.guide_d_jnts
         self.bind_jnts += self.guide_e_jnts
 
+        n = om2.MVector(normal) * (data["extrude_offset"] / 2)
+        nodes = self.wing_output_nodes + [self.fk3_loc, self.fk4_loc]
+        _points = [om2.MVector(vector.get_position(x)) for x in nodes] + [positions[-1]]
+        points = [v - n for v in _points]
+        crv1 = mc.curve(point=points, degree=1)
+        points = [v for v in _points]
+        crv2 = mc.curve(point=points, degree=1)
+        points = [v + n for v in _points]
+        crv3 = mc.curve(point=points, degree=1)
+        surface, loft = mc.loft(crv1,
+                                crv2,
+                                crv3,
+                                name=self.generate_name("bone", "mesh", "ctl"),
+                                uniform=1,
+                                close=0,
+                                degree=1,
+                                sectionSpans=1,
+                                range=0,
+                                polygon=1,
+                                reverseSurfaceNormals=True,
+                                constructionHistory=True)
+        tessellate = mc.listConnections(loft, destination=True, source=False, type="nurbsTessellate")[0]
+        mc.setAttr(tessellate + ".format", 3)
+        mc.delete(surface, constructionHistory=True)
+        self.feather_first_point_mesh = mc.parent(surface, context["xxx"])[0]
+        mc.delete(crv1, crv2, crv3)
+        mc.hide(self.feather_first_point_mesh)
+
         # refs
         self.refs = []
         twist_index = 0
@@ -1755,6 +1760,7 @@ class Rig(assembler.Rig):
             twist_index += 1
 
         # jnts
+        self.bone_jnts = []
         if data["create_jnt"]:
             uni_scale = False
             if assembly_data["force_uni_scale"]:
@@ -1790,6 +1796,7 @@ class Rig(assembler.Rig):
                                       m=m,
                                       leaf=False,
                                       uni_scale=uni_scale)
+                self.bone_jnts.append(jnt)
                 if bind:
                     self.bind_jnts.append(jnt)
                 twist_index += 1
@@ -1984,6 +1991,63 @@ class Rig(assembler.Rig):
         mc.connectAttr(self.fk0_ctl + ".message", self.fk_match_target_attr + "[0]")
         mc.connectAttr(self.fk1_ctl + ".message", self.fk_match_target_attr + "[1]")
         mc.connectAttr(self.fk2_ctl + ".message", self.fk_match_target_attr + "[2]")
+
+        self.primary_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                               longName="primary_feather_ctl_vis",
+                                                               type="float",
+                                                               keyable=True,
+                                                               minValue=0,
+                                                               maxValue=1,
+                                                               defaultValue=0)
+        self.primary_coverts_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                                       longName="primary_coverts_feather_ctl_vis",
+                                                                       type="float",
+                                                                       keyable=True,
+                                                                       minValue=0,
+                                                                       maxValue=1,
+                                                                       defaultValue=0)
+        self.primary_under_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                                     longName="primary_under_feather_ctl_vis",
+                                                                     type="float",
+                                                                     keyable=True,
+                                                                     minValue=0,
+                                                                     maxValue=1,
+                                                                     defaultValue=0)
+        self.secondary_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                                 longName="secondary_feather_ctl_vis",
+                                                                 type="float",
+                                                                 keyable=True,
+                                                                 minValue=0,
+                                                                 maxValue=1,
+                                                                 defaultValue=0)
+        self.secondary_coverts_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                                         longName="secondary_coverts_feather_ctl_vis",
+                                                                         type="float",
+                                                                         keyable=True,
+                                                                         minValue=0,
+                                                                         maxValue=1,
+                                                                         defaultValue=0)
+        self.secondary_under_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                                       longName="secondary_under_feather_ctl_vis",
+                                                                       type="float",
+                                                                       keyable=True,
+                                                                       minValue=0,
+                                                                       maxValue=1,
+                                                                       defaultValue=0)
+        self.tertiary_feather_ctl_vis_attr = attribute.add_attr(host,
+                                                                longName="tertiary_feather_ctl_vis",
+                                                                type="float",
+                                                                keyable=True,
+                                                                minValue=0,
+                                                                maxValue=1,
+                                                                defaultValue=0)
+        context[self.identifier]["feather_ctl_vis_attrs"] = [self.primary_feather_ctl_vis_attr,
+                                                             self.primary_coverts_feather_ctl_vis_attr,
+                                                             self.primary_under_feather_ctl_vis_attr,
+                                                             self.secondary_feather_ctl_vis_attr,
+                                                             self.secondary_coverts_feather_ctl_vis_attr,
+                                                             self.secondary_under_feather_ctl_vis_attr,
+                                                             self.tertiary_feather_ctl_vis_attr]
 
     def operators(self, context):
         super().operators(context)
@@ -2180,6 +2244,10 @@ class Rig(assembler.Rig):
         mc.setAttr(p_wrap + ".useBindTags", 1)
         mc.setAttr(p_wrap + ".bindTagsFilter", self.identifier + "*", type="string")
 
+        delta_mush = mc.deltaMush(self.split_meshes,
+                                  pinBorderVertices=False,
+                                  name=self.generate_name("splitMesh", "dm", "ctl"))
+
         bind_jnts = [self.fix_skin_jnt] + self.primary_in_jnts + self.primary_mid_jnts + self.primary_out_jnts
         primary_sc = mc.skinCluster(bind_jnts,
                                     self.primary_skin_mesh,
@@ -2253,6 +2321,24 @@ class Rig(assembler.Rig):
                                      normalizeWeights=1,
                                      weightDistribution=1,
                                      removeUnusedInfluence=False)[0]
+
+        feather_first_point_sc = mc.skinCluster(self.bone_jnts,
+                                                self.feather_first_point_mesh,
+                                                name=self.generate_name("feather_first_point", "sc", "ctl"),
+                                                toSelectedBones=True,
+                                                bindMethod=0,
+                                                dropoffRate=4,
+                                                maximumInfluences=6,
+                                                normalizeWeights=1,
+                                                weightDistribution=1,
+                                                removeUnusedInfluence=False)[0]
+        shape, orig_shape = mc.listRelatives(self.feather_first_point_mesh, shapes=True)
+        pin = mc.createNode("proximityPin")
+        mc.setAttr(pin + ".offsetTranslation", 1)
+        mc.setAttr(pin + ".offsetOrientation", 1)
+        mc.connectAttr(orig_shape + ".outMesh", pin + ".originalGeometry")
+        mc.connectAttr(shape + ".worldMesh[0]", pin + ".deformedGeometry")
+        context[self.identifier]["feather_pin"] = [pin, 0]
 
     def connections(self, context):
         super().connections(context)
