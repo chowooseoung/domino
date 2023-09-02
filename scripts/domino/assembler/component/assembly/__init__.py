@@ -147,7 +147,7 @@ class Rig(assembler.Rig):
                                                  name="origin_ctl",
                                                  m=m,
                                                  parent_ctl=None,
-                                                 attrs=("tx", "ty", "tz", "sx", "sy", "sz"),
+                                                 attrs=("tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"),
                                                  mirror_config=(),
                                                  shape_args={
                                                      "shape": "origin",
