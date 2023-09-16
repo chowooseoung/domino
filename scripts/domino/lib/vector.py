@@ -25,6 +25,13 @@ def get_scale(node, world_space=True):
     return mc.xform(node, query=True, scale=True, worldSpace=world_space)
 
 
+def get_average_position(vertices):
+    sum_position = om2.MVector((0, 0, 0))
+    for vtx in vertices:
+        sum_position += om2.MVector(mc.xform(vtx, query=True, translation=True, worldSpace=True))
+    return sum_position / len(vertices)
+
+
 def get_plane_normal(p0, p1, p2):
     p0, p1, p2 = [om2.MVector(p) for p in [p0, p1, p2]]
     vector0 = p1 - p0

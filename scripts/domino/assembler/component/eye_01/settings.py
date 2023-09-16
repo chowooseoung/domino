@@ -33,9 +33,33 @@ class Settings(CommonComponentSettings):
             ui.aim_space_switch_remove_pushButton,
             "aim_space_switch_array")
 
+        self.ui_funcs.install_checkBox(
+            ui.spherical_iris_pupil_rig_checkBox,
+            "spherical_iris_pupil_rig")
+        self.ui_funcs.install_mesh_lineEdit(
+            ui.eyeball_mesh_lineEdit,
+            ui.eyeball_mesh_pushButton,
+            "eyeball_mesh")
+        self.ui_funcs.install_edge_lineEdit(
+            ui.center_edge_index_lineEdit,
+            ui.center_edge_index_pushButton,
+            "center_edge_index")
+        self.ui_funcs.install_edge_lineEdit(
+            ui.limbus_edge_index_lineEdit,
+            ui.limbus_edge_index_pushButton,
+            "limbus_edge_index")
+        self.ui_funcs.install_edge_lineEdit(
+            ui.pupil_edge_index_lineEdit,
+            ui.pupil_edge_index_pushButton,
+            "pupil_edge_index")
+        self.ui_funcs.install_edge_lineEdit(
+            ui.last_edge_index_lineEdit,
+            ui.last_edge_index_pushButton,
+            "last_edge_index")
+
     def resize_window(self):
         super(Settings, self).resize_window()
         index = self.common_settings.toolBox.currentIndex()
         if index == 1:
-            size = QtCore.QSize(370, 300)
+            size = QtCore.QSize(370, 500)
             self.resize(size)

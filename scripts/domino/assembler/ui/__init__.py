@@ -17,7 +17,7 @@ from maya.api import OpenMaya as om2
 # domino
 from domino import assembler
 from domino.lib.color import MAYA_OVERRIDE_COLOR
-from domino.lib import attribute, log, hierarchy, utils
+from domino.lib import attribute, log, hierarchy, utils, polygon
 from domino import DOMINO_CUSTOM_COMPONENT
 
 
@@ -665,6 +665,35 @@ class UiFunctionSet:
         self.update_parent_comp_btn(line_edit, target_attr)
         btn.clicked.connect(
             partial(self.add_parent_comp_btn,
+                    line_edit,
+                    target_attr))
+
+    def add_edge_lineEdit(self, line_edit, target_attr):
+        selected = mc.ls(selection=True)
+        if not selected:
+            return
+        indexes = polygon.get_component_index(selected)
+        self.set_attr_to_root(target_attr, ",".join(indexes))
+        line_edit.setText(self.get_attr_from_root(target_attr))
+
+    def install_edge_lineEdit(self, line_edit, btn, target_attr):
+        line_edit.setText(self.get_attr_from_root(target_attr))
+        btn.clicked.connect(
+            partial(self.add_edge_lineEdit,
+                    line_edit,
+                    target_attr))
+
+    def add_mesh_lineEdit(self, line_edit, target_attr):
+        selected = mc.ls(selection=True)
+        if not selected:
+            return
+        self.set_attr_to_root(target_attr, selected[0])
+        line_edit.setText(self.get_attr_from_root(target_attr))
+
+    def install_mesh_lineEdit(self, line_edit, btn, target_attr):
+        line_edit.setText(self.get_attr_from_root(target_attr))
+        btn.clicked.connect(
+            partial(self.add_mesh_lineEdit,
                     line_edit,
                     target_attr))
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>329</width>
-    <height>165</height>
+    <width>323</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,13 +43,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="aim_space_switch_add_pushButton">
-        <property name="text">
-         <string>&lt;&lt;</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" rowspan="3">
        <widget class="QListWidget" name="aim_space_switch_listWidget">
         <property name="sizePolicy">
@@ -57,6 +50,13 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="aim_space_switch_add_pushButton">
+        <property name="text">
+         <string>&lt;&lt;</string>
         </property>
        </widget>
       </item>
@@ -72,6 +72,107 @@
          </size>
         </property>
        </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="4" column="2">
+       <widget class="QPushButton" name="pupil_edge_index_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Last Edge Index</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="center_edge_index_lineEdit"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="limbus_edge_index_lineEdit"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Limbus Edge Index</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Center Edge Index</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Eyeball Mesh</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Pupil Edge Index</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QPushButton" name="last_edge_index_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="pupil_edge_index_lineEdit"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="eyeball_mesh_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="center_edge_index_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="limbus_edge_index_pushButton">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="last_edge_index_lineEdit"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="eyeball_mesh_lineEdit"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="spherical_iris_pupil_rig_checkBox">
+        <property name="text">
+         <string>Spherical Iris Pupil Rig</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
