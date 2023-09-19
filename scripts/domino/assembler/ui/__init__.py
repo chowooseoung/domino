@@ -40,7 +40,7 @@ class DominoDialog(QtWidgets.QDialog):
         root = self.ui_funcs.root
         if root:
             name = root.split("|")[-1]
-            self.setWindowTitle(self.title_name + " " + name)
+            self.setWindowTitle(self.title_name + " [" + name + "]")
 
 
 class UiFunctionSet:

@@ -662,6 +662,9 @@ class Rig:
 
         rig_grp = context["asset"][1]
         self.root = mc.createNode("transform", name=name, parent=rig_grp + "|roots")
+        mc.setAttr(self.root + ".useOutlinerColor", True)
+        mc.setAttr(self.root + ".outlinerColor", 0.3, 0.7, 0.9)
+
         self.component.push_data_to_node(self.root)
         attribute.add_attr(self.root, longName="ctls", type="message", multi=True)
         attribute.add_attr(self.root, longName="refs", type="message", multi=True)
@@ -723,6 +726,11 @@ class Rig:
             "refs": [],
             "jnts": []
         }
+        root_container = mc.container(query=True, findContainer=self.root)
+        if not mc.container(root_container, query=True, publishAsRoot=True):
+            mc.container(root_container, edit=True, publishAsRoot=(self.root, 1))
+        else:
+            mc.container(root_container, edit=True, publishAsParent=(self.root, name))
         return self.root
 
     def finalize_ctl_setup(self, ctl):
@@ -744,6 +752,8 @@ class Rig:
         self.finalize_ctl_setup(self.host)
         mc.connectAttr(self.host + ".message", self.root + ".host")
         context[self.identifier]["host"] = self.host
+        mc.setAttr(self.host + ".useOutlinerColor", True)
+        mc.setAttr(self.host + ".outlinerColor", 0.85, 0.85, 0.2)
         return self.host
 
     def create_ctl(self, context, parent, name, m, parent_ctl, attrs, mirror_config, shape_args, cns=False, **config):
@@ -854,7 +864,9 @@ class Rig:
         # get parent piece joint
         skeleton_grp = context["skeleton"]
         parent_rig = self.parent
+        parent_is_none = False
         if not parent:
+            parent_is_none = True
             if None in self.component.identifier:
                 parent = skeleton_grp
             elif parent_rig and (None in parent_rig.component.identifier):
@@ -907,6 +919,12 @@ class Rig:
 
         # create joint
         jnt = joint.add_joint(parent, name, m)
+        if parent_is_none:
+            mc.setAttr(jnt + ".useOutlinerColor", True)
+            mc.setAttr(jnt + ".outlinerColor", 0.9, 0.35, 0.55)
+        else:
+            mc.setAttr(jnt + ".useOutlinerColor", True)
+            mc.setAttr(jnt + ".outlinerColor", 1, 0.55, 0.75)
         container.remove_node_from_asset(jnt)
         nonkeyable_attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "ro", "sx", "sy", "sz"]
         [mc.setAttr(jnt + "." + attr, channelBox=True) for attr in nonkeyable_attrs]
@@ -1283,8 +1301,15 @@ def create_rig(guide=None, rig=None, data=None, context=None):
         mc.setAttr(asset_container + ".iconName", rig_icon + ".png", type="string")
         asset_rig = mc.createNode("transform", name=name + "_rig")
 
+        mc.setAttr(asset_rig + ".useOutlinerColor", True)
+        mc.setAttr(asset_rig + ".outlinerColor", 0.6, 0.8, 0.4)
+
         geometry = mc.createNode("transform", name="geometry", parent=asset_rig)
+        mc.setAttr(geometry + ".useOutlinerColor", True)
+        mc.setAttr(geometry + ".outlinerColor", 0.6, 0.8, 0.4)
         skeleton = mc.createNode("transform", name="skeleton", parent=asset_rig)
+        mc.setAttr(skeleton + ".useOutlinerColor", True)
+        mc.setAttr(skeleton + ".outlinerColor", 0.6, 0.8, 0.4)
         roots = mc.createNode("transform", name="roots", parent=asset_rig)
         xxx = mc.createNode("transform", name="xxx", parent=asset_rig)
 

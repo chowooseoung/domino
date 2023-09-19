@@ -186,6 +186,8 @@ class Rig(assembler.Rig):
                               ref=ref,
                               m=m,
                               uni_scale=data["force_uni_scale"])
+        mc.setAttr(jnt + ".useOutlinerColor", True)
+        mc.setAttr(jnt + ".outlinerColor", 1, 0.7, 0)
 
         ctl_tag = mc.controller(origin_ctl, query=True)[0]
         choice = mc.createNode("choice")
