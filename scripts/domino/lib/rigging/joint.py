@@ -1,10 +1,9 @@
 # maya
-from maya import mel
 from maya import cmds as mc
 from maya.api import OpenMaya as om2
 
 # domino
-from domino.lib import matrix
+from domino.lib import matrix, hierarchy
 
 # built-ins
 import math
@@ -102,7 +101,9 @@ def labeling(jnt, name, side, index, description):
 def connect_space(source, target):
     mult_m = mc.createNode("multMatrix")
     mc.connectAttr(source + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
-    mc.connectAttr(target + ".parentInverseMatrix", mult_m + ".matrixIn[1]")
+
+    target_parent = hierarchy.get_parent(target)
+    mc.connectAttr(target_parent + ".worldInverseMatrix", mult_m + ".matrixIn[1]")
 
     decom_m = mc.createNode("decomposeMatrix")
     mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
