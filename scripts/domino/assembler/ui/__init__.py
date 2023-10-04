@@ -668,7 +668,7 @@ class UiFunctionSet:
                     line_edit,
                     target_attr))
 
-    def add_edge_lineEdit(self, line_edit, target_attr):
+    def add_index_lineEdit(self, line_edit, target_attr):
         selected = mc.ls(selection=True)
         if not selected:
             return
@@ -676,10 +676,10 @@ class UiFunctionSet:
         self.set_attr_to_root(target_attr, ",".join(indexes))
         line_edit.setText(self.get_attr_from_root(target_attr))
 
-    def install_edge_lineEdit(self, line_edit, btn, target_attr):
+    def install_index_lineEdit(self, line_edit, btn, target_attr):
         line_edit.setText(self.get_attr_from_root(target_attr))
         btn.clicked.connect(
-            partial(self.add_edge_lineEdit,
+            partial(self.add_index_lineEdit,
                     line_edit,
                     target_attr))
 

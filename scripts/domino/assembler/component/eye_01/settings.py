@@ -40,19 +40,19 @@ class Settings(CommonComponentSettings):
             ui.eyeball_mesh_lineEdit,
             ui.eyeball_mesh_pushButton,
             "eyeball_mesh")
-        self.ui_funcs.install_edge_lineEdit(
+        self.ui_funcs.install_index_lineEdit(
             ui.center_edge_index_lineEdit,
             ui.center_edge_index_pushButton,
             "center_edge_index")
-        self.ui_funcs.install_edge_lineEdit(
+        self.ui_funcs.install_index_lineEdit(
             ui.limbus_edge_index_lineEdit,
             ui.limbus_edge_index_pushButton,
             "limbus_edge_index")
-        self.ui_funcs.install_edge_lineEdit(
+        self.ui_funcs.install_index_lineEdit(
             ui.pupil_edge_index_lineEdit,
             ui.pupil_edge_index_pushButton,
             "pupil_edge_index")
-        self.ui_funcs.install_edge_lineEdit(
+        self.ui_funcs.install_index_lineEdit(
             ui.last_edge_index_lineEdit,
             ui.last_edge_index_pushButton,
             "last_edge_index")
