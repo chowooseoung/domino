@@ -179,9 +179,7 @@ def set_matrix_rotate(m, r):
 def set_matrix_rotate2(m, r):
     if not isinstance(m, om2.MTransformationMatrix):
         m = om2.MTransformationMatrix(om2.MMatrix(m))
-    if not isinstance(r, om2.MTransformationMatrix):
-        r = om2.MTransformationMatrix(om2.MMatrix(r))
-    m.setRotation(om2.MEulerRotation(r.rotation()))
+    m.setRotation(om2.MEulerRotation([math.radians(x) for x in r]))
     return m.asMatrix()
 
 def set_matrix_scale(m, s):
