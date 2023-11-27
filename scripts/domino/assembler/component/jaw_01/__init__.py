@@ -86,7 +86,7 @@ class Rig(assembler.Rig):
                                                      parent=root,
                                                      name=self.generate_name("aim", "", "ctl"),
                                                      parent_ctl=None,
-                                                     attrs=["tx", "ty", "tz"],
+                                                     attrs=["ty", "tz"],
                                                      m=aim_m,
                                                      cns=False,
                                                      mirror_config=(1, 1, 1, 0, 0, 0, 0, 0, 0),
@@ -119,6 +119,7 @@ class Rig(assembler.Rig):
                                                          "color": fk_color
                                                      },
                                                      mirror_ctl_name=self.generate_name("", "", "ctl", True))
+
         name = self.generate_name("rot", "", "ctl")
         self.rot_obj = matrix.transform(root, name, m, True)
 
@@ -164,6 +165,10 @@ class Rig(assembler.Rig):
                                                      type="double",
                                                      defaultValue=data["sliding_angle"],
                                                      keyable=True)
+        self.close_limit_attr = attribute.add_attr(host,
+                                                     longName="close_limit",
+                                                     type="double",
+                                                     keyable=True)
 
     def operators(self, context):
         super().operators(context)
@@ -177,6 +182,8 @@ class Rig(assembler.Rig):
                          worldUpObject=self.root)
         mc.orientConstraint(self.jaw_loc, self.sliding_aim)
         mc.orientConstraint(self.jaw_loc, self.rot_obj)
+        mc.transformLimits(jaw_npo, erz=(0, 1))
+        mc.connectAttr(self.close_limit_attr, jaw_npo + ".maxRotZLimit")
 
         md = mc.createNode("multiplyDivide")
         mc.setAttr(md + ".input1X", -1)
