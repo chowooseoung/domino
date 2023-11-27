@@ -53,7 +53,7 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
             "end_point")
         self.ui_funcs.install_textEdit(
             ui.notes_textEdit,
-            "publish_notes")
+            "rig_note")
 
         self.ui_funcs.install_spinBox(
             ui.origin_sub_ctl_count_spinBox,
@@ -65,9 +65,6 @@ class Settings(DominoDialog, settings_ui.Ui_Dialog):
         self.ui_funcs.install_checkBox(
             ui.force_uniform_scale_checkBox,
             "force_uni_scale")
-        # self.ui_funcs.install_checkBox(
-        #     ui.connect_jnt_checkBox,
-        #     "connect_jnt_rig")
 
         self.ui_funcs.install_checkBox(
             ui.use_RGB_colors_checkBox,

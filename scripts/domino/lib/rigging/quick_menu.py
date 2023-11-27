@@ -222,9 +222,9 @@ def __quick_menu(parent_menu, current_control):
         if mc.getAttr(f"{i}.component") == "assembly":
             assembly_root = i
             break
-    notes = mc.getAttr(assembly_root + ".publish_notes")
+    notes = mc.getAttr(assembly_root + ".rig_note")
     mc.menuItem(parent=parent_menu, divider=True)
-    mc.menuItem(parent=parent_menu, label="rig notes", command=partial(__message_dialog, notes))
+    mc.menuItem(parent=parent_menu, label="rig note", command=partial(__message_dialog, notes))
 
 
 def domino_quick_menu(*args, **kwargs):

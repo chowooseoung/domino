@@ -71,7 +71,7 @@ def component_preset():
         "ctl_shapes": {"type": "nurbsCurve", "multi": True},
         "icon_name": {"type": "string"},
         "pose_json": {"type": "string"},
-        "publish_notes": {"type": "string"},
+        "rig_note": {"type": "string"},
         "asset_container": {"type": "string"}
     }
     value = {

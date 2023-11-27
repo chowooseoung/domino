@@ -45,8 +45,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>377</width>
-        <height>520</height>
+        <width>360</width>
+        <height>563</height>
        </rect>
       </property>
       <attribute name="label">
@@ -116,11 +116,11 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
           </item>
           <item row="4" column="0" colspan="3">
            <widget class="QTextEdit" name="notes_textEdit">
-            <property name="tabStopWidth">
-             <number>20</number>
-            </property>
             <property name="placeholderText">
-             <string>Publish note</string>
+             <string>rig note</string>
+            </property>
+            <property name="tabStopWidth" stdset="0">
+             <number>20</number>
             </property>
            </widget>
           </item>
@@ -616,8 +616,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>377</width>
-        <height>520</height>
+        <width>219</width>
+        <height>254</height>
        </rect>
       </property>
       <attribute name="label">
@@ -741,8 +741,8 @@ QToolBox QScrollArea&gt;QWidget&gt;QWidget
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>377</width>
-        <height>520</height>
+        <width>307</width>
+        <height>490</height>
        </rect>
       </property>
       <attribute name="label">

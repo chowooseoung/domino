@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'settings_ui.ui'
+## Form generated from reading UI file 'settings_uifbjLVH.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
@@ -354,7 +354,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.rig_page, u"Rig Settings")
         self.custom_step_page = QWidget()
         self.custom_step_page.setObjectName(u"custom_step_page")
-        self.custom_step_page.setGeometry(QRect(0, 0, 377, 520))
+        self.custom_step_page.setGeometry(QRect(0, 0, 223, 242))
         self.verticalLayout_3 = QVBoxLayout(self.custom_step_page)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gridLayout_4 = QGridLayout()
@@ -423,7 +423,7 @@ class Ui_Dialog(object):
         self.toolBox.addItem(self.custom_step_page, u"CustomStep Settings")
         self.name_rule_page = QWidget()
         self.name_rule_page.setObjectName(u"name_rule_page")
-        self.name_rule_page.setGeometry(QRect(0, 0, 377, 520))
+        self.name_rule_page.setGeometry(QRect(0, 0, 315, 456))
         self.verticalLayout_6 = QVBoxLayout(self.name_rule_page)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.groupBox_6 = QGroupBox(self.name_rule_page)
@@ -721,7 +721,7 @@ class Ui_Dialog(object):
 
         self.label.setText(QCoreApplication.translate("Dialog", u"Name", None))
         self.label_12.setText(QCoreApplication.translate("Dialog", u"End Point", None))
-        self.notes_textEdit.setPlaceholderText(QCoreApplication.translate("Dialog", u"Publish note", None))
+        self.notes_textEdit.setPlaceholderText(QCoreApplication.translate("Dialog", u"rig note", None))
         self.mode_comboBox.setItemText(0, QCoreApplication.translate("Dialog", u"DEBUG", None))
         self.mode_comboBox.setItemText(1, QCoreApplication.translate("Dialog", u"WIP", None))
         self.mode_comboBox.setItemText(2, QCoreApplication.translate("Dialog", u"PUB", None))
