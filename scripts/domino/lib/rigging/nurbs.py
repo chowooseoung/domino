@@ -66,11 +66,15 @@ def build(curve_data, name="", parent=None, replace="", match=False, inherits=Tr
     return crv
 
 
-def create(parent, name, degree, positions, m=om2.MTransformationMatrix(), bezier=False, vis=True, inherits=True,
-           display_type=0):
+def create(parent, name, degree, positions, m=om2.MTransformationMatrix(), bezier=False, ep=False, vis=True,
+           inherits=True, display_type=0):
     if isinstance(m, om2.MTransformationMatrix):
         m = m.asMatrix()
-    argument = {"point": [om2.MVector(p) - om2.MVector(list(m)[12:-1]) for p in positions], "bezier": bezier}
+    argument = {"bezier": bezier}
+    if ep:
+        argument.update({"editPoint": [om2.MVector(p) - om2.MVector(list(m)[12:-1]) for p in positions]})
+    else:
+        argument.update({"point": [om2.MVector(p) - om2.MVector(list(m)[12:-1]) for p in positions]})
     if not bezier:
         argument.update({"degree": degree})
     crv = mc.curve(**argument)
