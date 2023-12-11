@@ -27,8 +27,8 @@ def reset_all(nodes):
     for node in nodes:
         keyable_attrs = mc.listAttr(node, keyable=True) or []
         nonkeyable_attrs = mc.listAttr(node, channelBox=True) or []
-        attrs = keyable_attrs + nonkeyable_attrs
-        reset(node, list(set(attrs)))
+        reset(node, list(set(keyable_attrs)))
+        reset(node, list(set(nonkeyable_attrs)))
 
 
 def reset_SRT(nodes, attributes=("tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz")):
