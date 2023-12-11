@@ -12,7 +12,7 @@ def get_component_index(component):
             yield index
 
 
-def convert_component(component, vertex=False, edge=False, face=False, uv=False):
+def convert_component(component, vertex=False, edge=False, face=False, uv=False, to_string=True):
     if not isinstance(component, (list, tuple)):
         component = [component]
     mesh = component[0].split(".")[0]
@@ -27,6 +27,8 @@ def convert_component(component, vertex=False, edge=False, face=False, uv=False)
                                                                      toFace=face,
                                                                      toUV=uv))
     sorted_index_range = sorted(list(set(index_range)), key=lambda x: int(x))
+    if not to_string:
+        return [int(x) for x in sorted_index_range]
     if vertex:
         result_component = "vtx"
     elif edge:
