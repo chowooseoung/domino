@@ -12,6 +12,7 @@ import uuid
 from maya import mel
 from maya import cmds as mc
 from maya.api import OpenMaya as om2
+from maya.internal.nodes.proximitywrap import node_interface as ifc
 
 
 class Author:
@@ -37,8 +38,10 @@ def component_preset():
         "inner_edge_loop": {"type": "string"},
         "inner_upper_vertex": {"type": "string"},
         "inner_lower_vertex": {"type": "string"},
+        "sub_ctl_number": {"type": "long"},
         "auto_skinning": {"type": "bool"},
         "skin_fcurve": {"type": "double"},
+        "falloff": {"type": "long"},
         #
         "individual_settings_hide": {"type": "bool"},
         "left_up": {"type": "double"},
@@ -77,7 +80,9 @@ def component_preset():
         "side": Author.side,
         "index": Author.index,
         "anchors": [list(x) for x in _anchors()],
-        "auto_skinning": True
+        "sub_ctl_number": 5,
+        "auto_skinning": True,
+        "falloff": 4
     })
     common_preset["anim"].update({
         "skin_fcurve": {"name": "skin_fcurve_UU",
@@ -158,7 +163,7 @@ class Rig(assembler.Rig):
         inner_upper_vertex = int(data["inner_upper_vertex"])
         inner_lower_vertex = int(data["inner_lower_vertex"])
 
-        sub_ctl_number = 5
+        sub_ctl_number = data["sub_ctl_number"]
 
         def get_lip_vertex(edges, previous_vertices, destination_vertex, edge_loop, way1=[], way2=[]):
             new_edges = []
@@ -214,8 +219,11 @@ class Rig(assembler.Rig):
         else:
             left_way = outer_way2
             right_way = outer_way1
-        self.outer_upper_way = list(reversed(left_way[:int(len(left_way) / 2) + 1])) + right_way[
-                                                                                       1:int(len(right_way) / 2)]
+        if len(right_way) % 2 == 1:
+            index = int(len(right_way) / 2) + 1
+        else:
+            index = int(len(right_way) / 2)
+        self.outer_upper_way = list(reversed(left_way[:int(len(left_way) / 2) + 1])) + right_way[1:index]
         self.outer_lower_way = left_way[int(len(left_way) / 2):-1] + list(
             reversed(right_way[int((len(right_way) - 1) / 2):]))
 
@@ -320,8 +328,11 @@ class Rig(assembler.Rig):
         else:
             left_way = inner_way2
             right_way = inner_way1
-        self.inner_upper_way = list(reversed(left_way[:int(len(left_way) / 2) + 1])) + right_way[
-                                                                                       1:int(len(right_way) / 2)]
+        if len(right_way) % 2 == 1:
+            index = int(len(right_way) / 2) + 1
+        else:
+            index = int(len(right_way) / 2)
+        self.inner_upper_way = list(reversed(left_way[:int(len(left_way) / 2) + 1])) + right_way[1:index]
         self.inner_lower_way = left_way[int(len(left_way) / 2):-1] + list(
             reversed(right_way[int((len(right_way) - 1) / 2):]))
 
@@ -440,30 +451,52 @@ class Rig(assembler.Rig):
                                        height=0.01)[0])
             mc.setAttr(planes[i] + ".t",
                        *vector.get_position(self.lower_inner_driver_crv + ".cv[{0}]".format(i % number)))
-        self.driver_mesh = mc.polyUnite(planes,
-                                        constructionHistory=False,
-                                        mergeUVSets=True,
-                                        name=self.generate_name("driver", "mesh", "ctl"))[0]
-        self.driver_mesh = mc.parent(self.driver_mesh, context["xxx"])[0]
+        self.pin_upper_mesh = mc.polyUnite(planes[:int(number * 2)],
+                                           constructionHistory=False,
+                                           mergeUVSets=True,
+                                           name=self.generate_name("pinUpper", "mesh", "ctl"))[0]
+        self.pin_upper_mesh = mc.parent(self.pin_upper_mesh, self.root)[0]
+        self.pin_lower_mesh = mc.polyUnite(planes[int(number * 2):],
+                                           constructionHistory=False,
+                                           mergeUVSets=True,
+                                           name=self.generate_name("pinLower", "mesh", "ctl"))[0]
+        self.pin_lower_mesh = mc.parent(self.pin_lower_mesh, self.root)[0]
+        meshes = mc.duplicate([self.pin_upper_mesh, self.pin_lower_mesh])
+        self.driver_sc_mesh = mc.polyUnite(meshes,
+                                           constructionHistory=False,
+                                           mergeUVSets=True,
+                                           name=self.generate_name("driverSC", "mesh", "ctl"))[0]
+        self.driver_sc_mesh = mc.parent(self.driver_sc_mesh, self.root)[0]
+        mc.makeIdentity([self.driver_sc_mesh, self.pin_upper_mesh, self.pin_lower_mesh], apply=True, translate=True)
+        self.driver_cls_mesh = mc.duplicate(self.driver_sc_mesh, name=self.generate_name("driverCls", "mesh", "ctl"))[0]
+        self.driver_cls_mesh = mc.parent(self.driver_cls_mesh, context["xxx"])[0]
+        self.driver_pin_mesh = mc.duplicate(self.driver_sc_mesh, name=self.generate_name("driverPin", "mesh", "ctl"))[0]
 
-        mc.setAttr(self.driver_mesh + ".componentTags[0].componentTagName",
-                   self.driver_mesh + "_upper",
+        mc.setAttr(self.driver_cls_mesh + ".componentTags[0].componentTagName",
+                   self.driver_cls_mesh + "_upper",
                    type="string")
-        mc.setAttr(self.driver_mesh + ".componentTags[1].componentTagName",
-                   self.driver_mesh + "_lower",
+        mc.setAttr(self.driver_cls_mesh + ".componentTags[1].componentTagName",
+                   self.driver_cls_mesh + "_lower",
                    type="string")
-        mc.setAttr(self.driver_mesh + ".componentTags[0].componentTagContents",
+        mc.setAttr(self.driver_cls_mesh + ".componentTags[0].componentTagContents",
                    2,
                    "vtx[4:{0}]".format((sub_ctl_number + 2) * 4 - 5),
                    "vtx[{0}:{1}]".format((sub_ctl_number + 2) * 4 + 4, (sub_ctl_number + 2) * 8 - 5),
                    type="componentList")
-        mc.setAttr(self.driver_mesh + ".componentTags[1].componentTagContents",
+        mc.setAttr(self.driver_cls_mesh + ".componentTags[1].componentTagContents",
                    2,
                    "vtx[{0}:{1}]".format((sub_ctl_number + 2) * 8 + 4, (sub_ctl_number + 2) * 12 - 5),
                    "vtx[{0}:{1}]".format((sub_ctl_number + 2) * 12 + 4, (sub_ctl_number + 2) * 16 - 5),
                    type="componentList")
 
-        mc.hide(self.driver_mesh)
+        p_wrap = mc.deformer([self.pin_upper_mesh, self.pin_lower_mesh, self.driver_cls_mesh],
+                             type="proximityWrap",
+                             name=self.generate_name("", "pWrap", "ctl"))[0]
+        p_wrap_ifc = ifc.NodeInterface(p_wrap)
+        p_wrap_ifc.addDriver(mc.listRelatives(self.driver_sc_mesh, shapes=True, fullPath=True)[0])
+        mc.setAttr(p_wrap + ".wrapMode", 2)
+
+        mc.hide(self.driver_sc_mesh, self.driver_cls_mesh, self.driver_pin_mesh, self.pin_upper_mesh, self.pin_lower_mesh)
 
         # ctls
         m = matrix.set_matrix_scale(data["anchors"][3], (1, 1, 1))
@@ -482,10 +515,18 @@ class Rig(assembler.Rig):
                                                            "color": (1, 0, 0),
                                                        },
                                                        mirror_ctl_name=self.generate_name("right", "", "ctl"))
-        self.left_jnt = joint.add_joint(self.left_loc,
+        npo = hierarchy.get_parent(self.left_ctl)
+        self.left_jnt = joint.add_joint(self.root,
                                         name=self.generate_name("left", "jnt", "ctl"),
-                                        m=matrix.get_matrix(self.left_loc),
+                                        m=m,
                                         vis=False)
+        mc.parentConstraint(self.left_loc, self.left_jnt)
+        mc.scaleConstraint(self.left_loc, self.left_jnt)
+        self.left_pin_jnt = joint.add_joint(self.root,
+                                            name=self.generate_name("leftPin", "jnt", "ctl"),
+                                            m=m,
+                                            vis=False)
+        mc.parentConstraint(npo, self.left_pin_jnt)
 
         m = matrix.set_matrix_scale(data["anchors"][4], (1, 1, -1))
         self.right_ctl, self.right_loc = self.create_ctl(context=context,
@@ -502,10 +543,18 @@ class Rig(assembler.Rig):
                                                              "color": (1, 0, 0),
                                                          },
                                                          mirror_ctl_name=self.generate_name("left", "", "ctl"))
-        self.right_jnt = joint.add_joint(self.right_loc,
+        npo = hierarchy.get_parent(self.right_ctl)
+        self.right_jnt = joint.add_joint(self.root,
                                          name=self.generate_name("right", "jnt", "ctl"),
-                                         m=matrix.get_matrix(self.right_loc),
+                                         m=m,
                                          vis=False)
+        mc.parentConstraint(self.right_loc, self.right_jnt)
+        mc.scaleConstraint(self.right_loc, self.right_jnt)
+        self.right_pin_jnt = joint.add_joint(self.root,
+                                             name=self.generate_name("rightPin", "jnt", "ctl"),
+                                             m=m,
+                                             vis=False)
+        mc.parentConstraint(npo, self.right_pin_jnt)
 
         m = matrix.set_matrix_scale(data["anchors"][1], (1, 1, 1))
         self.upper_ctl, self.upper_loc = self.create_ctl(context=context,
@@ -522,10 +571,19 @@ class Rig(assembler.Rig):
                                                              "color": (1, 0, 0),
                                                          },
                                                          mirror_ctl_name="")
-        self.upper_jnt = joint.add_joint(self.upper_loc,
+        npo = hierarchy.get_parent(self.upper_ctl)
+        self.upper_jnt = joint.add_joint(self.root,
                                          name=self.generate_name("upper", "jnt", "ctl"),
-                                         m=matrix.get_matrix(self.upper_loc),
+                                         m=m,
                                          vis=False)
+        mc.parentConstraint(self.upper_loc, self.upper_jnt)
+        mc.scaleConstraint(self.upper_loc, self.upper_jnt)
+        self.upper_pin_jnt = joint.add_joint(self.root,
+                                             name=self.generate_name("upperPin", "jnt", "ctl"),
+                                             m=m,
+                                             vis=False)
+        mc.parentConstraint(npo, self.upper_pin_jnt)
+
         m = matrix.set_matrix_scale(data["anchors"][2], (1, 1, -1))
         self.lower_ctl, self.lower_loc = self.create_ctl(context=context,
                                                          parent=None,
@@ -541,17 +599,51 @@ class Rig(assembler.Rig):
                                                              "color": (1, 0, 0),
                                                          },
                                                          mirror_ctl_name="")
-        self.lower_jnt = joint.add_joint(self.lower_loc,
+        npo = hierarchy.get_parent(self.lower_ctl)
+        self.lower_jnt = joint.add_joint(self.root,
                                          name=self.generate_name("lower", "jnt", "ctl"),
-                                         m=matrix.get_matrix(self.lower_loc),
+                                         m=m,
                                          vis=False)
+        mc.parentConstraint(self.lower_loc, self.lower_jnt)
+        mc.scaleConstraint(self.lower_loc, self.lower_jnt)
+        self.lower_pin_jnt = joint.add_joint(self.root,
+                                             name=self.generate_name("lowerPin", "jnt", "ctl"),
+                                             m=m,
+                                             vis=False)
+        mc.parentConstraint(npo, self.lower_pin_jnt)
+
         self.driver_sc = mc.skinCluster([self.left_jnt, self.right_jnt, self.upper_jnt, self.lower_jnt],
-                                        self.driver_mesh,
+                                        self.driver_sc_mesh,
                                         name=self.generate_name("driver", "sc", "ctl"),
                                         toSelectedBones=True,
                                         bindMethod=1,
                                         normalizeWeights=1,
                                         weightDistribution=1)[0]
+        self.driver_pin_sc = mc.skinCluster([self.left_pin_jnt,
+                                             self.right_pin_jnt,
+                                             self.upper_pin_jnt,
+                                             self.lower_pin_jnt],
+                                            self.driver_pin_mesh,
+                                            name=self.generate_name("driverPin", "sc", "ctl"),
+                                            toSelectedBones=True,
+                                            bindMethod=1,
+                                            normalizeWeights=1,
+                                            weightDistribution=1)[0]
+
+        upper_driver_pin = mc.createNode("proximityPin")
+        mc.setAttr(upper_driver_pin + ".offsetTranslation", 1)
+        mc.setAttr(upper_driver_pin + ".offsetOrientation", 1)
+        mc.connectAttr(self.pin_upper_mesh + ".outMesh", upper_driver_pin + ".deformedGeometry")
+        orig_shape = mc.ls(mc.listRelatives(self.pin_upper_mesh, noIntermediate=False), intermediateObjects=True)[0]
+        mc.connectAttr(orig_shape + ".outMesh", upper_driver_pin + ".originalGeometry")
+
+        lower_driver_pin = mc.createNode("proximityPin")
+        mc.setAttr(lower_driver_pin + ".offsetTranslation", 1)
+        mc.setAttr(lower_driver_pin + ".offsetOrientation", 1)
+        mc.connectAttr(self.pin_lower_mesh + ".outMesh", lower_driver_pin + ".deformedGeometry")
+        orig_shape = mc.ls(mc.listRelatives(self.pin_lower_mesh, noIntermediate=False), intermediateObjects=True)[0]
+        mc.connectAttr(orig_shape + ".outMesh", lower_driver_pin + ".originalGeometry")
+
         # skinning
         # right side
         cv_number = sub_ctl_number + 2
@@ -587,7 +679,7 @@ class Rig(assembler.Rig):
             weight = 0
             n = 0
             mc.skinPercent(self.driver_sc,
-                           self.driver_mesh + ".vtx[{0}:{1}]".format(n + offset * i, n + offset * i + 3),
+                           self.driver_sc_mesh + ".vtx[{0}:{1}]".format(n + offset * i, n + offset * i + 3),
                            transformValue=((self.right_jnt, 1)))
             n += 4
             for w in right_weights:
@@ -597,7 +689,7 @@ class Rig(assembler.Rig):
                                                  destination=False)[0]
                 multiple_weight = fcurve.get_fcurve_values(skin_fcurve, division=0, inputs=[weight])[0]
                 mc.skinPercent(self.driver_sc,
-                               self.driver_mesh + ".vtx[{0}:{1}]".format(n + offset * i, n + offset * i + 3),
+                               self.driver_sc_mesh + ".vtx[{0}:{1}]".format(n + offset * i, n + offset * i + 3),
                                transformValue=((self.right_jnt, 1 - multiple_weight),
                                                (mid_jnt, multiple_weight)))
                 n += 4
@@ -610,35 +702,35 @@ class Rig(assembler.Rig):
                                                  destination=False)[0]
                 multiple_weight = fcurve.get_fcurve_values(skin_fcurve, division=0, inputs=[weight])[0]
                 mc.skinPercent(self.driver_sc,
-                               self.driver_mesh + ".vtx[{0}:{1}]".format(offset * (i + 1) - n,
-                                                                         offset * (i + 1) + 3 - n),
+                               self.driver_sc_mesh + ".vtx[{0}:{1}]".format(offset * (i + 1) - n,
+                                                                            offset * (i + 1) + 3 - n),
                                transformValue=((self.left_jnt, 1 - multiple_weight),
                                                (mid_jnt, multiple_weight)))
                 n += 4
+        mc.copySkinWeights(self.driver_sc_mesh,
+                           self.driver_pin_mesh,
+                           noMirror=True,
+                           surfaceAssociation="closestPoint",
+                           influenceAssociation="closestJoint")
+        for jnt in [self.left_jnt, self.left_pin_jnt, self.right_jnt, self.right_pin_jnt, self.upper_jnt, self.upper_pin_jnt, self.lower_jnt, self.lower_pin_jnt]:
+            plugs = mc.listConnections(jnt, destination=True, source=False, plugs=True)
+            for plug in plugs:
+                if "matrix" in plug:
+                    mult_m = mc.createNode("multMatrix")
+                    i_m = mc.getAttr(self.root + ".worldMatrix[0]")
+                    mc.setAttr(mult_m + ".matrixIn[1]", i_m, type="matrix")
+                    mc.connectAttr(jnt + ".matrix", mult_m + ".matrixIn[0]")
+                    mc.connectAttr(mult_m + ".matrixSum", plug, force=True)
 
         # proximity wrap ctls
         m = matrix.set_matrix_scale(data["anchors"][5], (1, 1, 1))
         self.upper_left_cns = matrix.transform(parent=self.root,
                                                name=self.generate_name("upperLeft", "cns", "ctl"),
                                                m=matrix.get_matrix(self.root))
-        source0 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("upperLeft0", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.upper_jnt, source0, maintainOffset=True)
-        source1 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("upperLeft1", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.left_jnt, source1, maintainOffset=True)
-        wt_m = mc.createNode("wtAddMatrix")
-        mc.connectAttr(source0 + ".worldMatrix[0]", wt_m + ".wtMatrix[0].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[0].weightIn", 0.5)
-        mc.connectAttr(source1 + ".worldMatrix[0]", wt_m + ".wtMatrix[1].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[1].weightIn", 0.5)
-
-        mult_m = mc.createNode("multMatrix")
-        mc.connectAttr(wt_m + ".matrixSum", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-        mc.connectAttr(mult_m + ".matrixSum", self.upper_left_cns + ".offsetParentMatrix")
+        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+        mc.setAttr(upper_driver_pin + ".inputMatrix[0]", mc.getAttr(temp + ".matrix"), type="matrix")
+        mc.delete(temp)
+        mc.connectAttr(upper_driver_pin + ".outputMatrix[0]", self.upper_left_cns + ".offsetParentMatrix")
 
         distance = vector.get_distance(vector.get_position(vertex_index), vector.get_position(destination_index))
         self.upper_left_ctl, self.upper_left_loc = self.create_ctl(context=context,
@@ -669,24 +761,10 @@ class Rig(assembler.Rig):
         self.upper_right_cns = matrix.transform(parent=self.root,
                                                 name=self.generate_name("upperRight", "cns", "ctl"),
                                                 m=matrix.get_matrix(self.root))
-        source0 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("upperRight0", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.upper_jnt, source0, maintainOffset=True)
-        source1 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("upperRight1", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.right_jnt, source1, maintainOffset=True)
-        wt_m = mc.createNode("wtAddMatrix")
-        mc.connectAttr(source0 + ".worldMatrix[0]", wt_m + ".wtMatrix[0].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[0].weightIn", 0.5)
-        mc.connectAttr(source1 + ".worldMatrix[0]", wt_m + ".wtMatrix[1].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[1].weightIn", 0.5)
-
-        mult_m = mc.createNode("multMatrix")
-        mc.connectAttr(wt_m + ".matrixSum", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-        mc.connectAttr(mult_m + ".matrixSum", self.upper_right_cns + ".offsetParentMatrix")
+        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+        mc.setAttr(upper_driver_pin + ".inputMatrix[1]", mc.getAttr(temp + ".matrix"), type="matrix")
+        mc.delete(temp)
+        mc.connectAttr(upper_driver_pin + ".outputMatrix[1]", self.upper_right_cns + ".offsetParentMatrix")
 
         self.upper_right_ctl, self.upper_right_loc = self.create_ctl(context=context,
                                                                      parent=self.upper_right_cns,
@@ -716,24 +794,10 @@ class Rig(assembler.Rig):
         self.lower_left_cns = matrix.transform(parent=self.root,
                                                name=self.generate_name("lowerLeft", "cns", "ctl"),
                                                m=matrix.get_matrix(self.root))
-        source0 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("lowerLeft0", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.lower_jnt, source0, maintainOffset=True)
-        source1 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("lowerLeft1", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.left_jnt, source1, maintainOffset=True)
-        wt_m = mc.createNode("wtAddMatrix")
-        mc.connectAttr(source0 + ".worldMatrix[0]", wt_m + ".wtMatrix[0].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[0].weightIn", 0.5)
-        mc.connectAttr(source1 + ".worldMatrix[0]", wt_m + ".wtMatrix[1].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[1].weightIn", 0.5)
-
-        mult_m = mc.createNode("multMatrix")
-        mc.connectAttr(wt_m + ".matrixSum", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-        mc.connectAttr(mult_m + ".matrixSum", self.lower_left_cns + ".offsetParentMatrix")
+        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+        mc.setAttr(lower_driver_pin + ".inputMatrix[0]", mc.getAttr(temp + ".matrix"), type="matrix")
+        mc.delete(temp)
+        mc.connectAttr(lower_driver_pin + ".outputMatrix[0]", self.lower_left_cns + ".offsetParentMatrix")
 
         self.lower_left_ctl, self.lower_left_loc = self.create_ctl(context=context,
                                                                    parent=self.lower_left_cns,
@@ -763,24 +827,10 @@ class Rig(assembler.Rig):
         self.lower_right_cns = matrix.transform(parent=self.root,
                                                 name=self.generate_name("lowerRight", "cns", "ctl"),
                                                 m=matrix.get_matrix(self.root))
-        source0 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("lowerRight0", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.lower_jnt, source0, maintainOffset=True)
-        source1 = matrix.transform(parent=self.root,
-                                   name=self.generate_name("lowerRight1", "source", "ctl"),
-                                   m=m)
-        mc.pointConstraint(self.right_jnt, source1, maintainOffset=True)
-        wt_m = mc.createNode("wtAddMatrix")
-        mc.connectAttr(source0 + ".worldMatrix[0]", wt_m + ".wtMatrix[0].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[0].weightIn", 0.5)
-        mc.connectAttr(source1 + ".worldMatrix[0]", wt_m + ".wtMatrix[1].matrixIn")
-        mc.setAttr(wt_m + ".wtMatrix[1].weightIn", 0.5)
-
-        mult_m = mc.createNode("multMatrix")
-        mc.connectAttr(wt_m + ".matrixSum", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-        mc.connectAttr(mult_m + ".matrixSum", self.lower_right_cns + ".offsetParentMatrix")
+        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+        mc.setAttr(lower_driver_pin + ".inputMatrix[1]", mc.getAttr(temp + ".matrix"), type="matrix")
+        mc.delete(temp)
+        mc.connectAttr(lower_driver_pin + ".outputMatrix[1]", self.lower_right_cns + ".offsetParentMatrix")
 
         self.lower_right_ctl, self.lower_right_loc = self.create_ctl(context=context,
                                                                      parent=self.lower_right_cns,
@@ -807,11 +857,12 @@ class Rig(assembler.Rig):
         mc.scaleConstraint(self.lower_right_loc, self.lower_right_jnt)
 
         distance = vector.get_distance(vector.get_position(outer_side_vertex2), vector.get_position(outer_side_vertex1))
-        self.upper_left_cls = mc.cluster(self.driver_mesh,
+        self.upper_left_cls = mc.cluster(self.driver_cls_mesh,
                                          name=self.generate_name("upperLeft", "cls", "ctl"),
                                          bindState=1,
                                          weightedNode=(self.upper_left_jnt, self.upper_left_jnt))[0]
-        mc.setAttr(self.upper_left_cls + ".input[0].componentTagExpression", self.driver_mesh + "_upper", type="string")
+        mc.setAttr(self.upper_left_cls + ".input[0].componentTagExpression", self.driver_cls_mesh + "_upper",
+                   type="string")
         handle = \
             mc.listConnections(self.upper_left_cls, source=True, destination=False, type="clusterHandle", shapes=True)[
                 0]
@@ -834,11 +885,11 @@ class Rig(assembler.Rig):
         mc.setAttr(self.upper_left_falloff + ".ramp[2].ramp_Position", 1)
         mc.setAttr(self.upper_left_falloff + ".ramp[2].ramp_FloatValue", 0.5)
         mc.connectAttr(self.upper_left_falloff + ".outputWeightFunction", self.upper_left_cls + ".weightFunction[0]")
-        self.upper_right_cls = mc.cluster(self.driver_mesh,
+        self.upper_right_cls = mc.cluster(self.driver_cls_mesh,
                                           name=self.generate_name("upperRight", "cls", "ctl"),
                                           bindState=1,
                                           weightedNode=(self.upper_right_jnt, self.upper_right_jnt))[0]
-        mc.setAttr(self.upper_right_cls + ".input[0].componentTagExpression", self.driver_mesh + "_upper",
+        mc.setAttr(self.upper_right_cls + ".input[0].componentTagExpression", self.driver_cls_mesh + "_upper",
                    type="string")
         handle = \
             mc.listConnections(self.upper_right_cls, source=True, destination=False, type="clusterHandle", shapes=True)[
@@ -864,11 +915,12 @@ class Rig(assembler.Rig):
         mc.connectAttr(self.upper_right_falloff + ".outputWeightFunction", self.upper_right_cls + ".weightFunction[0]")
         mc.hide([self.upper_left_falloff, self.upper_right_falloff])
 
-        self.lower_left_cls = mc.cluster(self.driver_mesh,
+        self.lower_left_cls = mc.cluster(self.driver_cls_mesh,
                                          name=self.generate_name("lowerLeft", "cls", "ctl"),
                                          bindState=1,
                                          weightedNode=(self.lower_left_jnt, self.lower_left_jnt))[0]
-        mc.setAttr(self.lower_left_cls + ".input[0].componentTagExpression", self.driver_mesh + "_lower", type="string")
+        mc.setAttr(self.lower_left_cls + ".input[0].componentTagExpression", self.driver_cls_mesh + "_lower",
+                   type="string")
         handle = \
             mc.listConnections(self.lower_left_cls, source=True, destination=False, type="clusterHandle", shapes=True)[
                 0]
@@ -891,11 +943,11 @@ class Rig(assembler.Rig):
         mc.setAttr(self.lower_left_falloff + ".ramp[2].ramp_Position", 1)
         mc.setAttr(self.lower_left_falloff + ".ramp[2].ramp_FloatValue", 0.5)
         mc.connectAttr(self.lower_left_falloff + ".outputWeightFunction", self.lower_left_cls + ".weightFunction[0]")
-        self.lower_right_cls = mc.cluster(self.driver_mesh,
+        self.lower_right_cls = mc.cluster(self.driver_cls_mesh,
                                           name=self.generate_name("lowerRight", "cls", "ctl"),
                                           bindState=1,
                                           weightedNode=(self.lower_right_jnt, self.lower_right_jnt))[0]
-        mc.setAttr(self.lower_right_cls + ".input[0].componentTagExpression", self.driver_mesh + "_lower",
+        mc.setAttr(self.lower_right_cls + ".input[0].componentTagExpression", self.driver_cls_mesh + "_lower",
                    type="string")
         handle = \
             mc.listConnections(self.lower_right_cls, source=True, destination=False, type="clusterHandle", shapes=True)[
@@ -924,7 +976,7 @@ class Rig(assembler.Rig):
         self.upper_curve_ctls = []
         pin = mc.createNode("proximityPin")
         mc.setAttr(pin + ".offsetTranslation", 1)
-        shape, orig_shape = mc.listRelatives(self.driver_mesh, shapes=True)
+        shape, orig_shape = mc.listRelatives(self.driver_cls_mesh, shapes=True)
         mc.connectAttr(orig_shape + ".outMesh", pin + ".originalGeometry")
         mc.connectAttr(shape + ".worldMesh[0]", pin + ".deformedGeometry")
 
@@ -969,7 +1021,9 @@ class Rig(assembler.Rig):
             inner_index = i * 2 + 1
 
             # outer pos
-            mc.setAttr(pin + ".inputMatrix[{0}]".format(outer_index), outer_m, type="matrix")
+            temp = matrix.transform(parent=self.root, name="TEMP", m=outer_m)
+            mc.setAttr(pin + ".inputMatrix[{0}]".format(outer_index), mc.getAttr(temp + ".matrix"), type="matrix")
+            mc.delete(temp)
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(pin + ".outputMatrix[{0}]".format(outer_index), mult_m + ".matrixIn[0]")
             mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
@@ -979,7 +1033,9 @@ class Rig(assembler.Rig):
             mc.connectAttr(decom_m + ".outputTranslate", npo + ".t")
 
             # inner
-            mc.setAttr(pin + ".inputMatrix[{0}]".format(inner_index), inner_m, type="matrix")
+            temp = matrix.transform(parent=self.root, name="TEMP", m=inner_m)
+            mc.setAttr(pin + ".inputMatrix[{0}]".format(inner_index), mc.getAttr(temp + ".matrix"), type="matrix")
+            mc.delete(temp)
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(pin + ".outputMatrix[{0}]".format(inner_index), mult_m + ".matrixIn[0]")
             mc.connectAttr(npo + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
@@ -1055,7 +1111,9 @@ class Rig(assembler.Rig):
             inner_index = i * 2 + (sub_ctl_number * 2 + 1)
 
             # outer
-            mc.setAttr(pin + ".inputMatrix[{0}]".format(outer_index), outer_m, type="matrix")
+            temp = matrix.transform(parent=self.root, name="TEMP", m=outer_m)
+            mc.setAttr(pin + ".inputMatrix[{0}]".format(outer_index), mc.getAttr(temp + ".matrix"), type="matrix")
+            mc.delete(temp)
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(pin + ".outputMatrix[{0}]".format(outer_index), mult_m + ".matrixIn[0]")
             mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
@@ -1065,7 +1123,9 @@ class Rig(assembler.Rig):
             mc.connectAttr(decom_m + ".outputTranslate", npo + ".t")
 
             # inner
-            mc.setAttr(pin + ".inputMatrix[{0}]".format(inner_index), inner_m, type="matrix")
+            temp = matrix.transform(parent=self.root, name="TEMP", m=inner_m)
+            mc.setAttr(pin + ".inputMatrix[{0}]".format(inner_index), mc.getAttr(temp + ".matrix"), type="matrix")
+            mc.delete(temp)
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(pin + ".outputMatrix[{0}]".format(inner_index), mult_m + ".matrixIn[0]")
             mc.connectAttr(npo + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
@@ -1118,7 +1178,9 @@ class Rig(assembler.Rig):
         for i in range(4):
             index = i + sub_ctl_number * 4
             m = matrix.set_matrix_translate(orig_m, pos_list[i])
-            mc.setAttr(pin + ".inputMatrix[{0}]".format(index), m, type="matrix")
+            temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+            mc.setAttr(pin + ".inputMatrix[{0}]".format(index), mc.getAttr(temp + ".matrix"), type="matrix")
+            mc.delete(temp)
 
             for cp in cps_list[i]:
                 crv = cp.split(".")[0]
@@ -1482,51 +1544,57 @@ class Rig(assembler.Rig):
                        hierarchy.get_parent(self.lower_ctl) + ".offsetParentMatrix")
 
         # side auto rotate
-        ph = mc.listRelatives(self.left_ctl, children=True, type="transform")[0]
+        side_data = [
+            [self.left_ctl, self.left_up_attr, self.left_down_attr, self.left_in_attr, self.left_out_attr],
+            [self.right_ctl, self.right_up_attr, self.right_down_attr, self.right_in_attr, self.right_out_attr]
+        ]
+        for d in side_data:
+            ctl, up_attr, down_attr, in_attr, out_attr = d
+            ph = mc.listRelatives(ctl, children=True, type="transform")[0]
 
-        mp = mc.createNode("multiplyDivide")
-        mc.setAttr(mp + ".input1X", -1)
-        mc.setAttr(mp + ".input1Y", -1)
-        mc.connectAttr(self.left_up_attr, mp + ".input2X")
-        mc.connectAttr(self.left_ctl + ".tz", mp + ".input2Y")
+            mp = mc.createNode("multiplyDivide")
+            mc.setAttr(mp + ".input1X", -1)
+            mc.setAttr(mp + ".input1Y", -1)
+            mc.connectAttr(up_attr, mp + ".input2X")
+            mc.connectAttr(ctl + ".tz", mp + ".input2Y")
 
-        r_v = mc.createNode("remapValue")
-        mc.connectAttr(self.left_ctl + ".tz", r_v + ".inputValue")
-        mc.connectAttr(mp + ".outputX", r_v + ".outputMax")
+            r_v = mc.createNode("remapValue")
+            mc.connectAttr(ctl + ".tz", r_v + ".inputValue")
+            mc.connectAttr(mp + ".outputX", r_v + ".outputMax")
 
-        condition = mc.createNode("condition")
-        mc.setAttr(condition + ".operation", 5)
-        mc.connectAttr(self.left_ctl + ".tz", condition + ".firstTerm")
-        mc.connectAttr(r_v + ".outValue", condition + ".colorIfFalseR")
+            condition = mc.createNode("condition")
+            mc.setAttr(condition + ".operation", 5)
+            mc.connectAttr(ctl + ".tz", condition + ".firstTerm")
+            mc.connectAttr(r_v + ".outValue", condition + ".colorIfFalseR")
 
-        r_v = mc.createNode("remapValue")
-        mc.connectAttr(mp + ".outputY", r_v + ".inputValue")
-        mc.connectAttr(self.left_down_attr, r_v + ".outputMax")
-        mc.connectAttr(r_v + ".outValue", condition + ".colorIfTrueR")
+            r_v = mc.createNode("remapValue")
+            mc.connectAttr(mp + ".outputY", r_v + ".inputValue")
+            mc.connectAttr(down_attr, r_v + ".outputMax")
+            mc.connectAttr(r_v + ".outValue", condition + ".colorIfTrueR")
 
-        mc.connectAttr(condition + ".outColorR", ph + ".ry")
+            mc.connectAttr(condition + ".outColorR", ph + ".ry")
 
-        condition = mc.createNode("condition")
-        mc.setAttr(condition + ".operation", 3)
-        mc.connectAttr(self.left_ctl + ".tx", condition + ".firstTerm")
+            condition = mc.createNode("condition")
+            mc.setAttr(condition + ".operation", 3)
+            mc.connectAttr(ctl + ".tx", condition + ".firstTerm")
 
-        r_v = mc.createNode("remapValue")
-        mc.connectAttr(self.left_ctl + ".tx", r_v + ".inputValue")
-        mc.connectAttr(self.left_out_attr, r_v + ".outputMax")
-        mc.connectAttr(r_v + ".outValue", condition + ".colorIfTrueR")
+            r_v = mc.createNode("remapValue")
+            mc.connectAttr(ctl + ".tx", r_v + ".inputValue")
+            mc.connectAttr(out_attr, r_v + ".outputMax")
+            mc.connectAttr(r_v + ".outValue", condition + ".colorIfTrueR")
 
-        mp = mc.createNode("multiplyDivide")
-        mc.setAttr(mp + ".input1X", -1)
-        mc.setAttr(mp + ".input1Y", -1)
-        mc.connectAttr(self.left_in_attr, mp + ".input2X")
-        mc.connectAttr(self.left_ctl + ".tx", mp + ".input2Y")
+            mp = mc.createNode("multiplyDivide")
+            mc.setAttr(mp + ".input1X", -1)
+            mc.setAttr(mp + ".input1Y", -1)
+            mc.connectAttr(in_attr, mp + ".input2X")
+            mc.connectAttr(ctl + ".tx", mp + ".input2Y")
 
-        r_v = mc.createNode("remapValue")
-        mc.connectAttr(mp + ".outputY", r_v + ".inputValue")
-        mc.connectAttr(mp + ".outputX", r_v + ".outputMax")
-        mc.connectAttr(r_v + ".outValue", condition + ".colorIfFalseR")
+            r_v = mc.createNode("remapValue")
+            mc.connectAttr(mp + ".outputY", r_v + ".inputValue")
+            mc.connectAttr(mp + ".outputX", r_v + ".outputMax")
+            mc.connectAttr(r_v + ".outValue", condition + ".colorIfFalseR")
 
-        mc.connectAttr(condition + ".outColorR", ph + ".rz")
+            mc.connectAttr(condition + ".outColorR", ph + ".rz")
 
         # auto skinning
         if not data["auto_skinning"]:
@@ -1540,8 +1608,8 @@ class Rig(assembler.Rig):
                                 bindMethod=1,
                                 normalizeWeights=1,
                                 weightDistribution=1)[0]
-        outer_edge_loop = data["outer_edge_loop"]
-        inner_edge_loop = data["inner_edge_loop"]
+        outer_edge_loop = data["outer_edge_loop"].split(",")
+        inner_edge_loop = data["inner_edge_loop"].split(",")
         mc.skinCluster(sc,
                        edit=True,
                        weight=0,
@@ -1582,7 +1650,7 @@ class Rig(assembler.Rig):
 
                 count = 1
                 ratio = 1 / len(intersection)
-                while intersection and count < len(intersection):
+                while intersection and count <= len(intersection):
                     outer_edges = set(polygon.convert_component(outer_vtx, edge=True, to_string=False))
                     inner_edges = set(polygon.convert_component(inner_vtx, edge=True, to_string=False))
 
@@ -1679,7 +1747,7 @@ class Rig(assembler.Rig):
                 count += 1
 
         # outer falloff skinning
-        falloff = 6
+        falloff = data["falloff"]
         outer_upper_way = self.outer_upper_way
         outer_lower_way = self.outer_lower_way
         inner_upper_way = self.inner_upper_way
