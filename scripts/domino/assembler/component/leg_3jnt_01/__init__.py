@@ -369,7 +369,6 @@ class Rig(assembler.Rig):
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(inverse_mult_m + ".matrixSum", decom_m + ".inputMatrix")
             mc.connectAttr(decom_m + ".outputRotate", inverse_node + ".r")
-            mc.connectAttr(decom_m + ".outputScale", inverse_node + ".s")
             parent = inverse_node
         self.chain3_ik_jnts = joint.add_chain_joint(parent,
                                                     name,
