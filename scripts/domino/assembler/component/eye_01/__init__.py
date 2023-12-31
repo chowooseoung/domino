@@ -1,5 +1,5 @@
 # domino
-from domino.lib import matrix, vector, polygon, attribute
+from domino.lib import matrix, vector, polygon, attribute, hierarchy
 from domino.lib.rigging import nurbs, operators, callback
 from domino import assembler
 
@@ -136,6 +136,7 @@ class Rig(assembler.Rig):
                                                          "color": fk_color
                                                      },
                                                      mirror_ctl_name=self.generate_name("", "", "ctl", True))
+        context[self.identifier]["line_of_sight"] = hierarchy.get_parent(self.eye_ctl)
 
         m = matrix.get_look_at_matrix(positions[0], positions[1], normal, "xz", self.component.negate)
         name = self.generate_name("ref", "source", "ctl")
