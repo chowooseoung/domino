@@ -197,6 +197,10 @@ class Rig(assembler.Rig):
                 return way1, way2
             return get_lip_vertex(new_edges, new_previous_vertices, destination_vertex, edge_loop, way1, way2)
 
+        self.origin_space = matrix.transform(parent=self.root,
+                                             name=self.generate_name("origin", "space", "ctl"),
+                                             m=orig_m)
+
         # curve
         outer_edges = polygon.convert_component(mesh + ".vtx[" + str(outer_upper_vertex) + "]", edge=True)
         outer_edges = [x for x in outer_edges if int(next(polygon.get_component_index([x]))) in outer_edge_loop]
@@ -227,7 +231,7 @@ class Rig(assembler.Rig):
         self.outer_lower_way = left_way[int(len(left_way) / 2):-1] + list(
             reversed(right_way[int((len(right_way) - 1) / 2):]))
 
-        self.upper_outer_ep_crv = nurbs.create(parent=self.root,
+        self.upper_outer_ep_crv = nurbs.create(parent=self.origin_space,
                                                name=self.generate_name("upperOuterEP", "crv", "ctl"),
                                                degree=3,
                                                positions=[vector.get_position(x) for x in self.outer_upper_way],
@@ -235,7 +239,7 @@ class Rig(assembler.Rig):
                                                ep=True,
                                                vis=False)
         mc.rebuildCurve(self.upper_outer_ep_crv, keepControlPoints=True)
-        self.lower_outer_ep_crv = nurbs.create(parent=self.root,
+        self.lower_outer_ep_crv = nurbs.create(parent=self.origin_space,
                                                name=self.generate_name("lowerOuterEP", "crv", "ctl"),
                                                degree=3,
                                                positions=[vector.get_position(x) for x in self.outer_lower_way],
@@ -244,13 +248,13 @@ class Rig(assembler.Rig):
                                                vis=False)
         mc.rebuildCurve(self.lower_outer_ep_crv, keepControlPoints=True)
 
-        self.upper_outer_driver_crv = nurbs.create(parent=self.root,
+        self.upper_outer_driver_crv = nurbs.create(parent=self.origin_space,
                                                    name=self.generate_name("upperOuterDriver", "crv", "ctl"),
                                                    degree=1,
                                                    positions=[vector.get_position(x) for x in self.outer_upper_way],
                                                    m=orig_m,
                                                    vis=False)
-        self.lower_outer_driver_crv = nurbs.create(parent=self.root,
+        self.lower_outer_driver_crv = nurbs.create(parent=self.origin_space,
                                                    name=self.generate_name("lowerOuterDriver", "crv", "ctl"),
                                                    degree=1,
                                                    positions=[vector.get_position(x) for x in self.outer_lower_way],
@@ -280,7 +284,6 @@ class Rig(assembler.Rig):
                         spans=sub_ctl_number - 1,
                         degree=3,
                         tolerance=0.01)
-        mc.refresh()
         mc.makeIdentity([self.upper_outer_driver_crv,
                          self.lower_outer_driver_crv,
                          self.upper_outer_ep_crv,
@@ -336,7 +339,7 @@ class Rig(assembler.Rig):
         self.inner_lower_way = left_way[int(len(left_way) / 2):-1] + list(
             reversed(right_way[int((len(right_way) - 1) / 2):]))
 
-        self.upper_inner_ep_crv = nurbs.create(parent=self.root,
+        self.upper_inner_ep_crv = nurbs.create(parent=self.origin_space,
                                                name=self.generate_name("upperInnerEP", "crv", "ctl"),
                                                degree=3,
                                                positions=[vector.get_position(x) for x in self.inner_upper_way],
@@ -344,7 +347,7 @@ class Rig(assembler.Rig):
                                                ep=True,
                                                vis=False)
         mc.rebuildCurve(self.upper_inner_ep_crv, keepControlPoints=True)
-        self.lower_inner_ep_crv = nurbs.create(parent=self.root,
+        self.lower_inner_ep_crv = nurbs.create(parent=self.origin_space,
                                                name=self.generate_name("lowerInnerEP", "crv", "ctl"),
                                                degree=3,
                                                positions=[vector.get_position(x) for x in self.inner_lower_way],
@@ -353,13 +356,13 @@ class Rig(assembler.Rig):
                                                vis=False)
         mc.rebuildCurve(self.lower_inner_ep_crv, keepControlPoints=True)
 
-        self.upper_inner_driver_crv = nurbs.create(parent=self.root,
+        self.upper_inner_driver_crv = nurbs.create(parent=self.origin_space,
                                                    name=self.generate_name("upperInnerDriver", "crv", "ctl"),
                                                    degree=1,
                                                    positions=[vector.get_position(x) for x in self.inner_upper_way],
                                                    m=orig_m,
                                                    vis=False)
-        self.lower_inner_driver_crv = nurbs.create(parent=self.root,
+        self.lower_inner_driver_crv = nurbs.create(parent=self.origin_space,
                                                    name=self.generate_name("lowerInnerDriver", "crv", "ctl"),
                                                    degree=1,
                                                    positions=[vector.get_position(x) for x in self.inner_lower_way],
@@ -389,7 +392,6 @@ class Rig(assembler.Rig):
                         spans=sub_ctl_number - 1,
                         degree=3,
                         tolerance=0.01)
-        mc.refresh()
         mc.makeIdentity([self.upper_inner_driver_crv,
                          self.lower_inner_driver_crv,
                          self.upper_inner_ep_crv,
@@ -455,18 +457,18 @@ class Rig(assembler.Rig):
                                            constructionHistory=False,
                                            mergeUVSets=True,
                                            name=self.generate_name("pinUpper", "mesh", "ctl"))[0]
-        self.pin_upper_mesh = mc.parent(self.pin_upper_mesh, self.root)[0]
+        self.pin_upper_mesh = mc.parent(self.pin_upper_mesh, self.origin_space)[0]
         self.pin_lower_mesh = mc.polyUnite(planes[int(number * 2):],
                                            constructionHistory=False,
                                            mergeUVSets=True,
                                            name=self.generate_name("pinLower", "mesh", "ctl"))[0]
-        self.pin_lower_mesh = mc.parent(self.pin_lower_mesh, self.root)[0]
+        self.pin_lower_mesh = mc.parent(self.pin_lower_mesh, self.origin_space)[0]
         meshes = mc.duplicate([self.pin_upper_mesh, self.pin_lower_mesh])
         self.driver_sc_mesh = mc.polyUnite(meshes,
                                            constructionHistory=False,
                                            mergeUVSets=True,
                                            name=self.generate_name("driverSC", "mesh", "ctl"))[0]
-        self.driver_sc_mesh = mc.parent(self.driver_sc_mesh, self.root)[0]
+        self.driver_sc_mesh = mc.parent(self.driver_sc_mesh, self.origin_space)[0]
         mc.makeIdentity([self.driver_sc_mesh, self.pin_upper_mesh, self.pin_lower_mesh], apply=True, translate=True)
         self.driver_cls_mesh = mc.duplicate(self.driver_sc_mesh, name=self.generate_name("driverCls", "mesh", "ctl"))[0]
         mc.setAttr(self.driver_cls_mesh + ".inheritsTransform", 0)
@@ -504,7 +506,7 @@ class Rig(assembler.Rig):
         m = matrix.set_matrix_scale(data["anchors"][3], (1, 1, 1))
         distance = vector.get_distance(vector.get_position(outer_side_vertex1), vector.get_position(outer_side_vertex2))
         self.left_ctl, self.left_loc = self.create_ctl(context=context,
-                                                       parent=None,
+                                                       parent=self.origin_space,
                                                        name=self.generate_name("left", "", "ctl"),
                                                        parent_ctl=None,
                                                        attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
@@ -518,18 +520,18 @@ class Rig(assembler.Rig):
                                                        },
                                                        mirror_ctl_name=self.generate_name("right", "", "ctl"))
         npo = hierarchy.get_parent(self.left_ctl)
-        self.left_jnt = joint.add_joint(self.root,
+        self.left_jnt = joint.add_joint(self.origin_space,
                                         name=self.generate_name("left", "jnt", "ctl"),
                                         m=m,
                                         vis=False)
         mc.parentConstraint(self.left_loc, self.left_jnt)
         mult_m = mc.createNode("multMatrix")
         mc.connectAttr(self.left_loc + ".worldMatrix", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
         decom_m = mc.createNode("decomposeMatrix")
         mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
         mc.connectAttr(decom_m + ".outputScale", self.left_jnt + ".s")
-        self.left_pin_jnt = joint.add_joint(self.root,
+        self.left_pin_jnt = joint.add_joint(self.origin_space,
                                             name=self.generate_name("leftPin", "jnt", "ctl"),
                                             m=m,
                                             vis=False)
@@ -537,7 +539,7 @@ class Rig(assembler.Rig):
 
         m = matrix.set_matrix_scale(data["anchors"][4], (1, 1, -1))
         self.right_ctl, self.right_loc = self.create_ctl(context=context,
-                                                         parent=None,
+                                                         parent=self.origin_space,
                                                          name=self.generate_name("right", "", "ctl"),
                                                          parent_ctl=None,
                                                          attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
@@ -551,18 +553,18 @@ class Rig(assembler.Rig):
                                                          },
                                                          mirror_ctl_name=self.generate_name("left", "", "ctl"))
         npo = hierarchy.get_parent(self.right_ctl)
-        self.right_jnt = joint.add_joint(self.root,
+        self.right_jnt = joint.add_joint(self.origin_space,
                                          name=self.generate_name("right", "jnt", "ctl"),
                                          m=m,
                                          vis=False)
         mc.parentConstraint(self.right_loc, self.right_jnt)
         mult_m = mc.createNode("multMatrix")
         mc.connectAttr(self.right_loc + ".worldMatrix", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
         decom_m = mc.createNode("decomposeMatrix")
         mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
         mc.connectAttr(decom_m + ".outputScale", self.right_jnt + ".s")
-        self.right_pin_jnt = joint.add_joint(self.root,
+        self.right_pin_jnt = joint.add_joint(self.origin_space,
                                              name=self.generate_name("rightPin", "jnt", "ctl"),
                                              m=m,
                                              vis=False)
@@ -570,7 +572,7 @@ class Rig(assembler.Rig):
 
         m = matrix.set_matrix_scale(data["anchors"][1], (1, 1, 1))
         self.upper_ctl, self.upper_loc = self.create_ctl(context=context,
-                                                         parent=None,
+                                                         parent=self.origin_space,
                                                          name=self.generate_name("upper", "", "ctl"),
                                                          parent_ctl=None,
                                                          attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
@@ -584,18 +586,18 @@ class Rig(assembler.Rig):
                                                          },
                                                          mirror_ctl_name="")
         npo = hierarchy.get_parent(self.upper_ctl)
-        self.upper_jnt = joint.add_joint(self.root,
+        self.upper_jnt = joint.add_joint(self.origin_space,
                                          name=self.generate_name("upper", "jnt", "ctl"),
                                          m=m,
                                          vis=False)
         mc.parentConstraint(self.upper_loc, self.upper_jnt)
         mult_m = mc.createNode("multMatrix")
         mc.connectAttr(self.upper_loc + ".worldMatrix", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
         decom_m = mc.createNode("decomposeMatrix")
         mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
         mc.connectAttr(decom_m + ".outputScale", self.upper_jnt + ".s")
-        self.upper_pin_jnt = joint.add_joint(self.root,
+        self.upper_pin_jnt = joint.add_joint(self.origin_space,
                                              name=self.generate_name("upperPin", "jnt", "ctl"),
                                              m=m,
                                              vis=False)
@@ -603,7 +605,7 @@ class Rig(assembler.Rig):
 
         m = matrix.set_matrix_scale(data["anchors"][2], (1, 1, -1))
         self.lower_ctl, self.lower_loc = self.create_ctl(context=context,
-                                                         parent=None,
+                                                         parent=self.origin_space,
                                                          name=self.generate_name("lower", "", "ctl"),
                                                          parent_ctl=None,
                                                          attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
@@ -617,18 +619,18 @@ class Rig(assembler.Rig):
                                                          },
                                                          mirror_ctl_name="")
         npo = hierarchy.get_parent(self.lower_ctl)
-        self.lower_jnt = joint.add_joint(self.root,
+        self.lower_jnt = joint.add_joint(self.origin_space,
                                          name=self.generate_name("lower", "jnt", "ctl"),
                                          m=m,
                                          vis=False)
         mc.parentConstraint(self.lower_loc, self.lower_jnt)
         mult_m = mc.createNode("multMatrix")
         mc.connectAttr(self.lower_loc + ".worldMatrix", mult_m + ".matrixIn[0]")
-        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
         decom_m = mc.createNode("decomposeMatrix")
         mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
         mc.connectAttr(decom_m + ".outputScale", self.lower_jnt + ".s")
-        self.lower_pin_jnt = joint.add_joint(self.root,
+        self.lower_pin_jnt = joint.add_joint(self.origin_space,
                                              name=self.generate_name("lowerPin", "jnt", "ctl"),
                                              m=m,
                                              vis=False)
@@ -756,10 +758,10 @@ class Rig(assembler.Rig):
 
         # proximity wrap ctls
         m = matrix.set_matrix_scale(data["anchors"][5], (1, 1, 1))
-        self.upper_left_cns = matrix.transform(parent=self.root,
+        self.upper_left_cns = matrix.transform(parent=self.origin_space,
                                                name=self.generate_name("upperLeft", "cns", "ctl"),
-                                               m=matrix.get_matrix(self.root))
-        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+                                               m=matrix.get_matrix(self.origin_space))
+        temp = matrix.transform(parent=self.origin_space, name="TEMP", m=m)
         mc.setAttr(upper_driver_pin + ".inputMatrix[0]", mc.getAttr(temp + ".matrix"), type="matrix")
         mc.delete(temp)
         mc.connectAttr(upper_driver_pin + ".outputMatrix[0]", self.upper_left_cns + ".offsetParentMatrix")
@@ -788,10 +790,10 @@ class Rig(assembler.Rig):
         mc.orientConstraint(self.upper_left_loc, self.upper_left_jnt)
 
         m = matrix.set_matrix_scale(data["anchors"][6], (1, 1, 1))
-        self.upper_right_cns = matrix.transform(parent=self.root,
+        self.upper_right_cns = matrix.transform(parent=self.origin_space,
                                                 name=self.generate_name("upperRight", "cns", "ctl"),
-                                                m=matrix.get_matrix(self.root))
-        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+                                                m=matrix.get_matrix(self.origin_space))
+        temp = matrix.transform(parent=self.origin_space, name="TEMP", m=m)
         mc.setAttr(upper_driver_pin + ".inputMatrix[1]", mc.getAttr(temp + ".matrix"), type="matrix")
         mc.delete(temp)
         mc.connectAttr(upper_driver_pin + ".outputMatrix[1]", self.upper_right_cns + ".offsetParentMatrix")
@@ -819,10 +821,10 @@ class Rig(assembler.Rig):
         mc.orientConstraint(self.upper_right_loc, self.upper_right_jnt)
 
         m = matrix.set_matrix_scale(data["anchors"][7], (1, 1, 1))
-        self.lower_left_cns = matrix.transform(parent=self.root,
+        self.lower_left_cns = matrix.transform(parent=self.origin_space,
                                                name=self.generate_name("lowerLeft", "cns", "ctl"),
-                                               m=matrix.get_matrix(self.root))
-        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+                                               m=matrix.get_matrix(self.origin_space))
+        temp = matrix.transform(parent=self.origin_space, name="TEMP", m=m)
         mc.setAttr(lower_driver_pin + ".inputMatrix[0]", mc.getAttr(temp + ".matrix"), type="matrix")
         mc.delete(temp)
         mc.connectAttr(lower_driver_pin + ".outputMatrix[0]", self.lower_left_cns + ".offsetParentMatrix")
@@ -850,10 +852,10 @@ class Rig(assembler.Rig):
         mc.orientConstraint(self.lower_left_loc, self.lower_left_jnt)
 
         m = matrix.set_matrix_scale(data["anchors"][8], (1, 1, 1))
-        self.lower_right_cns = matrix.transform(parent=self.root,
+        self.lower_right_cns = matrix.transform(parent=self.origin_space,
                                                 name=self.generate_name("lowerRight", "cns", "ctl"),
-                                                m=matrix.get_matrix(self.root))
-        temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+                                                m=matrix.get_matrix(self.origin_space))
+        temp = matrix.transform(parent=self.origin_space, name="TEMP", m=m)
         mc.setAttr(lower_driver_pin + ".inputMatrix[1]", mc.getAttr(temp + ".matrix"), type="matrix")
         mc.delete(temp)
         mc.connectAttr(lower_driver_pin + ".outputMatrix[1]", self.lower_right_cns + ".offsetParentMatrix")
@@ -896,6 +898,7 @@ class Rig(assembler.Rig):
         self.upper_left_falloff = mc.createNode("primitiveFalloff",
                                                 name=self.generate_name("upperLeft", "falloff", "ctl"),
                                                 parent=context["xxx"])
+        matrix.set_matrix(self.upper_left_falloff, matrix.get_matrix(self.root))
         mc.setAttr(self.upper_left_falloff + ".primitive", 1)
         mc.setAttr(self.upper_left_falloff + ".start", distance / -1.8)
         mc.setAttr(self.upper_left_falloff + ".end", distance / 1.8)
@@ -924,6 +927,7 @@ class Rig(assembler.Rig):
         self.upper_right_falloff = mc.createNode("primitiveFalloff",
                                                  name=self.generate_name("upperRight", "falloff", "ctl"),
                                                  parent=context["xxx"])
+        matrix.set_matrix(self.upper_right_falloff, matrix.get_matrix(self.root))
         mc.setAttr(self.upper_right_falloff + ".primitive", 1)
         mc.setAttr(self.upper_right_falloff + ".start", distance / -1.8)
         mc.setAttr(self.upper_right_falloff + ".end", distance / 1.8)
@@ -954,6 +958,7 @@ class Rig(assembler.Rig):
         self.lower_left_falloff = mc.createNode("primitiveFalloff",
                                                 name=self.generate_name("lowerLeft", "falloff", "ctl"),
                                                 parent=context["xxx"])
+        matrix.set_matrix(self.lower_left_falloff, matrix.get_matrix(self.root))
         mc.setAttr(self.lower_left_falloff + ".primitive", 1)
         mc.setAttr(self.lower_left_falloff + ".start", distance / -1.8)
         mc.setAttr(self.lower_left_falloff + ".end", distance / 1.8)
@@ -982,6 +987,7 @@ class Rig(assembler.Rig):
         self.lower_right_falloff = mc.createNode("primitiveFalloff",
                                                  name=self.generate_name("lowerRight", "falloff", "ctl"),
                                                  parent=context["xxx"])
+        matrix.set_matrix(self.lower_right_falloff, matrix.get_matrix(self.root))
         mc.setAttr(self.lower_right_falloff + ".primitive", 1)
         mc.setAttr(self.lower_right_falloff + ".start", distance / -1.8)
         mc.setAttr(self.lower_right_falloff + ".end", distance / 1.8)
@@ -1020,7 +1026,7 @@ class Rig(assembler.Rig):
         mc.setAttr(self.upper_ctl_display_crv + ".alwaysDrawOnTop", 1)
         for i, outer_pos in enumerate(outer_positions):
             ctl, loc = self.create_ctl(context=context,
-                                       parent=None,
+                                       parent=self.origin_space,
                                        name=self.generate_name("upper{0}".format(i), "", "ctl"),
                                        parent_ctl=None,
                                        attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
@@ -1045,13 +1051,13 @@ class Rig(assembler.Rig):
             inner_index = i * 2 + 1
 
             # outer pos
-            temp = matrix.transform(parent=self.root, name="TEMP", m=outer_m)
+            temp = matrix.transform(parent=self.origin_space, name="TEMP", m=outer_m)
             mc.setAttr(pin + ".inputMatrix[{0}]".format(outer_index), mc.getAttr(temp + ".matrix"), type="matrix")
             mc.delete(temp)
 
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(pin + ".outputMatrix[{0}]".format(outer_index), mult_m + ".matrixIn[0]")
-            mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+            mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
 
             pick_m = mc.createNode("pickMatrix")
             mc.setAttr(pick_m + ".useRotate", 0)
@@ -1063,7 +1069,7 @@ class Rig(assembler.Rig):
             mc.connectAttr(pick_m + ".outputMatrix", npo + ".offsetParentMatrix")
 
             # inner
-            temp = matrix.transform(parent=self.root, name="TEMP", m=inner_m)
+            temp = matrix.transform(parent=self.origin_space, name="TEMP", m=inner_m)
             mc.setAttr(pin + ".inputMatrix[{0}]".format(inner_index), mc.getAttr(temp + ".matrix"), type="matrix")
             mc.delete(temp)
             mult_m = mc.createNode("multMatrix")
@@ -1116,7 +1122,7 @@ class Rig(assembler.Rig):
         mc.setAttr(self.lower_ctl_display_crv + ".alwaysDrawOnTop", 1)
         for i, outer_pos in enumerate(outer_positions):
             ctl, loc = self.create_ctl(context=context,
-                                       parent=None,
+                                       parent=self.origin_space,
                                        name=self.generate_name("lower{0}".format(i), "", "ctl"),
                                        parent_ctl=None,
                                        attrs=["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"],
@@ -1141,13 +1147,13 @@ class Rig(assembler.Rig):
             inner_index = i * 2 + (sub_ctl_number * 2 + 1)
 
             # outer
-            temp = matrix.transform(parent=self.root, name="TEMP", m=outer_m)
+            temp = matrix.transform(parent=self.origin_space, name="TEMP", m=outer_m)
             mc.setAttr(pin + ".inputMatrix[{0}]".format(outer_index), mc.getAttr(temp + ".matrix"), type="matrix")
             mc.delete(temp)
 
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(pin + ".outputMatrix[{0}]".format(outer_index), mult_m + ".matrixIn[0]")
-            mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+            mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
 
             pick_m = mc.createNode("pickMatrix")
             mc.setAttr(pick_m + ".useRotate", 0)
@@ -1159,7 +1165,7 @@ class Rig(assembler.Rig):
             mc.connectAttr(pick_m + ".outputMatrix", npo + ".offsetParentMatrix")
 
             # inner
-            temp = matrix.transform(parent=self.root, name="TEMP", m=inner_m)
+            temp = matrix.transform(parent=self.origin_space, name="TEMP", m=inner_m)
             mc.setAttr(pin + ".inputMatrix[{0}]".format(inner_index), mc.getAttr(temp + ".matrix"), type="matrix")
             mc.delete(temp)
             mult_m = mc.createNode("multMatrix")
@@ -1214,7 +1220,7 @@ class Rig(assembler.Rig):
         for i in range(4):
             index = i + sub_ctl_number * 4
             m = matrix.set_matrix_translate(orig_m, pos_list[i])
-            temp = matrix.transform(parent=self.root, name="TEMP", m=m)
+            temp = matrix.transform(parent=self.origin_space, name="TEMP", m=m)
             mc.setAttr(pin + ".inputMatrix[{0}]".format(index), mc.getAttr(temp + ".matrix"), type="matrix")
             mc.delete(temp)
 
@@ -1240,13 +1246,12 @@ class Rig(assembler.Rig):
         outer_jnt_list = self.outer_upper_jnts
         inner_jnt_list = self.inner_upper_jnts
         for way in [outer_way1, inner_way1]:
-            outer_aim_grp = matrix.transform(parent=self.root,
+            outer_aim_grp = matrix.transform(parent=self.origin_space,
                                              name=self.generate_name("{0}OuterAim".format(prefix), "grp", "ctl"),
                                              m=orig_m)
-            inner_aim_grp = matrix.transform(parent=self.root,
+            inner_aim_grp = matrix.transform(parent=self.origin_space,
                                              name=self.generate_name("{0}InnerAim".format(prefix), "grp", "ctl"),
                                              m=orig_m)
-            mc.makeIdentity([outer_aim_grp, inner_aim_grp], apply=True, translate=True)
             for i in range(len(way[1:-1])):
                 outer_aim_obj = matrix.transform(parent=outer_aim_grp,
                                                  name=self.generate_name("{0}OuterAim{1}".format(prefix, i),
@@ -1457,14 +1462,14 @@ class Rig(assembler.Rig):
                 mc.connectAttr(self.lip_sub_ctl_vis_attr, shape + ".v")
 
         # jaw follow
-        jaw_npo = matrix.transform(parent=self.root,
+        jaw_npo = matrix.transform(parent=self.origin_space,
                                    name=self.generate_name("jaw", "space", "ctl"),
                                    m=matrix.get_matrix(jaw_jnt))
         mc.pointConstraint(jaw_jnt, jaw_npo)
         mc.orientConstraint(jaw_jnt, jaw_npo)
 
         m = matrix.get_matrix(self.left_ctl)
-        self.left_head_follow = matrix.transform(parent=self.root,
+        self.left_head_follow = matrix.transform(parent=self.origin_space,
                                                  name=self.generate_name("leftHead", "follow", "ctl"),
                                                  m=m)
         self.left_jaw_follow = matrix.transform(parent=jaw_npo,
@@ -1491,7 +1496,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(reverse + ".outputX", self.left_follow_wt_m + ".wtMatrix[1].weightIn")
 
         m = matrix.get_matrix(self.right_ctl)
-        self.right_head_follow = matrix.transform(parent=self.root,
+        self.right_head_follow = matrix.transform(parent=self.origin_space,
                                                   name=self.generate_name("rightHead", "follow", "ctl"),
                                                   m=m)
         self.right_jaw_follow = matrix.transform(parent=jaw_npo,
@@ -1518,7 +1523,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(reverse + ".outputX", self.right_follow_wt_m + ".wtMatrix[1].weightIn")
 
         m = matrix.get_matrix(self.upper_ctl)
-        self.upper_head_follow = matrix.transform(parent=self.root,
+        self.upper_head_follow = matrix.transform(parent=self.origin_space,
                                                   name=self.generate_name("upperHead", "follow", "ctl"),
                                                   m=m)
         self.upper_jaw_follow = matrix.transform(parent=jaw_npo,
@@ -1545,7 +1550,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(reverse + ".outputX", self.upper_follow_wt_m + ".wtMatrix[1].weightIn")
 
         m = matrix.get_matrix(self.lower_ctl)
-        self.lower_head_follow = matrix.transform(parent=self.root,
+        self.lower_head_follow = matrix.transform(parent=self.origin_space,
                                                   name=self.generate_name("lowerHead", "follow", "ctl"),
                                                   m=m)
         self.lower_jaw_follow = matrix.transform(parent=jaw_npo,
