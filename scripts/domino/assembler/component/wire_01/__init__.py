@@ -162,6 +162,7 @@ class Rig(assembler.Rig):
                                       parent=self.origin_space,
                                       match=True,
                                       inherits=False)
+        mc.hide([self.wire_curve, self.wire_up_curve])
 
         orig_curve_length = mc.getAttr(self.orig_curve_length_attr)
         division_length = orig_curve_length / division
