@@ -80,14 +80,19 @@ class Rig(assembler.Rig):
         division = data["division"] - 1
 
         self.create_root(context)
+        orig_m = om2.MMatrix()
+        self.origin_space = matrix.transform(parent=self.root,
+                                             name=self.generate_name("origin", "space", "ctl"),
+                                             m=orig_m)
+
         self.wire_orig_curve = nurbs.build(wire_curve,
                                            name=self.generate_name("orig", "crv", "ctl"),
-                                           parent=self.root,
+                                           parent=self.origin_space,
                                            match=True)
         mc.setAttr(self.wire_orig_curve + ".v", 0)
         self.path_deform_curve = nurbs.build(wire_curve,
                                              name=self.generate_name("deform", "crv", "ctl"),
-                                             parent=self.root,
+                                             parent=self.origin_space,
                                              match=True,
                                              inherits=False)
         mc.setAttr(self.path_deform_curve + ".overrideEnabled", 1)
@@ -109,13 +114,10 @@ class Rig(assembler.Rig):
                                                           useGivenNormal=True)
         mc.connectAttr(self.wire_orig_curve + ".local", offset_curve + ".inputCurve", force=True)
         mc.delete(offset_curve)
-        self.path_up_curve = mc.parent(self.path_up_curve, self.root)[0]
+        self.path_up_curve = mc.parent(self.path_up_curve, self.origin_space)[0]
         mc.setAttr(self.path_up_curve + ".overrideEnabled", 1)
         mc.setAttr(self.path_up_curve + ".overrideDisplayType", 2)
         mc.setAttr(self.path_up_curve + ".inheritsTransform", 0)
-        mc.setAttr(self.path_up_curve + ".t", 0, 0, 0)
-        mc.setAttr(self.path_up_curve + ".r", 0, 0, 0)
-        mc.setAttr(self.path_up_curve + ".s", 1, 1, 1)
 
         self.orig_curve_length_attr = nurbs.get_length_attr(self.wire_orig_curve, False)
         self.deform_curve_length_attr = nurbs.get_length_attr(self.path_deform_curve, False)
@@ -125,7 +127,7 @@ class Rig(assembler.Rig):
 
         self.path_ctls = []
         matrices = matrix.get_chain_matrix2(positions, normal)
-        parent = self.root
+        parent = self.origin_space
         for i, m in enumerate(matrices):
             ctl, loc = self.create_ctl(context=context,
                                        parent=parent,
@@ -150,29 +152,22 @@ class Rig(assembler.Rig):
             if data["fk_path"]:
                 parent = loc
 
-        self.wire_curve = nurbs.create(parent=self.root,
-                                       name=self.generate_name("wire", "crv", "ctl"),
-                                       degree=1,
-                                       positions=((0, 0, 0), (0, 0, 0)),
-                                       m=matrix.get_matrix(self.path_deform_curve),
-                                       inherits=False,
-                                       display_type=2)
-        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", self.wire_curve + ".create")
-        mc.disconnectAttr(self.path_deform_curve + ".worldSpace[0]", self.wire_curve + ".create")
-        self.wire_up_curve = nurbs.create(parent=self.root,
-                                          name=self.generate_name("wireUp", "crv", "ctl"),
-                                          degree=1,
-                                          positions=((0, 0, 0), (0, 0, 0)),
-                                          inherits=False,
-                                          display_type=2)
-        mc.connectAttr(self.path_up_curve + ".worldSpace[0]", self.wire_up_curve + ".create")
-        mc.disconnectAttr(self.path_up_curve + ".worldSpace[0]", self.wire_up_curve + ".create")
+        self.wire_curve = nurbs.build(wire_curve,
+                                      name=self.generate_name("wire", "crv", "ctl"),
+                                      parent=self.origin_space,
+                                      match=True,
+                                      inherits=False)
+        self.wire_up_curve = nurbs.build(wire_curve,
+                                      name=self.generate_name("wireUp", "crv", "ctl"),
+                                      parent=self.origin_space,
+                                      match=True,
+                                      inherits=False)
 
         orig_curve_length = mc.getAttr(self.orig_curve_length_attr)
         division_length = orig_curve_length / division
 
         m = om2.MMatrix()
-        parent = self.root
+        parent = self.origin_space
         self.wire_joints = []
         wire_decom_m = []
         for i in range(division + 1):
@@ -187,10 +182,19 @@ class Rig(assembler.Rig):
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(parent + ".worldMatrix[0]", decom_m + ".inputMatrix")
             wire_decom_m.append(decom_m)
-        wire_ikh = joint.sp_ikh(self.root, self.generate_name("wire", "ikh", "ctl"), self.wire_joints, self.wire_curve)
+        wire_ikh = joint.sp_ikh(self.origin_space,
+                                self.generate_name("wire", "ikh", "ctl"),
+                                self.wire_joints,
+                                self.wire_curve)
+        mc.delete(wire_ikh)
+        mc.makeIdentity(self.wire_joints, apply=True, rotate=True)
+        wire_ikh = joint.sp_ikh(self.origin_space,
+                                self.generate_name("wire", "ikh", "ctl"),
+                                self.wire_joints,
+                                self.wire_curve)
         mc.setAttr(wire_ikh + ".offset", lock=True)
 
-        parent = self.root
+        parent = self.origin_space
         self.up_joints = []
         up_decom_m = []
         for i in range(division + 1):
@@ -204,11 +208,20 @@ class Rig(assembler.Rig):
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(parent + ".worldMatrix[0]", decom_m + ".inputMatrix")
             up_decom_m.append(decom_m)
-        up_ikh = joint.sp_ikh(self.root, self.generate_name("up", "ikh", "ctl"), self.up_joints, self.wire_up_curve)
+        up_ikh = joint.sp_ikh(self.origin_space,
+                              self.generate_name("up", "ikh", "ctl"),
+                              self.up_joints,
+                              self.wire_up_curve)
+        mc.delete(up_ikh)
+        mc.makeIdentity(self.up_joints, apply=True, rotate=True)
+        up_ikh = joint.sp_ikh(self.origin_space,
+                              self.generate_name("up", "ikh", "ctl"),
+                              self.up_joints,
+                              self.wire_up_curve)
         mc.setAttr(up_ikh + ".offset", lock=True)
 
-        parent = self.root
-        parent_space = self.root
+        parent = self.origin_space
+        parent_space = self.origin_space
         self.forward_ctls = []
         up_vec_attrs = []
         self.forward_choice_nodes = []
@@ -233,12 +246,21 @@ class Rig(assembler.Rig):
                                             name=self.generate_name("forward" + str(i), "space", "ctl"),
                                             m=m)
             mc.connectAttr(self.wire_joints[i] + ".t", parent_space + ".t")
-            aim_cons = mc.aimConstraint(target,
-                                        parent_space,
-                                        aimVector=aim_vector,
-                                        upVector=(0, 0, -1),
-                                        worldUpType="vector")[0]
-            mc.connectAttr(up_vec_attr, aim_cons + ".worldUpVector")
+            aim_m = mc.createNode("aimMatrix")
+            mc.setAttr(aim_m + ".primaryMode", 1)
+            mc.setAttr(aim_m + ".primaryInputAxis", *aim_vector)
+            mc.setAttr(aim_m + ".secondaryMode", 1)
+            mc.connectAttr(self.wire_joints[i] + ".worldMatrix[0]", aim_m + ".inputMatrix")
+            mc.connectAttr(target + ".worldMatrix[0]", aim_m + ".primaryTargetMatrix")
+            mc.connectAttr(self.up_joints[i] + ".worldMatrix[0]", aim_m + ".secondaryTargetMatrix")
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(aim_m + ".outputMatrix", mult_m + ".matrixIn[0]")
+            mc.connectAttr(parent_space + ".parentInverseMatrix[0]", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputRotate", parent_space + ".r")
 
             ctl, parent = self.create_ctl(context=context,
                                           parent=parent,
@@ -277,11 +299,12 @@ class Rig(assembler.Rig):
             mc.connectAttr(parent_space + ".r", npo + ".r")
             self.forward_ctls.append(ctl)
 
-        parent = self.root
-        parent_space = self.root
+        parent = self.origin_space
+        parent_space = self.origin_space
         self.reverse_ctls = []
         up_vec_attrs.reverse()
         self.wire_joints.reverse()
+        self.up_joints.reverse()
         self.reverse_choice_nodes = []
         for i in range(division + 1):
             if i == 0:
@@ -295,12 +318,21 @@ class Rig(assembler.Rig):
                                             name=self.generate_name("reverse" + str(i), "space", "ctl"),
                                             m=m)
             mc.pointConstraint(self.wire_joints[i], parent_space)
-            aim_cons = mc.aimConstraint(target,
-                                        parent_space,
-                                        aimVector=aim_vector,
-                                        upVector=(0, 0, -1),
-                                        worldUpType="vector")[0]
-            mc.connectAttr(up_vec_attrs[i], aim_cons + ".worldUpVector")
+            aim_m = mc.createNode("aimMatrix")
+            mc.setAttr(aim_m + ".primaryMode", 1)
+            mc.setAttr(aim_m + ".primaryInputAxis", *aim_vector)
+            mc.setAttr(aim_m + ".secondaryMode", 1)
+            mc.connectAttr(self.wire_joints[i] + ".worldMatrix[0]", aim_m + ".inputMatrix")
+            mc.connectAttr(target + ".worldMatrix[0]", aim_m + ".primaryTargetMatrix")
+            mc.connectAttr(self.up_joints[i] + ".worldMatrix[0]", aim_m + ".secondaryTargetMatrix")
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(aim_m + ".outputMatrix", mult_m + ".matrixIn[0]")
+            mc.connectAttr(parent_space + ".parentInverseMatrix[0]", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputRotate", parent_space + ".r")
 
             ctl, parent = self.create_ctl(context=context,
                                           parent=parent,
@@ -345,20 +377,40 @@ class Rig(assembler.Rig):
         self.reverse_ctls.reverse()
         self.ref_point_cons = []
         self.ref_orient_cons = []
-        self.ref_scale_cons = []
+        self.ref_scale_condition = []
         spaces = []
         for i in range(division + 1):
-            space = matrix.transform(parent=self.root,
+            space = matrix.transform(parent=self.origin_space,
                                      name=self.generate_name("ref" + str(i), "space", "ctl"),
                                      m=m)
             forward_loc = mc.listRelatives(self.forward_ctls[i], children=True, fullPath=True, type="transform")[0]
             reverse_loc = mc.listRelatives(self.reverse_ctls[i], children=True, fullPath=True, type="transform")[0]
             point_cons = mc.pointConstraint([forward_loc, reverse_loc], space)[0]
             orient_cons = mc.orientConstraint([forward_loc, reverse_loc], space)[0]
-            scale_cons = mc.scaleConstraint([forward_loc, reverse_loc], space)[0]
+
+            condition = mc.createNode("condition")
+            mc.setAttr(condition + ".operation", 0)
+            mc.setAttr(condition + ".secondTerm", 1)
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(forward_loc + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+            mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputScale", condition + ".colorIfTrue")
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(reverse_loc + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+            mc.connectAttr(self.origin_space + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputScale", condition + ".colorIfFalse")
+            mc.connectAttr(condition + ".outColor", space + ".s")
             self.ref_point_cons.append(point_cons)
             self.ref_orient_cons.append(orient_cons)
-            self.ref_scale_cons.append(scale_cons)
+            self.ref_scale_condition.append(condition)
 
             attr1, attr2 = mc.pointConstraint(point_cons, query=True, weightAliasList=True)
             mc.setAttr(point_cons + "." + attr1, 1)
@@ -366,9 +418,6 @@ class Rig(assembler.Rig):
             attr1, attr2 = mc.orientConstraint(orient_cons, query=True, weightAliasList=True)
             mc.setAttr(orient_cons + "." + attr1, 1)
             mc.setAttr(orient_cons + "." + attr2, 0)
-            attr1, attr2 = mc.scaleConstraint(scale_cons, query=True, weightAliasList=True)
-            mc.setAttr(scale_cons + "." + attr1, 1)
-            mc.setAttr(scale_cons + "." + attr2, 0)
             spaces.append(space)
         self.reverse_ctls.reverse()
 
@@ -379,6 +428,181 @@ class Rig(assembler.Rig):
                                   anchor=False,
                                   m=space)
             self.refs.append(ref)
+
+        # wire curve setup
+        md = mc.createNode("multiplyDivide")
+        mc.connectAttr(self.deform_curve_length_attr, md + ".input1X")
+        mc.connectAttr(self.orig_curve_length_attr, md + ".input2X")
+        mc.setAttr(md + ".operation", 2)
+        self.curve_ratio_attr = md + ".outputX"
+
+        pma = mc.createNode("plusMinusAverage")
+        mc.setAttr(pma + ".input1D[0]", 0)
+        mc.setAttr(pma + ".input1D[1]", 1)
+        self.offset_attr_destination = pma + ".input1D[0]"
+
+        bta = mc.createNode("blendTwoAttr")
+        mc.connectAttr(pma + ".output1D", bta + ".input[0]")
+        mc.setAttr(bta + ".input[1]", 1)
+        mc.setAttr(bta + ".attributesBlender", 0)
+        end_length_u_value_attr = bta + ".output"
+        self.stretch_attr_destination = bta + ".attributesBlender"
+
+        mp = mc.createNode("motionPath")
+        mc.setAttr(mp + ".fractionMode", True)
+        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", mp + ".geometryPath")
+        mc.setAttr(mp + ".uValue", 0)
+        self.offset_attr_destination1 = mp + ".uValue"
+
+        npoc = mc.createNode("nearestPointOnCurve")
+        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", npoc + ".inputCurve")
+        mc.connectAttr(mp + ".allCoordinates", npoc + ".inPosition")
+        start_u_value_attr = npoc + ".parameter"
+
+        mp = mc.createNode("motionPath")
+        mc.setAttr(mp + ".fractionMode", True)
+        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", mp + ".geometryPath")
+        mc.connectAttr(end_length_u_value_attr, mp + ".uValue")
+
+        npoc = mc.createNode("nearestPointOnCurve")
+        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", npoc + ".inputCurve")
+        mc.connectAttr(mp + ".allCoordinates", npoc + ".inPosition")
+        end_u_value_attr = npoc + ".parameter"
+
+        detach_curve = mc.createNode("detachCurve")
+        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", detach_curve + ".inputCurve")
+        mc.connectAttr(start_u_value_attr, detach_curve + ".parameter[0]")
+        mc.connectAttr(end_u_value_attr, detach_curve + ".parameter[1]")
+        mc.connectAttr(detach_curve + ".outputCurve[1]", self.wire_curve + ".create")
+
+        detach_curve = mc.createNode("detachCurve")
+        mc.connectAttr(self.path_up_curve + ".worldSpace[0]", detach_curve + ".inputCurve")
+        mc.connectAttr(start_u_value_attr, detach_curve + ".parameter[0]")
+        mc.connectAttr(end_u_value_attr, detach_curve + ".parameter[1]")
+        mc.connectAttr(detach_curve + ".outputCurve[1]", self.wire_up_curve + ".create")
+
+        # stretch
+        pma = mc.createNode("plusMinusAverage")
+        mc.setAttr(pma + ".operation", 2)
+        mc.connectAttr(self.curve_ratio_attr, pma + ".input1D[0]")
+        mc.setAttr(pma + ".input1D[1]", 1)
+
+        condition = mc.createNode("condition")
+        mc.setAttr(condition + ".operation", 2)
+        mc.connectAttr(pma + ".output1D", condition + ".firstTerm")
+        mc.setAttr(condition + ".secondTerm", 0)
+        mc.connectAttr(pma + ".output1D", condition + ".colorIfTrueR")
+        mc.setAttr(condition + ".colorIfFalseR", 0)
+
+        md = mc.createNode("multiplyDivide")
+        mc.connectAttr(condition + ".outColorR", md + ".input1X")
+        mc.setAttr(md + ".input2X", 0)
+        stretch_attr = md + ".outputX"
+        self.stretch_attr_destination1 = md + ".input2X"
+
+        md = mc.createNode("multiplyDivide")
+        mc.connectAttr(stretch_attr, md + ".input1X")
+        mc.setAttr(md + ".input2X", mc.getAttr(self.wire_joints[1] + ".tx"))
+
+        pma = mc.createNode("plusMinusAverage")
+        mc.setAttr(pma + ".input1D[0]", mc.getAttr(self.wire_joints[1] + ".tx"))
+        mc.connectAttr(md + ".outputX", pma + ".input1D[1]")
+        stretch_value_attr = pma + ".output1D"
+
+        for i in range(1, len(self.up_joints)):
+            mc.connectAttr(stretch_value_attr, self.wire_joints[i] + ".tx")
+            mc.connectAttr(stretch_value_attr, self.up_joints[i] + ".tx")
+
+        # turning point
+        self.turning_point_attr_destination = []
+        for i in range(len(self.forward_ctls)):
+            forward_ctl_shapes = mc.listRelatives(self.forward_ctls[i], shapes=True, fullPath=True)
+            reverse_ctl_shapes = mc.listRelatives(self.reverse_ctls[i], shapes=True, fullPath=True)
+            forward_ctl_position = mc.getAttr(self.forward_ctls[i] + ".turning_point")
+            reverse_ctl_position = mc.getAttr(self.reverse_ctls[i] + ".turning_point")
+
+            condition = mc.createNode("condition")
+            mc.setAttr(condition + ".firstTerm", data["turning_point"])
+            self.turning_point_attr_destination.append(condition + ".firstTerm")
+            mc.setAttr(condition + ".secondTerm", forward_ctl_position)
+            mc.setAttr(condition + ".operation", 5 if i == 0 else 4)
+            mc.setAttr(condition + ".colorIfTrueR", 1)
+            mc.setAttr(condition + ".colorIfFalseR", 0)
+            forward_condition_attr = condition + ".outColorR"
+            mc.connectAttr(forward_condition_attr, self.forward_choice_nodes[i] + ".selector")
+            for shape in forward_ctl_shapes:
+                mc.connectAttr(forward_condition_attr, shape + ".v")
+
+            condition = mc.createNode("condition")
+            mc.setAttr(condition + ".firstTerm", data["turning_point"])
+            self.turning_point_attr_destination.append(condition + ".firstTerm")
+            mc.setAttr(condition + ".secondTerm", reverse_ctl_position)
+            mc.setAttr(condition + ".operation", 2 if i >= len(self.forward_ctls) - 2 else 3)
+            mc.setAttr(condition + ".colorIfTrueR", 1)
+            mc.setAttr(condition + ".colorIfFalseR", 0)
+            reverse_condition_attr = condition + ".outColorR"
+            mc.connectAttr(reverse_condition_attr, self.reverse_choice_nodes[i] + ".selector")
+            for shape in reverse_ctl_shapes:
+                mc.connectAttr(reverse_condition_attr, shape + ".v")
+
+            rev = mc.createNode("reverse")
+            mc.connectAttr(forward_condition_attr, rev + ".inputX")
+            rev_attr = rev + ".outputX"
+            attr1, attr2 = mc.pointConstraint(self.ref_point_cons[i], query=True, weightAliasList=True)
+            mc.connectAttr(forward_condition_attr, self.ref_point_cons[i] + "." + attr1)
+            mc.connectAttr(rev_attr, self.ref_point_cons[i] + "." + attr2)
+            attr1, attr2 = mc.orientConstraint(self.ref_orient_cons[i], query=True, weightAliasList=True)
+            mc.connectAttr(forward_condition_attr, self.ref_orient_cons[i] + "." + attr1)
+            mc.connectAttr(rev_attr, self.ref_orient_cons[i] + "." + attr2)
+            mc.connectAttr(forward_condition_attr, self.ref_scale_condition[i] + ".firstTerm")
+
+
+        # remap scale setup
+        remap = mc.createNode("remapValue")
+
+        pma = mc.createNode("plusMinusAverage")
+        mc.setAttr(pma + ".operation", 2)
+        mc.setAttr(pma + ".input1D[0]", 0.5)
+        mc.setAttr(pma + ".input1D[1]", 0.5)
+        mc.connectAttr(pma + ".output1D", remap + ".value[0].value_Position")
+        mc.setAttr(remap + ".value[0].value_FloatValue", 0)
+        mc.setAttr(remap + ".value[0].value_Interp", 2)
+        self.scale_position_attr_destination = pma + ".input1D[0]"
+        self.scale_left_range_attr_destination = pma + ".input1D[1]"
+        self.scale_left_value_attr_destination = remap + ".value[0].value_FloatValue"
+
+        mc.setAttr(remap + ".value[1].value_Position", 0.5)
+        self.scale_position_attr_destination1 = remap +".value[1].value_Position"
+        mc.setAttr(remap + ".value[1].value_FloatValue", 0)
+        mc.setAttr(remap + ".value[1].value_Interp", 2)
+        self.scale_value_attr_destination = remap + ".value[1].value_FloatValue"
+
+        pma = mc.createNode("plusMinusAverage")
+        mc.setAttr(pma + ".input1D[0]", 0.5)
+        self.scale_position_attr_destination2 = pma + ".input1D[0]"
+        mc.setAttr(pma + ".input1D[1]", 0.5)
+        self.scale_right_range_attr_destination = pma + ".input1D[1]"
+        mc.connectAttr(pma + ".output1D", remap + ".value[2].value_Position")
+        mc.setAttr(remap + ".value[2].value_FloatValue", 0)
+        self.scale_right_value_attr_destination = remap + ".value[2].value_FloatValue"
+        mc.setAttr(remap + ".value[2].value_Interp", 2)
+
+        for i, ref in enumerate(self.refs):
+            mc.setAttr(ref + ".s", lock=False)
+            mc.setAttr(ref + ".sx", lock=False)
+            mc.setAttr(ref + ".sy", lock=False)
+            mc.setAttr(ref + ".sz", lock=False)
+
+            rm = mc.createNode("remapValue")
+            mc.setAttr(rm + ".inputValue", float(i) / len(self.refs))
+            mc.setAttr(rm + ".inputMin", 0)
+            mc.setAttr(rm + ".inputMax", 1)
+            mc.setAttr(rm + ".outputMin", 1)
+            mc.setAttr(rm + ".outputMax", 2)
+            mc.connectAttr(remap + ".value", rm + ".value")
+
+            mc.connectAttr(rm + ".outValue", ref + ".sy")
+            mc.connectAttr(rm + ".outValue", ref + ".sz")
 
         # jnts
         if data["create_jnt"]:
@@ -417,7 +641,7 @@ class Rig(assembler.Rig):
                                                keyable=True,
                                                minValue=0,
                                                maxValue=1)
-        self.scale_left_ragne_attr = attribute.add_attr(host,
+        self.scale_left_range_attr = attribute.add_attr(host,
                                                         longName="scale_left_range",
                                                         type="double",
                                                         minValue=0.001,
@@ -477,168 +701,21 @@ class Rig(assembler.Rig):
         mc.connectAttr(self.fk_vis_attr, hierarchy.get_parent(self.forward_ctls[0]) + ".v")
         mc.connectAttr(self.fk_vis_attr, hierarchy.get_parent(self.reverse_ctls[0]) + ".v")
 
-        # wire curve setup
-        md = mc.createNode("multiplyDivide")
-        mc.connectAttr(self.deform_curve_length_attr, md + ".input1X")
-        mc.connectAttr(self.orig_curve_length_attr, md + ".input2X")
-        mc.setAttr(md + ".operation", 2)
-        self.curve_ratio_attr = md + ".outputX"
-
-        start_length_u_value_attr = self.offset_attr
-
-        pma = mc.createNode("plusMinusAverage")
-        mc.connectAttr(start_length_u_value_attr, pma + ".input1D[0]")
-        mc.setAttr(pma + ".input1D[1]", 1)
-
-        bta = mc.createNode("blendTwoAttr")
-        mc.connectAttr(pma + ".output1D", bta + ".input[0]")
-        mc.setAttr(bta + ".input[1]", 1)
-        mc.connectAttr(self.stretch_attr, bta + ".attributesBlender")
-        end_length_u_value_attr = bta + ".output"
-
-        mp = mc.createNode("motionPath")
-        mc.setAttr(mp + ".fractionMode", True)
-        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", mp + ".geometryPath")
-        mc.connectAttr(start_length_u_value_attr, mp + ".uValue")
-
-        npoc = mc.createNode("nearestPointOnCurve")
-        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", npoc + ".inputCurve")
-        mc.connectAttr(mp + ".allCoordinates", npoc + ".inPosition")
-        start_u_value_attr = npoc + ".parameter"
-
-        mp = mc.createNode("motionPath")
-        mc.setAttr(mp + ".fractionMode", True)
-        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", mp + ".geometryPath")
-        mc.connectAttr(end_length_u_value_attr, mp + ".uValue")
-
-        npoc = mc.createNode("nearestPointOnCurve")
-        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", npoc + ".inputCurve")
-        mc.connectAttr(mp + ".allCoordinates", npoc + ".inPosition")
-        end_u_value_attr = npoc + ".parameter"
-
-        detach_curve = mc.createNode("detachCurve")
-        mc.connectAttr(self.path_deform_curve + ".worldSpace[0]", detach_curve + ".inputCurve")
-        mc.connectAttr(start_u_value_attr, detach_curve + ".parameter[0]")
-        mc.connectAttr(end_u_value_attr, detach_curve + ".parameter[1]")
-        mc.connectAttr(detach_curve + ".outputCurve[1]", self.wire_curve + ".create")
-
-        detach_curve = mc.createNode("detachCurve")
-        mc.connectAttr(self.path_up_curve + ".worldSpace[0]", detach_curve + ".inputCurve")
-        mc.connectAttr(start_u_value_attr, detach_curve + ".parameter[0]")
-        mc.connectAttr(end_u_value_attr, detach_curve + ".parameter[1]")
-        mc.connectAttr(detach_curve + ".outputCurve[1]", self.wire_up_curve + ".create")
-
-        # stretch
-        pma = mc.createNode("plusMinusAverage")
-        mc.setAttr(pma + ".operation", 2)
-        mc.connectAttr(self.curve_ratio_attr, pma + ".input1D[0]")
-        mc.setAttr(pma + ".input1D[1]", 1)
-
-        condition = mc.createNode("condition")
-        mc.setAttr(condition + ".operation", 2)
-        mc.connectAttr(pma + ".output1D", condition + ".firstTerm")
-        mc.setAttr(condition + ".secondTerm", 0)
-        mc.connectAttr(pma + ".output1D", condition + ".colorIfTrueR")
-        mc.setAttr(condition + ".colorIfFalseR", 0)
-
-        md = mc.createNode("multiplyDivide")
-        mc.connectAttr(condition + ".outColorR", md + ".input1X")
-        mc.connectAttr(self.stretch_attr, md + ".input2X")
-        stretch_attr = md + ".outputX"
-
-        md = mc.createNode("multiplyDivide")
-        mc.connectAttr(stretch_attr, md + ".input1X")
-        mc.setAttr(md + ".input2X", mc.getAttr(self.wire_joints[1] + ".tx"))
-
-        pma = mc.createNode("plusMinusAverage")
-        mc.setAttr(pma + ".input1D[0]", mc.getAttr(self.wire_joints[1] + ".tx"))
-        mc.connectAttr(md + ".outputX", pma + ".input1D[1]")
-        stretch_value_attr = pma + ".output1D"
-
-        for i in range(1, len(self.up_joints)):
-            mc.connectAttr(stretch_value_attr, self.wire_joints[i] + ".tx")
-            mc.connectAttr(stretch_value_attr, self.up_joints[i] + ".tx")
-
-        # turning point
-        for i in range(len(self.forward_ctls)):
-            forward_ctl_shapes = mc.listRelatives(self.forward_ctls[i], shapes=True, fullPath=True)
-            reverse_ctl_shapes = mc.listRelatives(self.reverse_ctls[i], shapes=True, fullPath=True)
-            forward_ctl_position = mc.getAttr(self.forward_ctls[i] + ".turning_point")
-            reverse_ctl_position = mc.getAttr(self.reverse_ctls[i] + ".turning_point")
-
-            condition = mc.createNode("condition")
-            mc.connectAttr(self.turning_point_attr, condition + ".firstTerm")
-            mc.setAttr(condition + ".secondTerm", forward_ctl_position)
-            mc.setAttr(condition + ".operation", 5 if i == 0 else 4)
-            mc.setAttr(condition + ".colorIfTrueR", 1)
-            mc.setAttr(condition + ".colorIfFalseR", 0)
-            forward_condition_attr = condition + ".outColorR"
-            mc.connectAttr(forward_condition_attr, self.forward_choice_nodes[i] + ".selector")
-            for shape in forward_ctl_shapes:
-                mc.connectAttr(forward_condition_attr, shape + ".v")
-
-            condition = mc.createNode("condition")
-            mc.connectAttr(self.turning_point_attr, condition + ".firstTerm")
-            mc.setAttr(condition + ".secondTerm", reverse_ctl_position)
-            mc.setAttr(condition + ".operation", 2 if i >= len(self.forward_ctls) - 2 else 3)
-            mc.setAttr(condition + ".colorIfTrueR", 1)
-            mc.setAttr(condition + ".colorIfFalseR", 0)
-            reverse_condition_attr = condition + ".outColorR"
-            mc.connectAttr(reverse_condition_attr, self.reverse_choice_nodes[i] + ".selector")
-            for shape in reverse_ctl_shapes:
-                mc.connectAttr(reverse_condition_attr, shape + ".v")
-
-            rev = mc.createNode("reverse")
-            mc.connectAttr(forward_condition_attr, rev + ".inputX")
-            rev_attr = rev + ".outputX"
-            attr1, attr2 = mc.pointConstraint(self.ref_point_cons[i], query=True, weightAliasList=True)
-            mc.connectAttr(forward_condition_attr, self.ref_point_cons[i] + "." + attr1)
-            mc.connectAttr(rev_attr, self.ref_point_cons[i] + "." + attr2)
-            attr1, attr2 = mc.orientConstraint(self.ref_orient_cons[i], query=True, weightAliasList=True)
-            mc.connectAttr(forward_condition_attr, self.ref_orient_cons[i] + "." + attr1)
-            mc.connectAttr(rev_attr, self.ref_orient_cons[i] + "." + attr2)
-            attr1, attr2 = mc.scaleConstraint(self.ref_scale_cons[i], query=True, weightAliasList=True)
-            mc.connectAttr(forward_condition_attr, self.ref_scale_cons[i] + "." + attr1)
-            mc.connectAttr(rev_attr, self.ref_scale_cons[i] + "." + attr2)
-
-        # remap scale setup
-        remap = mc.createNode("remapValue")
-
-        pma = mc.createNode("plusMinusAverage")
-        mc.setAttr(pma + ".operation", 2)
-        mc.connectAttr(self.scale_position_attr, pma + ".input1D[0]")
-        mc.connectAttr(self.scale_left_ragne_attr, pma + ".input1D[1]")
-        mc.connectAttr(pma + ".output1D", remap + ".value[0].value_Position")
-        mc.connectAttr(self.scale_left_value_attr, remap + ".value[0].value_FloatValue")
-        mc.setAttr(remap + ".value[0].value_Interp", 2)
-
-        mc.connectAttr(self.scale_position_attr, remap + ".value[1].value_Position")
-        mc.connectAttr(self.scale_value_attr, remap + ".value[1].value_FloatValue")
-        mc.setAttr(remap + ".value[1].value_Interp", 2)
-
-        pma = mc.createNode("plusMinusAverage")
-        mc.connectAttr(self.scale_position_attr, pma + ".input1D[0]")
-        mc.connectAttr(self.scale_right_range_attr, pma + ".input1D[1]")
-        mc.connectAttr(pma + ".output1D", remap + ".value[2].value_Position")
-        mc.connectAttr(self.scale_right_value_attr, remap + ".value[2].value_FloatValue")
-        mc.setAttr(remap + ".value[2].value_Interp", 2)
-
-        for i, ref in enumerate(self.refs):
-            mc.setAttr(ref + ".s", lock=False)
-            mc.setAttr(ref + ".sx", lock=False)
-            mc.setAttr(ref + ".sy", lock=False)
-            mc.setAttr(ref + ".sz", lock=False)
-
-            rm = mc.createNode("remapValue")
-            mc.setAttr(rm + ".inputValue", float(i) / len(self.refs))
-            mc.setAttr(rm + ".inputMin", 0)
-            mc.setAttr(rm + ".inputMax", 1)
-            mc.setAttr(rm + ".outputMin", 1)
-            mc.setAttr(rm + ".outputMax", 2)
-            mc.connectAttr(remap + ".value", rm + ".value")
-
-            mc.connectAttr(rm + ".outValue", ref + ".sy")
-            mc.connectAttr(rm + ".outValue", ref + ".sz")
+        # wire attribute setup
+        mc.connectAttr(self.offset_attr, self.offset_attr_destination)
+        mc.connectAttr(self.offset_attr, self.offset_attr_destination1)
+        mc.connectAttr(self.stretch_attr, self.stretch_attr_destination)
+        mc.connectAttr(self.stretch_attr, self.stretch_attr_destination1)
+        for destination in self.turning_point_attr_destination:
+            mc.connectAttr(self.turning_point_attr, destination)
+        mc.connectAttr(self.scale_position_attr, self.scale_position_attr_destination)
+        mc.connectAttr(self.scale_position_attr, self.scale_position_attr_destination1)
+        mc.connectAttr(self.scale_position_attr, self.scale_position_attr_destination2)
+        mc.connectAttr(self.scale_left_range_attr, self.scale_left_range_attr_destination)
+        mc.connectAttr(self.scale_left_value_attr, self.scale_left_value_attr_destination)
+        mc.connectAttr(self.scale_value_attr, self.scale_value_attr_destination)
+        mc.connectAttr(self.scale_right_range_attr, self.scale_right_range_attr_destination)
+        mc.connectAttr(self.scale_right_value_attr, self.scale_right_value_attr_destination)
 
     def connections(self, context):
         super().connections(context)
