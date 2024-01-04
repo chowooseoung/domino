@@ -233,9 +233,15 @@ class Rig(assembler.Rig):
                                        positions=[pos0, pos1, pos3, pos2],
                                        bezier=False,
                                        vis=False,
-                                       inherits=False,
+                                       inherits=True,
                                        display_type=1)
-        nurbs.constraint(self.deform_crv, [self.look_at_start_grp, self.cv1_loc, self.cv2_loc, self.ik_loc])
+        for i, obj in enumerate([self.look_at_start_grp, self.cv1_loc, self.cv2_loc, self.ik_loc]):
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(obj + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+            mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputTranslate", self.deform_crv + ".cv[{0}]".format(i))
 
         neck_jnt_positions = nurbs.point_on_curve(self.deform_crv, data["division"])
         name = self.generate_name("SP%s", "jnt", "ctl")

@@ -3,7 +3,7 @@ from maya import cmds as mc
 from maya.api import OpenMaya as om2
 
 # domino
-from domino.lib import hierarchy
+from domino.lib import hierarchy, matrix
 
 
 def get_fn_curve(crv):
@@ -161,15 +161,43 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
         normal_axis = 4
         primary_x_axis *= -1
     name = name_format.format("surf")
-    nurbs_surf = create_ribbon_surface(parent,
+    ribbon_grp = matrix.transform(parent=parent,
+                                  name=name_format.format("ribboneGrp"),
+                                  m=om2.MMatrix())
+    nurbs_surf = create_ribbon_surface(ribbon_grp,
                                        name,
                                        positions[0],
                                        positions[1],
                                        normal,
                                        len(v_values))
     mc.hide(nurbs_surf)
+    outputs = mc.parent(outputs, ribbon_grp)
+    [matrix.set_matrix(o, om2.MMatrix()) for o in outputs]
 
-    sc = mc.skinCluster(bind_jnts,
+    new_joints = []
+    for i, j in enumerate(bind_jnts):
+        jnt = mc.createNode("joint", name=name_format.format("ribbonBind{0}Jnt".format(i)), parent=ribbon_grp)
+        mc.setAttr(jnt + ".v", 0)
+        new_joints.append(jnt)
+        matrix.set_matrix(jnt, matrix.get_matrix(j))
+        mc.makeIdentity(jnt, apply=True, translate=True, rotate=True, scale=True)
+        mult_m = mc.createNode("multMatrix")
+        mc.connectAttr(j + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+        mc.connectAttr(ribbon_grp + ".worldInverseMatrix", mult_m + ".matrixIn[1]")
+        decom_m = mc.createNode("decomposeMatrix")
+        mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+        mc.connectAttr(decom_m + ".outputTranslate", jnt + ".t")
+        mc.connectAttr(decom_m + ".outputScale", jnt + ".s")
+        mc.connectAttr(decom_m + ".outputShear", jnt + ".shear")
+        mult_m = mc.createNode("multMatrix")
+        mc.connectAttr(j + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+        mc.connectAttr(ribbon_grp + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        mc.setAttr(mult_m + ".matrixIn[2]", mc.getAttr(j + ".worldInverseMatrix[0]"), type="matrix")
+        decom_m = mc.createNode("decomposeMatrix")
+        mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+        mc.connectAttr(decom_m + ".outputRotate", jnt + ".r")
+
+    sc = mc.skinCluster(new_joints,
                         nurbs_surf,
                         name=name_format.format("sc"),
                         toSelectedBones=True,
@@ -180,7 +208,20 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
                         weightDistribution=1,
                         removeUnusedInfluence=False,
                         nurbsSamples=6)[0]
-    # mc.setAttr(sc + ".relativeSpaceMode", 1)
+    for j in new_joints:
+        plugs = mc.listConnections(j, destination=True, source=False, plugs=True)
+        for plug in plugs:
+            if "matrix" in plug:
+                index = plug.split("[")[1][0]
+
+                mult_m = mc.createNode("multMatrix")
+                mc.setAttr(mult_m + ".matrixIn[0]", mc.getAttr(j + ".worldMatrix[0]"), type="matrix")
+
+                inv_m = mc.createNode("inverseMatrix")
+                mc.connectAttr(mult_m + ".matrixSum", inv_m + ".inputMatrix")
+                mc.connectAttr(inv_m + ".outputMatrix", sc + ".bindPreMatrix[{0}]".format(index))
+
+                mc.connectAttr(j + ".matrix", plug, force=True)
 
     name = name_format.format("uniformCrv")
     uniform_crv, iso = mc.duplicateCurve(nurbs_surf + ".u[1]",
@@ -189,18 +230,15 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
                                          range=0,
                                          local=0)
     mc.hide(uniform_crv)
-    uniform_crv = mc.parent(uniform_crv, parent)[0]
+    uniform_crv = mc.parent(uniform_crv, ribbon_grp)[0]
     mc.connectAttr(nurbs_surf + ".local", "{0}.inputSurface".format(iso), force=True)
 
     uniform_crv_shape = mc.listRelatives(uniform_crv, shapes=True, fullPath=True)[0]
     nurbs_surf_shape, orig = mc.listRelatives(nurbs_surf, shapes=True, fullPath=True)
 
     uvpin = mc.createNode("uvPin")
-    # mc.setAttr(uvpin + ".relativeSpaceMode", 2)
     mc.connectAttr(orig + ".local", uvpin + ".originalGeometry")
     mc.connectAttr(nurbs_surf + ".local", uvpin + ".deformedGeometry")
-    # mc.setAttr(uvpin + ".relativeSpaceMatrix",
-    #            mc.xform(parent, query=True, matrix=True, worldSpace=True), type="matrix")
     mc.setAttr(uvpin + ".normalAxis", normal_axis)
 
     for i, x in enumerate(v_values):
@@ -230,24 +268,22 @@ def ribbon(parent, name_format, positions, normal, v_values, bind_jnts, uniform_
             x_axis = primary_x_axis
         aim_m = mc.createNode("aimMatrix")
         mc.setAttr(aim_m + ".primaryInputAxisX", x_axis)
-        mc.setAttr(aim_m + ".secondaryMode", 2)
+        mc.setAttr(aim_m + ".secondaryMode", 1)
+        mc.connectAttr(uvpin + ".outputMatrix[{0}]".format(i), aim_m + ".inputMatrix")
+        mc.connectAttr(uvpin + ".outputMatrix[{0}]".format(next_i), aim_m + ".primaryTargetMatrix")
 
+        up_obj = matrix.transform(parent=ribbon_grp,
+                                  name=name_format.format("up{0}Obj".format(i)),
+                                  m=om2.MMatrix())
+        mc.connectAttr(uvpin + ".outputMatrix[{0}]".format(i), up_obj + ".offsetParentMatrix")
+        mc.setAttr(up_obj + ".ty", 0.1)
         mult_m = mc.createNode("multMatrix")
-        mc.connectAttr(uvpin + ".outputMatrix[{0}]".format(i), mult_m + ".matrixIn[0]")
-        mc.connectAttr(parent + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-        mc.connectAttr(mult_m + ".matrixSum", aim_m + ".inputMatrix")
-
-        mult_m = mc.createNode("multMatrix")
-        mc.connectAttr(uvpin + ".outputMatrix[{0}]".format(next_i), mult_m + ".matrixIn[0]")
-        mc.connectAttr(parent + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-
-        mc.connectAttr(mult_m + ".matrixSum", aim_m + ".primaryTargetMatrix")
+        mc.connectAttr(up_obj + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+        mc.connectAttr(ribbon_grp + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
         mc.connectAttr(mult_m + ".matrixSum", aim_m + ".secondaryTargetMatrix")
 
         pick_m = mc.createNode("pickMatrix")
         mc.connectAttr(aim_m + ".outputMatrix", pick_m + ".inputMatrix")
-        mc.setAttr(pick_m + ".useScale", False)
-        mc.setAttr(pick_m + ".useShear", False)
         mc.connectAttr(pick_m + ".outputMatrix", outputs[i] + ".offsetParentMatrix")
     return uvpin
 

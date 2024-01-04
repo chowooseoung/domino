@@ -388,7 +388,12 @@ class Rig(assembler.Rig):
                                 self.ik_jnts,
                                 pole_vector=self.pole_vec_loc)
         mc.orientConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
-        mc.scaleConstraint(self.ik_ikh, self.ik_jnts[-1], maintainOffset=True)
+        mult_m = mc.createNode("multMatrix")
+        mc.connectAttr(self.ik_ikh + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+        mc.connectAttr(self.ik_jnts[-1] + ".parentInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        decom_m = mc.createNode("decomposeMatrix")
+        mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+        mc.connectAttr(decom_m + ".outputScale", self.ik_jnts[-1] + ".s")
 
         # elbow - pole vector display curve
         self.display_curve = nurbs.create(parent=root,
@@ -712,7 +717,12 @@ class Rig(assembler.Rig):
         mc.connectAttr(self.wing_output_nodes[-1] + ".matrix", aim_m + ".primaryTargetMatrix", force=True)
 
         mc.parentConstraint(self.blend_nodes[-1], node, maintainOffset=False)
-        mc.scaleConstraint(self.blend_nodes[-1], node, maintainOffset=False)
+        mult_m = mc.createNode("multMatrix")
+        mc.connectAttr(self.blend_nodes[-1] + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+        mc.connectAttr(node + ".parentInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        decom_m = mc.createNode("decomposeMatrix")
+        mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+        mc.connectAttr(decom_m + ".outputScale", node + ".s")
 
         self.volume_inputs = upper_jnt_v_values + [x + 1 for x in lower_jnt_v_values]
         self.volume_inputs = sorted([x / 2.0 for x in self.volume_inputs])

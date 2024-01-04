@@ -787,7 +787,12 @@ class Rig(assembler.Rig):
         # pelvis
         pelvis_npo = hierarchy.get_parent(self.pelvis_ctl)
         mc.parentConstraint(self.fk_0_lock_orient_loc, pelvis_npo, maintainOffset=True)
-        mc.scaleConstraint(self.fk_0_lock_orient_loc, pelvis_npo, maintainOffset=True)
+        mult_m = mc.createNode("multMatrix")
+        mc.connectAttr(self.fk_0_lock_orient_loc + ".worldMatrix[0]", mult_m + ".matrixIn[0]")
+        mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
+        decom_m = mc.createNode("decomposeMatrix")
+        mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+        mc.connectAttr(decom_m + ".outputScale", pelvis_npo + ".s")
 
         # tangent ctl
         tan_npo = hierarchy.get_parent(self.ik_tan_ctl)
