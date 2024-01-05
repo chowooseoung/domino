@@ -363,9 +363,8 @@ class Rig(assembler.Rig):
             mc.setAttr(inverse_mult_m + ".matrixIn[0]",
                        matrix.get_matrix(inverse_node),
                        type="matrix")
-            mc.setAttr(inverse_mult_m + ".matrixIn[1]", orig_m, type="matrix")
             mc.connectAttr(inverse_node + ".parentInverseMatrix",
-                           inverse_mult_m + ".matrixIn[2]")
+                           inverse_mult_m + ".matrixIn[1]")
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(inverse_mult_m + ".matrixSum", decom_m + ".inputMatrix")
             mc.connectAttr(decom_m + ".outputRotate", inverse_node + ".r")
