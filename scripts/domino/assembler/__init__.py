@@ -1231,12 +1231,12 @@ def mirror_guide(guide):
                     data = mc.getAttr(new_node + "." + mirror_attr) or ""
                     if data:
                         containers = data.split(",")
-                        new_data = []
+                        replace_data = []
                         for _container in containers:
                             n, s, i = _container.split("_")
                             if s != "C":
-                                new_data.append("_".join([n, side, i]))
-                        mc.setAttr(new_node + "." + mirror_attr, ",".join(new_data), type="string")
+                                replace_data.append("_".join([n, side, i]))
+                        mc.setAttr(new_node + "." + mirror_attr, ",".join(replace_data), type="string")
 
             # space switch mirror
             for attr in mc.listAttr(new_node, userDefined=True) or []:
