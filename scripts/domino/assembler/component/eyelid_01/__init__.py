@@ -956,7 +956,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(orig_shape + ".outMesh", hole_upper_pin + ".originalGeometry")
 
         upper_pos = [vector.get_position(x) for x in self.eye_hole_upper_way]
-        self.hole_upper_aim_jnts = []
+        self.hole_upper_aim_pos = []
         for i, pos in enumerate(upper_pos[1:-1]):
             temp = matrix.transform(parent=None, name="TEMP", m=orig_m)
             mc.setAttr(temp + ".t", *pos)
@@ -964,16 +964,15 @@ class Rig(assembler.Rig):
 
             mc.setAttr(hole_upper_pin + ".inputMatrix[{0}]".format(i), mc.getAttr(temp + ".matrix"), type="matrix")
 
-            jnt = joint.add_joint(parent=self.root,
-                                  name=self.generate_name("eyeHoleUpper{0}".format(i), "jnt", "ctl"),
-                                  m=matrix.get_matrix(temp),
-                                  vis=False)
+            pos = matrix.transform(parent=self.root,
+                             name=self.generate_name("eyeHoleUpper{0}".format(i), "pos", "ctl"),
+                             m=matrix.get_matrix(temp))
 
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(hole_upper_pin + ".outputMatrix[{0}]".format(i), decom_m + ".inputMatrix")
-            mc.connectAttr(decom_m + ".outputTranslate", jnt + ".t")
-            mc.connectAttr(decom_m + ".outputScale", jnt + ".s")
-            mc.connectAttr(decom_m + ".outputShear", jnt + ".shear")
+            mc.connectAttr(decom_m + ".outputTranslate", pos + ".t")
+            mc.connectAttr(decom_m + ".outputScale", pos + ".s")
+            mc.connectAttr(decom_m + ".outputShear", pos + ".shear")
 
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(hole_upper_pin + ".outputMatrix[{0}]".format(i), mult_m + ".matrixIn[0]")
@@ -982,9 +981,9 @@ class Rig(assembler.Rig):
 
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
-            mc.connectAttr(decom_m + ".outputRotate", jnt + ".r")
+            mc.connectAttr(decom_m + ".outputRotate", pos + ".r")
             mc.delete(temp)
-            self.hole_upper_aim_jnts.append(jnt)
+            self.hole_upper_aim_pos.append(pos)
 
         hole_lower_pin = mc.createNode("proximityPin")
         mc.setAttr(hole_lower_pin + ".offsetTranslation", 1)
@@ -994,7 +993,7 @@ class Rig(assembler.Rig):
         mc.connectAttr(orig_shape + ".outMesh", hole_lower_pin + ".originalGeometry")
 
         lower_pos = [vector.get_position(x) for x in self.eye_hole_lower_way]
-        self.hole_lower_aim_jnts = []
+        self.hole_lower_aim_pos = []
         for i, pos in enumerate(lower_pos[1:-1]):
             temp = matrix.transform(parent=None, name="TEMP", m=orig_m)
             mc.setAttr(temp + ".t", *pos)
@@ -1002,16 +1001,15 @@ class Rig(assembler.Rig):
 
             mc.setAttr(hole_lower_pin + ".inputMatrix[{0}]".format(i), mc.getAttr(temp + ".matrix"), type="matrix")
 
-            jnt = joint.add_joint(parent=self.root,
-                                  name=self.generate_name("eyeHoleLower{0}".format(i), "jnt", "ctl"),
-                                  m=matrix.get_matrix(temp),
-                                  vis=False)
+            pos = matrix.transform(parent=self.root,
+                                   name=self.generate_name("eyeHoleLower{0}".format(i), "pos", "ctl"),
+                                   m=matrix.get_matrix(temp))
 
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(hole_lower_pin + ".outputMatrix[{0}]".format(i), decom_m + ".inputMatrix")
-            mc.connectAttr(decom_m + ".outputTranslate", jnt + ".t")
-            mc.connectAttr(decom_m + ".outputScale", jnt + ".s")
-            mc.connectAttr(decom_m + ".outputShear", jnt + ".shear")
+            mc.connectAttr(decom_m + ".outputTranslate", pos + ".t")
+            mc.connectAttr(decom_m + ".outputScale", pos + ".s")
+            mc.connectAttr(decom_m + ".outputShear", pos + ".shear")
 
             mult_m = mc.createNode("multMatrix")
             mc.connectAttr(hole_lower_pin + ".outputMatrix[{0}]".format(i), mult_m + ".matrixIn[0]")
@@ -1020,9 +1018,9 @@ class Rig(assembler.Rig):
 
             decom_m = mc.createNode("decomposeMatrix")
             mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
-            mc.connectAttr(decom_m + ".outputRotate", jnt + ".r")
+            mc.connectAttr(decom_m + ".outputRotate", pos + ".r")
             mc.delete(temp)
-            self.hole_lower_aim_jnts.append(jnt)
+            self.hole_lower_aim_pos.append(pos)
 
         # refs, jnts
         self.upper_refs = []
@@ -1096,6 +1094,50 @@ class Rig(assembler.Rig):
                                           leaf=False,
                                           uni_scale=uni_scale)
                     jnts.append(jnt)
+        self.hole_upper_refs = []
+        self.hole_lower_refs = []
+        self.hole_upper_jnts = []
+        self.hole_lower_jnts = []
+        for i, p in enumerate(self.hole_upper_aim_pos):
+            ref = self.create_ref(context=context,
+                                  name=self.generate_name("eyeHoleUpper{0}".format(i), "ref", "ctl"),
+                                  anchor=True,
+                                  m=p)
+            self.hole_upper_refs.append(ref)
+            if data["create_jnt"]:
+                uni_scale = False
+                if assembly_data["force_uni_scale"]:
+                    uni_scale = True
+                name = self.generate_name("eyeHoleUpper{0}".format(i), "", "jnt")
+                jnt = self.create_jnt(context=context,
+                                      parent=None,
+                                      name=name,
+                                      description="eyeHoleUpper{0}".format(i),
+                                      ref=ref,
+                                      m=matrix.get_matrix(ref),
+                                      leaf=False,
+                                      uni_scale=uni_scale)
+                self.hole_upper_jnts.append(jnt)
+        for i, p in enumerate(self.hole_lower_aim_pos):
+            ref = self.create_ref(context=context,
+                                  name=self.generate_name("eyeHoleLower{0}".format(i), "ref", "ctl"),
+                                  anchor=True,
+                                  m=p)
+            self.hole_lower_refs.append(ref)
+            if data["create_jnt"]:
+                uni_scale = False
+                if assembly_data["force_uni_scale"]:
+                    uni_scale = True
+                name = self.generate_name("eyeHoleLower{0}".format(i), "", "jnt")
+                jnt = self.create_jnt(context=context,
+                                      parent=None,
+                                      name=name,
+                                      description="eyeHoleLower{0}".format(i),
+                                      ref=ref,
+                                      m=matrix.get_matrix(ref),
+                                      leaf=False,
+                                      uni_scale=uni_scale)
+                self.hole_lower_jnts.append(jnt)
 
     def attributes(self, context):
         super().attributes(context)
