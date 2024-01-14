@@ -47,6 +47,29 @@ def convert_component(component, vertex=False, edge=False, face=False, uv=False,
     return [mesh + "." + result_component + "[" + index + "]" for index in sorted_index_range]
 
 
+def loop_to_way(loop, start_vertex, end_vertex):
+    if start_vertex not in loop:
+        return [], []
+    if end_vertex not in loop:
+        return [], []
+
+    way1 = [start_vertex]
+    loop.remove(start_vertex)
+
+    def get_ways():
+        if loop and end_vertex not in way1:
+            edges = mc.polyListComponentConversion(way1[-1], fromVertex=True, toEdge=True)
+            for v in convert_component(edges, vertex=True):
+                if v in loop:
+                    way1.append(v)
+                    if v != end_vertex:
+                        loop.remove(v)
+                    break
+            get_ways()
+
+    get_ways()
+    return way1
+
 def loop_to_2way(loop, start_vertex, end_vertex):
     """
 
@@ -79,6 +102,7 @@ def loop_to_2way(loop, start_vertex, end_vertex):
                         if v != end_vertex:
                             loop.remove(v)
                         break
+                break
             get_ways()
 
     get_ways()
