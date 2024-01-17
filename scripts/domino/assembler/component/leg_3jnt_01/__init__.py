@@ -350,7 +350,8 @@ class Rig(assembler.Rig):
         # 3 joint chain (spring solver or rp solver)
         is_spring = data["spring_solver"]
         if is_spring:
-            mel.eval("ikSpringSolver;")
+            if mc.pluginInfo("ikSpringSolver.mll", query=True, loaded=True) is False:
+                mc.loadPlugin("ikSpringSolver.mll")
         n = "chain3Spring%s" if is_spring else "chain3RP%s"
         name = self.generate_name(n, "jnt", "ctl")
         parent = root
@@ -407,6 +408,7 @@ class Rig(assembler.Rig):
         self.chain3_pos_obj = matrix.transform(root, name, matrix.set_matrix_translate(orig_m, positions[-2]))
         mc.parentConstraint(self.ik_loc, self.chain3_pos_obj)
 
+        orig_pos = [round(p, 4) for p in vector.get_position(self.chain3_ik_jnts[1])]
         n = "chain3Spring" if is_spring else "chain3RP"
         s = "ikSpringSolver" if is_spring else "ikRPsolver"
         name = self.generate_name(n, "ikh", "ctl")
@@ -415,6 +417,9 @@ class Rig(assembler.Rig):
                                        self.chain3_ik_jnts,
                                        solver=s,
                                        pole_vector=self.pole_vec_loc)
+        new_pos = [round(p, 4) for p in vector.get_position(self.chain3_ik_jnts[1])]
+        if orig_pos != new_pos:
+            mc.setAttr(self.chain3_ik_ikh + ".twist", 180)
 
         # ik jnts
         name = self.generate_name("ik%s", "jnt", "ctl")
@@ -778,33 +783,47 @@ class Rig(assembler.Rig):
                            aim_m + ".primaryTargetMatrix",
                            force=True)
 
+            name = self.generate_name("div1Offset", "npo", "ctl")
+            div1_offset_npo = matrix.transform(parent=self.root, name=name, m=orig_m)
+
+            name = self.generate_name("div1Offset", "pos", "ctl")
+            div1_offset = mc.createNode("transform", name=name, parent=div1_offset_npo)
+            mc.setAttr(div1_offset + ".tz", 1)
+            mc.connectAttr(uvpin1 + ".outputMatrix[{0}]".format(index), div1_offset + ".offsetParentMatrix")
+
             decom_m = mc.createNode("decomposeMatrix")
-            mc.connectAttr(uvpin1 + ".outputMatrix[{0}]".format(index), decom_m + ".inputMatrix")
+            mc.connectAttr(div1_offset + ".worldMatrix[0]", decom_m + ".inputMatrix")
 
             pma = mc.createNode("plusMinusAverage")
             mc.setAttr(pma + ".operation", 2)
-            mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[1]")
-
-            mult_m = mc.createNode("multMatrix")
-            mc.connectAttr(uvpin1 + ".outputMatrix[{0}]".format(index), mult_m + ".matrixIn[0]")
-            mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-
-            name = self.generate_name("div1Offset", "tz", "ctl")
-            offset_node = mc.createNode("transform", name=name, parent=self.root)
-            mc.connectAttr(mult_m + ".matrixSum", offset_node + ".offsetParentMatrix")
-            mc.setAttr(offset_node + ".tz", 1)
-
-            decom_m = mc.createNode("decomposeMatrix")
-            mc.connectAttr(offset_node + ".worldMatrix[0]", decom_m + ".inputMatrix")
             mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[0]")
 
-            cons = mc.aimConstraint(self.leg_output_nodes[index + 1],
-                                    self.leg_output_nodes[index],
-                                    aimVector=(-1, 0, 0) if negate else (1, 0, 0),
-                                    upVector=(0, 0, 1),
-                                    worldUpType="vector",
-                                    worldUpVector=(0, 1, 0))[0]
-            mc.connectAttr(pma + ".output3D", cons + ".worldUpVector")
+            name = self.generate_name("div1Orig", "npo", "ctl")
+            div1_orig_npo = matrix.transform(parent=self.root, name=name, m=orig_m)
+
+            name = self.generate_name("div1Orig", "pos", "ctl")
+            div1_orig = matrix.transform(parent=div1_orig_npo, name=name, m=orig_m)
+            mc.connectAttr(uvpin1 + ".outputMatrix[{0}]".format(index), div1_orig + ".offsetParentMatrix")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(div1_orig + ".worldMatrix[0]", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[1]")
+
+            aim_m = mc.createNode("aimMatrix")
+            mc.connectAttr(div1_orig + ".worldMatrix[0]", aim_m + ".inputMatrix")
+            mc.connectAttr(self.leg_output_nodes[index + 1] + ".worldMatrix[0]", aim_m + ".primaryTargetMatrix")
+            mc.connectAttr(div1_offset + ".worldMatrix[0]", aim_m + ".secondaryTargetMatrix")
+            mc.setAttr(aim_m + ".secondaryInputAxis", 0, 0, 1)
+            mc.setAttr(aim_m + ".primaryMode", 1)
+            mc.setAttr(aim_m + ".secondaryMode", 1)
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(aim_m + ".outputMatrix", mult_m + ".matrixIn[0]")
+            mc.connectAttr(self.leg_output_nodes[index] + ".parentInverseMatrix", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputRotate", self.leg_output_nodes[index] + ".r")
         else:
             mc.parentConstraint(self.upper_start_bind, self.leg_output_nodes[0])
             mc.pointConstraint(self.mid_start_bind, self.leg_output_nodes[1])
@@ -842,35 +861,50 @@ class Rig(assembler.Rig):
             mc.connectAttr(self.leg_output_nodes[index + 1] + ".matrix",
                            aim_m + ".primaryTargetMatrix",
                            force=True)
-            decom_m = mc.createNode("decomposeMatrix")
+
+            name = self.generate_name("div2Offset", "npo", "ctl")
+            div2_offset_npo = matrix.transform(parent=self.root, name=name, m=orig_m)
+
+            name = self.generate_name("div2Offset", "pos", "ctl")
+            div2_offset = mc.createNode("transform", name=name, parent=div2_offset_npo)
+            mc.setAttr(div2_offset + ".tz", 1)
             mc.connectAttr(uvpin2 + ".outputMatrix[{0}]".format(len(division2_v_values) - 1),
-                           decom_m + ".inputMatrix")
+                           div2_offset + ".offsetParentMatrix")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(div2_offset + ".worldMatrix[0]", decom_m + ".inputMatrix")
 
             pma = mc.createNode("plusMinusAverage")
             mc.setAttr(pma + ".operation", 2)
-            mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[1]")
-
-            mult_m = mc.createNode("multMatrix")
-            mc.connectAttr(uvpin2 + ".outputMatrix[{0}]".format(len(division2_v_values) - 1),
-                           mult_m + ".matrixIn[0]")
-            mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-
-            name = self.generate_name("div2Offset", "tz", "ctl")
-            offset_node = mc.createNode("transform", name=name, parent=self.root)
-            mc.connectAttr(mult_m + ".matrixSum", offset_node + ".offsetParentMatrix")
-            mc.setAttr(offset_node + ".tz", 1)
-
-            decom_m = mc.createNode("decomposeMatrix")
-            mc.connectAttr(offset_node + ".worldMatrix[0]", decom_m + ".inputMatrix")
             mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[0]")
 
-            cons = mc.aimConstraint(self.leg_output_nodes[index + 1],
-                                    self.leg_output_nodes[index],
-                                    aimVector=(-1, 0, 0) if negate else (1, 0, 0),
-                                    upVector=(0, 0, 1),
-                                    worldUpType="vector",
-                                    worldUpVector=(0, 1, 0))[0]
-            mc.connectAttr(pma + ".output3D", cons + ".worldUpVector")
+            name = self.generate_name("div2Orig", "npo", "ctl")
+            div2_orig_npo = matrix.transform(parent=self.root, name=name, m=orig_m)
+
+            name = self.generate_name("div2Orig", "pos", "ctl")
+            div2_orig = matrix.transform(parent=div2_orig_npo, name=name, m=orig_m)
+            mc.connectAttr(uvpin2 + ".outputMatrix[{0}]".format(len(division2_v_values) - 1),
+                           div2_orig + ".offsetParentMatrix")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(div2_orig + ".worldMatrix[0]", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[1]")
+
+            aim_m = mc.createNode("aimMatrix")
+            mc.connectAttr(div2_orig + ".worldMatrix[0]", aim_m + ".inputMatrix")
+            mc.connectAttr(self.leg_output_nodes[index + 1] + ".worldMatrix[0]", aim_m + ".primaryTargetMatrix")
+            mc.connectAttr(div2_offset + ".worldMatrix[0]", aim_m + ".secondaryTargetMatrix")
+            mc.setAttr(aim_m + ".secondaryInputAxis", 0, 0, 1)
+            mc.setAttr(aim_m + ".primaryMode", 1)
+            mc.setAttr(aim_m + ".secondaryMode", 1)
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(aim_m + ".outputMatrix", mult_m + ".matrixIn[0]")
+            mc.connectAttr(self.leg_output_nodes[index] + ".parentInverseMatrix", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputRotate", self.leg_output_nodes[index] + ".r")
         else:
             mc.connectAttr(self.fk1_ctl + ".rx", self.upper_rot_sc_jnts[-1] + ".rx")
             mc.pointConstraint(self.lower_start_bind,
@@ -890,7 +924,7 @@ class Rig(assembler.Rig):
                                                         maxValue=1,
                                                         keyable=True)
             name = self.generate_name("lower", "{}", "ctl")
-            uvpin2 = nurbs.ribbon(root,
+            uvpin3 = nurbs.ribbon(root,
                                   name,
                                   positions[2:4],
                                   normal,
@@ -908,35 +942,50 @@ class Rig(assembler.Rig):
             mc.connectAttr(self.leg_output_nodes[-1] + ".matrix",
                            aim_m + ".primaryTargetMatrix",
                            force=True)
+
+            name = self.generate_name("div3Offset", "npo", "ctl")
+            div3_offset_npo = matrix.transform(parent=self.root, name=name, m=orig_m)
+
+            name = self.generate_name("div3Offset", "pos", "ctl")
+            div3_offset = mc.createNode("transform", name=name, parent=div3_offset_npo)
+            mc.setAttr(div3_offset + ".tz", 1)
+            mc.connectAttr(uvpin3 + ".outputMatrix[{0}]".format(len(division3_v_values) - 2),
+                           div3_offset + ".offsetParentMatrix")
+
             decom_m = mc.createNode("decomposeMatrix")
-            mc.connectAttr(uvpin2 + ".outputMatrix[{0}]".format(len(division3_v_values) - 2),
-                           decom_m + ".inputMatrix")
+            mc.connectAttr(div3_offset + ".worldMatrix[0]", decom_m + ".inputMatrix")
 
             pma = mc.createNode("plusMinusAverage")
             mc.setAttr(pma + ".operation", 2)
-            mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[1]")
-
-            mult_m = mc.createNode("multMatrix")
-            mc.connectAttr(uvpin2 + ".outputMatrix[{0}]".format(len(division3_v_values) - 2),
-                           mult_m + ".matrixIn[0]")
-            mc.connectAttr(self.root + ".worldInverseMatrix[0]", mult_m + ".matrixIn[1]")
-
-            name = self.generate_name("div2Offset", "tz", "ctl")
-            offset_node = mc.createNode("transform", name=name, parent=self.root)
-            mc.connectAttr(mult_m + ".matrixSum", offset_node + ".offsetParentMatrix")
-            mc.setAttr(offset_node + ".tz", 1)
-
-            decom_m = mc.createNode("decomposeMatrix")
-            mc.connectAttr(offset_node + ".worldMatrix[0]", decom_m + ".inputMatrix")
             mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[0]")
 
-            cons = mc.aimConstraint(self.leg_output_nodes[index + 1],
-                                    self.leg_output_nodes[index],
-                                    aimVector=(-1, 0, 0) if negate else (1, 0, 0),
-                                    upVector=(0, 0, 1),
-                                    worldUpType="vector",
-                                    worldUpVector=(0, 1, 0))[0]
-            mc.connectAttr(pma + ".output3D", cons + ".worldUpVector")
+            name = self.generate_name("div3Orig", "npo", "ctl")
+            div3_orig_npo = matrix.transform(parent=self.root, name=name, m=orig_m)
+
+            name = self.generate_name("div3Orig", "pos", "ctl")
+            div3_orig = matrix.transform(parent=div3_orig_npo, name=name, m=orig_m)
+            mc.connectAttr(uvpin3 + ".outputMatrix[{0}]".format(len(division3_v_values) - 2),
+                           div3_orig + ".offsetParentMatrix")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(div3_orig + ".worldMatrix[0]", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputTranslate", pma + ".input3D[1]")
+
+            aim_m = mc.createNode("aimMatrix")
+            mc.connectAttr(div3_orig + ".worldMatrix[0]", aim_m + ".inputMatrix")
+            mc.connectAttr(self.leg_output_nodes[index + 1] + ".worldMatrix[0]", aim_m + ".primaryTargetMatrix")
+            mc.connectAttr(div3_offset + ".worldMatrix[0]", aim_m + ".secondaryTargetMatrix")
+            mc.setAttr(aim_m + ".secondaryInputAxis", 0, 0, 1)
+            mc.setAttr(aim_m + ".primaryMode", 1)
+            mc.setAttr(aim_m + ".secondaryMode", 1)
+
+            mult_m = mc.createNode("multMatrix")
+            mc.connectAttr(aim_m + ".outputMatrix", mult_m + ".matrixIn[0]")
+            mc.connectAttr(self.leg_output_nodes[index] + ".parentInverseMatrix", mult_m + ".matrixIn[1]")
+
+            decom_m = mc.createNode("decomposeMatrix")
+            mc.connectAttr(mult_m + ".matrixSum", decom_m + ".inputMatrix")
+            mc.connectAttr(decom_m + ".outputRotate", self.leg_output_nodes[index] + ".r")
         else:
             mc.connectAttr(self.fk2_ctl + ".rx", self.lower_start_bind + ".rx")
 
